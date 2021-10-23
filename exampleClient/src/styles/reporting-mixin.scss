@@ -1,0 +1,32 @@
+@import '~@angular/material/_theming';
+@mixin reporting_mixin($theme, $fontConfig) {
+  $fc-primary-color: map-get($theme, primary);
+  $fc-primary-color-light: map-get($theme, primary);
+  $fc-accent-color: map-get($theme, accent);
+  $fc-warn-color: map-get($theme, warn);
+  $foreground: map-get($theme, foreground);
+  $background: map-get($theme, background);
+
+  .chip-edit {
+    background: mat-color($fc-primary-color) !important;
+  }
+
+  .chip-read {
+    background: mat-color($fc-accent-color) !important;
+  }
+
+  .chip-delete {
+    background: mat-color($fc-warn-color) !important;
+  }
+
+  .list-item.active {
+    border-left-color: mat-color($fc-accent-color) !important;
+    background-color: #e8edf1;
+  }
+
+  .share-cancel-btn {
+    opacity: 0.8;
+    float: right;
+    color: mat-color($fc-accent-color);
+  }
+}

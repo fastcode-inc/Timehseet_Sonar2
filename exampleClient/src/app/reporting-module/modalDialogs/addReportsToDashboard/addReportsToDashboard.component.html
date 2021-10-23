@@ -1,0 +1,84 @@
+<div class="create-item">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ 'REPORTING.LABELS.ADD-TO-DASHBOARD-TITLE' | translate }}</mat-card-title>
+      <a name="cancel" href="javascript:void(0)" (click)="onNoClick()" class="cancle-btn"
+        ><i class="material-icons">add_circle</i></a
+      >
+    </mat-card-header>
+    <mat-card-content>
+      <mat-radio-group aria-label="Select dashboard" [(ngModel)]="choosedashboard">
+        <mat-radio-button value="existing">{{ 'REPORTING.LABELS.EXISTING-DASHBOARD' | translate }}</mat-radio-button>
+        <mat-radio-button value="new">{{ 'REPORTING.LABELS.NEW-DASHBOARD' | translate }}</mat-radio-button>
+      </mat-radio-group>
+      <!-- <mat-divider style="margin:20px 0;"></mat-divider> -->
+      <div *ngIf="choosedashboard === 'existing'">
+        <!-- <p class="mb-20">Add to existing dashboard</p> -->
+        <mat-form-field class="example-full-width">
+          <mat-label>{{ 'REPORTING.LABELS.SELECT-DASHBOARD' | translate }}</mat-label>
+          <mat-select [(ngModel)]="dashboard.title">
+            <mat-option *ngFor="let d of data" [value]="d.id">{{ d.title }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div *ngIf="choosedashboard === 'new'">
+        <!-- <p class="mb-20">Creating new dashboard</p> -->
+        <mat-form-field>
+          <mat-label>{{ 'REPORTING.LABELS.TITLE' | translate }}</mat-label>
+          <input
+            matInput
+            placeholder="{{ 'REPORTING.LABELS.DASHBOARD.TITLE-PLACEHOLDER' | translate }}"
+            [(ngModel)]="dashboard.title"
+          />
+        </mat-form-field>
+        <mat-form-field class="example-full-width">
+          <mat-label>{{ 'REPORTING.LABELS.DESCRIPTION' | translate }}</mat-label>
+          <textarea
+            matInput
+            placeholder="{{ 'REPORTING.LABELS.DASHBOARD.DESCRIPTION-PLACEHOLDER' | translate }}"
+            [(ngModel)]="dashboard.description"
+          ></textarea>
+        </mat-form-field>
+      </div>
+      <mat-form-field>
+        <mat-label>{{ 'REPORTING.LABELS.REPORT.TITLE' | translate }}</mat-label>
+        <input
+          matInput
+          placeholder="{{ 'REPORTING.LABELS.REPORT.TITLE-PLACEHOLDER' | translate }}"
+          [(ngModel)]="report.title"
+        />
+      </mat-form-field>
+      <mat-form-field class="example-full-width">
+        <mat-label>{{ 'REPORTING.LABELS.REPORT.DESCRIPTION' | translate }}</mat-label>
+        <textarea
+          matInput
+          placeholder="{{ 'REPORTING.LABELS.REPORT.DESCRIPTION-PLACEHOLDER' | translate }}"
+          [(ngModel)]="report.description"
+        ></textarea>
+      </mat-form-field>
+      <mat-form-field class="example-full-width">
+        <mat-label fcHelp="{{ 'REPORTING.LABELS.REPORT.WIDTH-HELP' | translate }}">{{
+          'REPORTING.LABELS.REPORT.WIDTH' | translate
+        }}</mat-label>
+        <mat-select [(ngModel)]="report.width">
+          <mat-option [value]="'smallchart'">{{
+            'REPORTING.LABELS.REPORT.WIDTH-OPTIONS.SMALL' | translate
+          }}</mat-option>
+          <mat-option [value]="'mediumchart'">{{
+            'REPORTING.LABELS.REPORT.WIDTH-OPTIONS.MEDIUM' | translate
+          }}</mat-option>
+          <mat-option [value]="'largechart'">{{
+            'REPORTING.LABELS.REPORT.WIDTH-OPTIONS.LARGE' | translate
+          }}</mat-option>
+          <mat-option [value]="'fullchart'">{{ 'REPORTING.LABELS.REPORT.WIDTH-OPTIONS.FULL' | translate }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </mat-card-content>
+    <mat-card-actions class="fc-text-right">
+      <!-- <button mat-button (click)="onNoClick()">No Thanks</button> -->
+      <button mat-raised-button color="primary" cdkFocusInitial (click)="getDashboardData()">
+        {{ 'GENERAL.ACTIONS.SAVE' | translate }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

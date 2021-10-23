@@ -1,0 +1,155 @@
+<div class="dashboard-container" *ngIf="dashboard">
+  <mat-card>
+    <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="10px" class="mb-20 details-container">
+      <div fxLayout="row" gdAlignRows="center" fxLayoutAlign="start" fxLayoutGap="10px">
+        <div class="top-breadcrumb">
+          <h3 class="template-title-small">{{ dashboard.title }}</h3>
+        </div>
+        <p>{{ dashboard.description }}</p>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="end center">
+        <mat-button-toggle-group
+          appearance="legacy"
+          [(ngModel)]="selectedVersion"
+          (change)="switchVersion($event)"
+          name="fontStyle"
+          aria-label="Font Style"
+        >
+          <mat-button-toggle value="running">Running</mat-button-toggle>
+          <mat-button-toggle value="published">Published</mat-button-toggle>
+        </mat-button-toggle-group>
+        <button
+          [disabled]="selectedVersion != 'running'"
+          mat-button
+          [matMenuTriggerFor]="menu"
+          style="margin-bottom: auto"
+        >
+          <mat-icon [color]="selectedVersion != 'running' ? null : 'accent'"> more_vert </mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="previewDashboard(dashboard.id)">
+            <mat-icon class="menu-icon">visibility</mat-icon>
+            {{ 'REPORTING.LABELS.PREVIEW' | translate }}
+          </button>
+
+          <button mat-menu-item *ngIf="!dashboard.sharedWithMe || dashboard.editable" (click)="editDashboard()">
+            <mat-icon class="menu-icon">save</mat-icon>
+            {{ 'GENERAL.ACTIONS.SAVE' | translate }}
+          </button>
+          <button
+            mat-menu-item
+            *ngIf="
+              !dashboard.isRefreshed &&
+              dashboard.sharedWithMe &&
+              dashboard.ownerSharingStatus &&
+              dashboard.recipientSharingStatus
+            "
+            (click)="refreshDashboard(dashboard.id)"
+          >
+            <mat-icon class="menu-icon">sync</mat-icon>
+            {{ 'REPORTING.LABELS.REFRESH' | translate }}
+          </button>
+          <button
+            mat-menu-item
+            *ngIf="dashboard.sharedWithMe && !dashboard.isResetted"
+            (click)="resetDashboard(dashboard.id)"
+          >
+            <mat-icon class="menu-icon">refresh</mat-icon>
+            {{ 'REPORTING.LABELS.RESET' | translate }}
+          </button>
+          <button
+            mat-menu-item
+            *ngIf="!dashboard.sharedWithMe && dashboard.isShareable"
+            [matMenuTriggerFor]="sharemenu"
+          >
+            <mat-icon class="menu-icon">group_add</mat-icon>
+            {{ 'REPORTING.LABELS.SHARE' | translate }}
+          </button>
+          <button
+            mat-menu-item
+            *ngIf="!dashboard.isPublished && !dashboard.sharedWithMe"
+            (click)="publishDashboard(dashboard.id)"
+          >
+            <mat-icon class="menu-icon">publish</mat-icon>
+            {{ 'REPORTING.LABELS.PUBLISH' | translate }}
+          </button>
+          <button mat-menu-item *ngIf="!dashboard.sharedWithMe" (click)="deleteDashboard(dashboard)">
+            <mat-icon class="menu-icon">delete</mat-icon>
+            {{ 'GENERAL.ACTIONS.DELETE' | translate }}
+          </button>
+          <button mat-menu-item *ngIf="!dashboard.sharedWithMe" (click)="changeOwner()">
+            <mat-icon class="menu-icon">repeat</mat-icon>
+            {{ 'REPORTING.LABELS.TRANSFER-OWNERSHIP' | translate }}
+          </button>
+        </mat-menu>
+        <mat-menu #sharemenu="matMenu">
+          <button mat-menu-item (click)="share()">
+            <mat-icon class="menu-icon">group</mat-icon>
+            {{ 'REPORTING.LABELS.SHARE-WITH-APP-USERS' | translate }}
+          </button>
+          <button mat-menu-item (click)="shareExternally(dashboard)">
+            <mat-icon class="menu-icon">link</mat-icon>
+            {{ 'REPORTING.LABELS.SHARE-EXTERNALLY' | translate }}
+          </button>
+          <button mat-menu-item *ngIf="!dashboard.sharedWithMe && dashboard.isShareable" (click)="manageSharing()">
+            <mat-icon class="menu-icon">settings</mat-icon>
+            {{ 'REPORTING.LABELS.MANAGE-SHARING' | translate }}
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+    <div fxLayout="row" class="charts-container" cdkDropList (cdkDropListDropped)="drop($event)">
+      <div *ngFor="let report of dashboard.reportDetails; let i = index" cdkDrag [class]="report.reportWidth">
+        <div class="innerChartBlock">
+          <div fxLayout="row" fxLayoutAlign="end center" fxLayoutGap="10px">
+            <div class="chartoptions" appDropdown>
+              <button [disabled]="selectedVersion != 'running'" mat-button [matMenuTriggerFor]="actions">
+                <mat-icon [color]="selectedVersion != 'running' ? null : 'accent'"> more_vert </mat-icon>
+              </button>
+
+              <mat-menu #actions="matMenu">
+                <button mat-menu-item [matMenuTriggerFor]="size">
+                  <mat-icon>photo_size_select_large</mat-icon>{{ 'REPORTING.LABELS.SIZE' | translate }}
+                </button>
+                <button mat-menu-item *ngIf="!report.sharedWithMe || report.editable" (click)="editReport(report)">
+                  <mat-icon>edit</mat-icon>{{ 'GENERAL.ACTIONS.EDIT' | translate }}
+                </button>
+                <button mat-menu-item (click)="deleteReport(dashboard.id, report.id)">
+                  <mat-icon>delete</mat-icon>{{ 'GENERAL.ACTIONS.DELETE' | translate }}
+                </button>
+                <button mat-menu-item (click)="refreshChart(report.id)">
+                  <mat-icon>refresh</mat-icon>{{ 'REPORTING.LABELS.REFRESH' | translate }}
+                </button>
+              </mat-menu>
+
+              <mat-menu #size="matMenu">
+                <button mat-menu-item (click)="setSize('smallchart', i)">
+                  {{ 'REPORTING.LABELS.REPORT.WIDTH-OPTIONS.SMALL' | translate }}
+                </button>
+                <button mat-menu-item (click)="setSize('mediumchart', i)">
+                  {{ 'REPORTING.LABELS.REPORT.WIDTH-OPTIONS.MEDIUM' | translate }}
+                </button>
+                <button mat-menu-item (click)="setSize('largechart', i)">
+                  {{ 'REPORTING.LABELS.REPORT.WIDTH-OPTIONS.LARGE' | translate }}
+                </button>
+                <button mat-menu-item (click)="setSize('fullchart', i)">
+                  {{ 'REPORTING.LABELS.REPORT.WIDTH-OPTIONS.FULL' | translate }}
+                </button>
+              </mat-menu>
+            </div>
+          </div>
+          <app-chart
+            [chartType]="report.reportType"
+            [query]="report.query"
+            [ctype]="report.ctype"
+            [title]="report.title"
+          >
+          </app-chart>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>
+<section class="spinner-container" *ngIf="loading">
+  <mat-spinner></mat-spinner>
+</section>

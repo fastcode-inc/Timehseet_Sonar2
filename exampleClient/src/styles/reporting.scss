@@ -1,0 +1,304 @@
+.width-1h {
+  width: 100px;
+}
+.width-2h {
+  width: 200px;
+}
+.mat-radio-button ~ .mat-radio-button {
+  margin-left: 16px;
+}
+
+//   .mat-drawer-container {
+//     background-color: #fff;
+//   }
+
+.text-center {
+  text-align: center;
+}
+.mt-10 {
+  margin-top: 10px;
+}
+.mt-20 {
+  margin-top: 20px;
+}
+.mt-30 {
+  margin-top: 30px;
+}
+.mt-50 {
+  margin-top: 50px;
+}
+.mb-10 {
+  margin-bottom: 10px;
+}
+.mb-20 {
+  margin-bottom: 20px;
+}
+.mb-30 {
+  margin-bottom: 30px;
+}
+.mb-50 {
+  margin-bottom: 50px;
+}
+.my-20 {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+.my-30 {
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+.mt-50 {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+.m-10 {
+  margin: 10px;
+}
+.m-20 {
+  margin: 20px;
+}
+.m-30 {
+  margin: 30px;
+}
+.m-50 {
+  margin: 50px;
+}
+/**************** Side Bar Navigation Styles *****************/
+mat-nav-list.navlist-sidebar {
+  width: 300px;
+}
+
+/***************** Header Bar Navigation Styles *****************/
+.main-menu {
+  margin-left: 2em;
+}
+.main-menu a.active {
+  background: #45267b;
+}
+
+/***************** Schema Page Styles *****************/
+.schema-left-panel {
+  border-right: 1px solid #ddd;
+}
+.schema-right-panel {
+  padding: 20px;
+}
+.mat-tab-list .mat-tab-label {
+  min-width: 100px;
+}
+.dbname {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+.dbname + mat-list.mat-list.mat-list-base {
+  height: 0;
+  -webkit-transition: 0.26s all ease-in;
+  transition: 0.26s all ease-in;
+  overflow: auto;
+  position: relative;
+  background: #fff;
+}
+.dbname.open + mat-list.mat-list.mat-list-base {
+  height: 200px;
+}
+
+/***************** Reports Page Styles *****************/
+.chartoptions-container {
+  margin: 30px;
+}
+.chartoptions {
+  position: relative;
+  padding: 0 10px;
+}
+.chartoptions .dropdown-list {
+  position: absolute;
+  background: #fff;
+  z-index: 2;
+  box-shadow: 0px 0px 3px #ccc;
+  transition: all 0.3s ease-in-out;
+  list-style: none;
+  //display: none;
+  max-height: 0px;
+  overflow: auto;
+}
+.chartoptions.open .dropdown-list {
+  //display: block;
+  max-height: 200px;
+}
+//.chartoptions .dropdown-list li:first-child{
+//  padding-top: 20px;
+//}
+//.chartoptions .dropdown-list li:last-child{
+//  padding-bottom: 20px;
+//}
+.chartoptions .dropdown-list li {
+  padding: 10px 15px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.chartoptions .dropdown-list li:hover {
+  background: #eee;
+}
+mat-accordion.mat-accordion {
+  width: 150px;
+}
+// .mat-expansion-panel, .mat-expansion-panel-header{
+//   height: 48px !important;
+// }
+// .mat-expansion-panel-content {
+//   display: flex;
+//   flex-direction: column;
+//   overflow: visible;
+//   position: absolute;
+//   background: #FFF;
+//   z-index: 2;
+//   box-shadow: 0px 0px 3px #ccc;
+// }
+.mat-stroked-button.filter-input-container {
+  padding: 0px;
+}
+.filter-input-container .input-values {
+  list-style: none;
+  display: flex;
+  align-items: center;
+}
+.filter-input-container .input-values li {
+  margin: 0 5px;
+}
+.filter-input-container .input-values li span {
+  background: #eee;
+  border: 1px solid #ddd;
+  padding: 3px 9px;
+  align-items: center;
+  display: flex;
+  text-transform: capitalize;
+  height: 26px;
+  font-weight: 400;
+  font-size: 14px;
+}
+.filter-input-container .input-values li input {
+  border: none;
+  height: 24px;
+  outline: none;
+}
+
+.chart-block {
+  // box-shadow: 0px 0px 5px rgba(0,0,0,0.2);
+  padding: 20px 20px;
+  margin: 20px;
+}
+.chart-block .chatoptions-container {
+  margin: 0px;
+}
+.chart-block mat-form-field {
+  width: 100%;
+}
+
+.criteria-panel mat-form-field {
+  width: 100%;
+}
+
+/***************** Dashboard Page Styles *****************/
+.delete-dash {
+  position: absolute;
+  right: 20px;
+  top: 35px;
+}
+.dashboard-cards {
+  // width:50%;
+  margin: 20px;
+}
+
+.dashboard-conatiner {
+  padding: 50px 20px 100px;
+}
+.charts-container {
+  height: 100%;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.report-preview-container {
+  padding: 25px;
+  background: #fff;
+}
+
+/* @media screen and (min-width: 992px) {
+    .smallchart{width:25%;}
+    .mediumchart{width:50%;}
+    .largechart{width:75%;}
+    .fullchart{width:100%;}
+  } */
+/*.smallchart, .mediumchart, .largechart, .fullchart{
+    position: absolute;
+    top: 0;
+    left: 0;
+    box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+    background: #fff;
+    padding: 20px;
+  }*/
+.smallchart,
+.mediumchart,
+.largechart,
+.fullchart {
+  padding: 15px;
+}
+.innerChartBlock {
+  background: #fff;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  position: relative;
+  width: 100%;
+}
+.smallchart {
+  width: 25%;
+  padding: 10px;
+}
+.mediumchart {
+  width: 50%;
+  padding: 10px;
+}
+.largechart {
+  width: 75%;
+  padding: 10px;
+}
+.fullchart {
+  width: 100%;
+  padding: 10px;
+}
+
+@media screen and (max-width: 992px) {
+  .smallchart,
+  .mediumchart,
+  .largechart,
+  .fullchart {
+    width: 100%;
+    position: relative;
+    transform: none !important;
+  }
+}
+
+.mat-chip-list .mat-chip-list-wrapper {
+  width: 100%;
+  padding-top: 5px;
+}
+
+//// report list styles
+
+app-schema .mat-expansion-panel-content {
+  // max-height: 250px;
+  // overflow-y: auto !important;
+  // overflow-x: hidden !important;
+  mat-list {
+    max-height: 205px;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+}
+app-schema .mat-expansion-panel-spacing {
+  margin: 0px !important;
+}
+
+app-myreports-main .mat-tab-body-wrapper {
+  height: 100%;
+}

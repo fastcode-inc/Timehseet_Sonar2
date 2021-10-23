@@ -1,0 +1,161 @@
+<div fxLayout fxLayoutGap="20" class="list-container">
+  <div fxLayout="column" *ngIf="showList || !isMediumDeviceOrLess" fxFlex="{{ listFlexWidth }}" class="report-list">
+    <div class="sort-value-block">
+      <mat-form-field class="full-width">
+        <input
+          matInput
+          placeholder="{{ 'REPORTING.LABELS.REPORT.SEARCH' | translate }}"
+          [(ngModel)]="searchText"
+          (ngModelChange)="applyFilters()"
+        />
+      </mat-form-field>
+      <div class="create-report">
+        <button name="add" mat-raised-button color="primary" routerLink="/reporting/reports/add">
+          <i class="material-icons"> add_circle_outline </i> &nbsp;{{ 'GENERAL.ACTIONS.ADD' | translate }}
+        </button>
+      </div>
+    </div>
+
+    <div class="list" (onScroll)="onTableScroll()" appVirtualScroll>
+      <div
+        *ngFor="let report of items"
+        [ngClass]="{ 'list-item': true, active: selectedReport?.id === report.id }"
+        class="list-item"
+        (click)="viewReport(report)"
+      >
+        <span class="report-icon">
+          <mat-icon>description</mat-icon>
+        </span>
+        <div fxLayout="fc-row" style="width: calc(100% - 24px)">
+          <div class="title" fxFlex>
+            {{ report.title || ('REPORTING.LABELS.REPORT.UNTITLED' | translate) }}
+          </div>
+        </div>
+        <div class="content" style="width: calc(100% - 50px)">
+          <span>{{ report.description || '--' }}</span>
+        </div>
+
+        <div class="actions-menu">
+          <button mat-icon-button (click)="$event.stopPropagation()" [matMenuTriggerFor]="actions">
+            <mat-icon color="accent"> more_vert </mat-icon>
+          </button>
+          <mat-menu #actions="matMenu">
+            <button mat-menu-item (click)="addReporttoDashboardDialog(report)">
+              <mat-icon>add</mat-icon>
+              <span>{{ 'REPORTING.LABELS.ADD-TO-DASHBOARD-TITLE' | translate }}</span>
+            </button>
+            <button mat-menu-item *ngIf="!report.sharedWithMe || report.editable" (click)="editReport(report.id)">
+              <mat-icon>edit</mat-icon>
+              <span>{{ 'GENERAL.ACTIONS.EDIT' | translate }}</span>
+            </button>
+            <button
+              mat-menu-item
+              *ngIf="
+                !report.isRefreshed && report.sharedWithMe && report.ownerSharingStatus && report.recipientSharingStatus
+              "
+              (click)="refreshReport(report.id)"
+            >
+              <mat-icon>sync</mat-icon>
+              <span>{{ 'REPORTING.LABELS.REFRESH' | translate }}</span>
+            </button>
+            <button mat-menu-item *ngIf="!report.isResetted && report.sharedWithMe" (click)="resetReport(report.id)">
+              <mat-icon>refresh</mat-icon>
+              <span>{{ 'REPORTING.LABELS.RESET' | translate }}</span>
+            </button>
+            <button mat-menu-item *ngIf="!report.sharedWithMe" [matMenuTriggerFor]="sharemenu">
+              <mat-icon class="menu-icon">group_add</mat-icon>
+              {{ 'REPORTING.LABELS.SHARE' | translate }}
+            </button>
+            <button
+              mat-menu-item
+              *ngIf="!report.isPublished && !report.sharedWithMe"
+              (click)="publishReport(report.id)"
+            >
+              <mat-icon>publish</mat-icon>
+              <span>{{ 'REPORTING.LABELS.PUBLISH' | translate }}</span>
+            </button>
+            <button mat-menu-item *ngIf="!report.sharedWithMe" (click)="deleteReport(report)">
+              <mat-icon class="menu-icon">delete</mat-icon>
+              {{ 'GENERAL.ACTIONS.DELETE' | translate }}
+            </button>
+            <button mat-menu-item *ngIf="!report.sharedWithMe" (click)="changeOwner(report)">
+              <mat-icon class="menu-icon">repeat</mat-icon>
+              {{ 'REPORTING.LABELS.TRANSFER-OWNERSHIP' | translate }}
+            </button>
+          </mat-menu>
+          <mat-menu #sharemenu="matMenu">
+            <button mat-menu-item *ngIf="!report.sharedWithMe" (click)="share(report)">
+              <mat-icon class="menu-icon">people</mat-icon>
+              {{ 'REPORTING.LABELS.SHARE-WITH-APP-USERS' | translate }}
+            </button>
+            <button mat-menu-item *ngIf="!report.sharedWithMe" (click)="shareExternally(report)">
+              <mat-icon class="menu-icon">link</mat-icon>
+              {{ 'REPORTING.LABELS.SHARE-EXTERNALLY' | translate }}
+            </button>
+            <button mat-menu-item *ngIf="!report.sharedWithMe" (click)="manageSharing(report)">
+              <mat-icon class="menu-icon">settings</mat-icon>
+              {{ 'REPORTING.LABELS.MANAGE-SHARING' | translate }}
+            </button>
+          </mat-menu>
+        </div>
+        <span class="share-icon">
+          <mat-icon *ngIf="report.sharedWithMe">group</mat-icon>
+        </span>
+      </div>
+      <section class="small-spinner-container" *ngIf="isLoading">
+        <mat-spinner></mat-spinner>
+      </section>
+      <div class="nothing-to-see" *ngIf="items.length == 0">
+        <span>{{ 'REPORTING.MESSAGES.REPORT.NO-REPORT-AVAILABLE' | translate }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div
+    class="details-container report-preview-container"
+    fxLayout="column"
+    *ngIf="!showList || !isMediumDeviceOrLess"
+    fxFlex="{{ detailsFlexWidth }}"
+  >
+    <div class="fc-col-sm-12" *ngIf="isMediumDeviceOrLess">
+      <button
+        color="accent"
+        mat-flat-button
+        class="full-width"
+        (click)="showList = !showList"
+        class="back-to-reportlist-btn"
+      >
+        <mat-icon>reply_all</mat-icon>&nbsp;&nbsp;Go back to list
+      </button>
+    </div>
+
+    <div class="nothing-to-see" *ngIf="!selectedReport?.id">
+      <span>No Report Seclected</span>
+    </div>
+    <div *ngIf="selectedReport !== undefined" style="width: 100%" class="mt-50">
+      <mat-button-toggle-group
+        appearance="legacy"
+        [(ngModel)]="selectedVersion"
+        (change)="switchVersion($event)"
+        name="fontStyle"
+        aria-label="Font Style"
+      >
+        <mat-button-toggle value="running">Running</mat-button-toggle>
+        <mat-button-toggle value="published">Published</mat-button-toggle>
+      </mat-button-toggle-group>
+      <button mat-stroked-button color="primary" class="refresh-button" title="Refresh" (click)="refreshChart()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <app-chart
+        style="width: 100%"
+        [ctype]="selectedReport?.ctype"
+        [chartType]="selectedReport?.reportType"
+        [query]="selectedReport?.query"
+        [title]="selectedReport?.title"
+      ></app-chart>
+    </div>
+  </div>
+</div>
+<section class="spinner-container" *ngIf="loading">
+  <mat-spinner></mat-spinner>
+</section>

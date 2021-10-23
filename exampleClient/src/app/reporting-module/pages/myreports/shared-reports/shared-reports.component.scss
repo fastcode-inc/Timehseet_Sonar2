@@ -1,0 +1,19 @@
+table {
+  width: 100%;
+}
+
+.list-container {
+  height: calc(100vh - 120px);
+  padding: 24px;
+  padding-bottom: 12px;
+  margin: 0 !important;
+  overflow: auto;
+  overflow-x: hidden;
+}
+
+@media (max-width: 767px) {
+  .mat-table {
+    overflow: auto;
+    min-width: 600px;
+  }
+}

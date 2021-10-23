@@ -1,0 +1,129 @@
+<div class="create-entry newjob-popup">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ title }}</mat-card-title>
+      <a href="javascript:void(0)" (click)="onCancel()" class="cancle-btn"><i class="material-icons">add_circle</i></a>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="jobForm" #jobNgForm="ngForm" (ngSubmit)="onSubmit()" class="job-form">
+        <div class="fc-row">
+          <div class="fc-col-md-6">
+            <mat-form-field class="full-width">
+              <mat-label fcHelp="{{ 'JOBS.FIELDS.NAME-HELP' | translate }}">{{
+                'JOBS.FIELDS.NAME' | translate
+              }}</mat-label>
+              <input formControlName="jobName" matInput required />
+              <mat-error *ngIf="!jobForm.get('jobName').valid && jobForm.get('jobName').touched">
+                {{ 'SCHEDULER-GENERAL.ERRORS.REQUIRED' | translate }}</mat-error
+              >
+            </mat-form-field>
+          </div>
+          <div class="fc-col-md-6">
+            <mat-form-field class="full-width">
+              <mat-label fcHelp="{{ 'JOBS.FIELDS.GROUP-HELP' | translate }}">{{
+                'JOBS.FIELDS.GROUP' | translate
+              }}</mat-label>
+              <input formControlName="jobGroup" matInput [matAutocomplete]="auto" required />
+              <mat-autocomplete #auto="matAutocomplete">
+                <mat-option *ngFor="let group of filteredOptions | async" [value]="group">
+                  {{ group }}
+                </mat-option>
+              </mat-autocomplete>
+              <mat-error *ngIf="!jobForm.get('jobGroup').valid && jobForm.get('jobGroup').touched">
+                {{ 'SCHEDULER-GENERAL.ERRORS.REQUIRED' | translate }}</mat-error
+              >
+            </mat-form-field>
+          </div>
+          <div class="fc-col-md-6">
+            <mat-form-field class="full-width">
+              <mat-label fcHelp="{{ 'JOBS.FIELDS.CLASS-HELP' | translate }}">{{
+                'JOBS.FIELDS.CLASS-PLACEHOLDER' | translate
+              }}</mat-label>
+              <mat-select formControlName="jobClass" required>
+                <mat-option *ngFor="let jc of jobClasses" [value]="jc">
+                  {{ jc }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="!jobForm.get('jobClass').valid && jobForm.get('jobClass').touched">
+                {{ 'SCHEDULER-GENERAL.ERRORS.REQUIRED' | translate }}</mat-error
+              >
+            </mat-form-field>
+          </div>
+          <div class="fc-col-md-6 checkbox-sp">
+            <span>
+              <mat-checkbox formControlName="isDurable">
+                {{ 'JOBS.FIELDS.IS-DURABLE' | translate }}
+                <mat-label fcHelp="{{ 'JOBS.FIELDS.IS-DURABLE-HELP' | translate }}"></mat-label>
+              </mat-checkbox>
+            </span>
+          </div>
+          <div class="fc-col-md-6">
+            <mat-form-field class="full-width">
+              <mat-label fcHelp="{{ 'JOBS.FIELDS.DESCRIPTION-HELP' | translate }}">{{
+                'JOBS.FIELDS.DESCRIPTION' | translate
+              }}</mat-label>
+              <textarea formControlName="description" matInput></textarea>
+              <mat-error *ngIf="!jobForm.get('description').valid && jobForm.get('description').touched">
+                {{ 'SCHEDULER-GENERAL.ERRORS.LENGTH-EXCEDDING' | translate: { length: 80 } }}</mat-error
+              >
+            </mat-form-field>
+          </div>
+          <div class="fc-col-md-12">
+            <div class="full-width">
+              <label style="display: flex; margin-bottom: 20px"
+                >{{ 'JOBS.FIELDS.JOB-MAP-DATA' | translate }}
+                <span fcHelp="{{ 'JOBS.FIELDS.JOB-MAP-DATA-HELP' | translate }}"></span>
+                <mat-icon (click)="addJobData()" style="cursor: pointer">add_circle</mat-icon>
+              </label>
+              <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+                <ng-container matColumnDef="key">
+                  <th mat-header-cell *matHeaderCellDef>{{ 'JOB-DATA.KEY' | translate }}</th>
+                  <td mat-cell *matCellDef="let element">
+                    <input
+                      matInput
+                      [(ngModel)]="element.dataKey"
+                      [ngModelOptions]="{ standalone: true }"
+                      placeholder="Enter key name"
+                    />
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="value">
+                  <th mat-header-cell *matHeaderCellDef>{{ 'JOB-DATA.VALUE' | translate }}</th>
+                  <td mat-cell *matCellDef="let element">
+                    <input
+                      matInput
+                      [(ngModel)]="element.dataValue"
+                      [ngModelOptions]="{ standalone: true }"
+                      placeholder="Enter value"
+                    />
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>{{ 'SCHEDULER-GENERAL.ACTIONS.ACTIONS' | translate }}</th>
+                  <td mat-cell *matCellDef="let element; let i = index" class="fc-text-center">
+                    <mat-icon (click)="removeJobData(i)" style="cursor: pointer">remove_circle</mat-icon>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+    <mat-card-actions class="fc-text-right">
+      <button
+        color="primary"
+        mat-raised-button
+        (click)="jobNgForm.ngSubmit.emit()"
+        [disabled]="!jobForm.valid || loading"
+      >
+        {{ 'SCHEDULER-GENERAL.ACTIONS.SAVE' | translate }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

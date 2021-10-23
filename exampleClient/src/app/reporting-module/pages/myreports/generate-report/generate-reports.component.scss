@@ -1,0 +1,48 @@
+.filter-chip {
+  max-width: 100%;
+  //float: right;
+  span {
+    max-width: calc(100% - 21px);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}
+.aggregate-measure {
+  width: 50%;
+  text-align: center;
+  font-size: medium;
+}
+.filter-input {
+  text-align: initial;
+  margin-left: 10px;
+}
+
+.options {
+  font-size: medium;
+  min-width: auto;
+}
+
+.filter-row {
+  align-items: center;
+  background: #f5f5f5;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  width: 60%;
+}
+
+.criteria-panel {
+  margin: 20px !important;
+}
+
+.chart-block {
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+  padding: 20px 20px;
+  margin: 20px;
+  overflow: auto;
+}
+
+.chart-container {
+  width: fit-content;
+  min-width: 100%;
+}

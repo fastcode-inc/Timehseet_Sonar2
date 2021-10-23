@@ -1,0 +1,31 @@
+<div class="full-height">
+  <a name="cancel" href="javascript:void(0)" (click)="cancel()" class="share-cancel-btn"
+    ><i class="material-icons">cancel</i></a
+  >
+  <mat-tab-group class="share-tab-group">
+    <mat-tab label="{{ 'REPORTING.LABELS.USERS' | translate }}">
+      <app-share-picker
+        [displayField]="userDescriptiveField"
+        [serviceMethod]="usersServiceMethod"
+        [shareType]="data.type"
+        [primaryKeys]="userPrimaryKeys"
+        (selectionUpdated)="selectionUpdated($event, 'usersList')"
+      >
+      </app-share-picker>
+    </mat-tab>
+    <mat-tab label="{{ 'REPORTING.LABELS.ROLES' | translate }}">
+      <app-share-picker
+        [displayField]="roleDescriptiveField"
+        [serviceMethod]="roleServiceMethod"
+        [shareType]="data.type"
+        [primaryKeys]="rolePrimaryKeys"
+        (selectionUpdated)="selectionUpdated($event, 'rolesList')"
+      >
+      </app-share-picker>
+    </mat-tab>
+  </mat-tab-group>
+
+  <button name="save" mat-raised-button color="primary" class="select-btn" (click)="select()">
+    {{ 'GENERAL.ACTIONS.SELECT' | translate }}
+  </button>
+</div>

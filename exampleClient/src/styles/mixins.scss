@@ -1,0 +1,7 @@
+@import './../app/extended/core/main-nav/main-nav-mixin.component.scss';
+@import './dynamic-styles.scss';
+@import './reporting-mixin.scss';
+
+@include main-nav-mixin($fc-theme, $fontConfig);
+@include main-style($fc-theme, $fontConfig);
+@include reporting_mixin($fc-theme, $fontConfig);

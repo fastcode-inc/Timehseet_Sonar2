@@ -1,0 +1,15 @@
+@import 'src/styles/base.scss';
+.container {
+  margin: $fc-margin3;
+}
+
+table {
+  width: 100%;
+  min-width: 700px;
+}
+
+@media (max-width: 580px) {
+  .mat-header-cell {
+    font-size: 14px !important;
+  }
+}

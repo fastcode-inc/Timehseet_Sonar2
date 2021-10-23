@@ -1,0 +1,120 @@
+.ex-share-option {
+  position: absolute;
+  right: 0px;
+  width: 50%;
+  height: 100%;
+  // border: thin;
+}
+
+.ex-share-container {
+  height: 100%;
+}
+
+.ex-share-option-close {
+  position: absolute;
+  right: 0px;
+  top: 0px;
+  padding: 15px;
+  cursor: pointer;
+}
+
+.ex-share-option-head {
+  // background-color: #f1f1f1;
+  top: 0px;
+  padding: 10px;
+  border-bottom: solid lightgray 2px;
+}
+// .ex-share-option-body{
+//   height:100%;
+// }
+.access-opt {
+  margin-top: 3%;
+  position: relative;
+}
+
+.option-item {
+  margin-bottom: 3%;
+}
+
+.access-opt-menu {
+  max-width: 400px !important;
+  overflow: visible !important;
+}
+
+.access-opt-menu-item {
+  overflow: visible !important;
+  line-height: 86px !important;
+  height: 86px !important;
+}
+
+.cdk-overlay-connected-position-bounding-box .cdk-overlay-pane .mat-menu-panel {
+  max-width: 500px !important;
+}
+
+#urltag {
+  float: right;
+}
+
+.label-link {
+  margin-bottom: 1%;
+}
+
+.access-url {
+  position: relative;
+  border: 2px solid lightgray;
+  height: 93px;
+  padding: 10px;
+  color: gray;
+}
+
+.embed-options {
+  position: relative;
+  border: 2px solid lightgray;
+  height: 245px;
+  padding: 10px;
+  color: gray;
+}
+
+.copy-url {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
+
+#refreshrateinput {
+  width: 20%;
+}
+.settingsinput {
+  width: 20%;
+}
+
+.viewoption {
+  margin-left: 20px;
+  cursor: pointer;
+  padding: 10px;
+}
+.mat-dialog-content {
+  height: calc(100% - 85px);
+}
+.mat-tab-body-wrapper {
+  display: block;
+}
+
+// .cancle-btn {
+//   opacity: 0.8;
+//   margin-left: auto;
+//   color: #e27e4b;
+//   transform: rotate(45deg);
+// }
+
+.lable-icon {
+  position: absolute;
+}
+
+.access-label {
+  margin-left: 25px;
+}
+
+.mat-tab-body.mat-tab-body-active {
+  overflow-y: visible !important;
+}

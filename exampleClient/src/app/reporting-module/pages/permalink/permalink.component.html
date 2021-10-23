@@ -1,0 +1,234 @@
+<div *ngIf="permalink">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ title }}</mat-card-title>
+      <a name="cancel" href="javascript:void(0)" (click)="cancel()" class="cancle-btn"
+        ><i class="material-icons">add_circle</i></a
+      >
+    </mat-card-header>
+    <mat-card-content>
+      <mat-tab-group>
+        <mat-tab label="Link">
+          <div class="ex-share-option-body">
+            <div class="access-opt option-item" [matMenuTriggerFor]="accessoptions">
+              <label>{{ 'REPORTING.LABELS.PERMALINK.ACCESS-PERMISSION' | translate }}:</label>
+              <span class="viewoption">
+                <mat-icon class="lable-icon">{{ accessOptionIcon }}</mat-icon>
+                <label class="access-label">{{ accessOptionTitle }}</label>
+                <mat-icon class="lable-icon">arrow_drop_down</mat-icon>
+              </span>
+              <mat-menu class="access-opt-menu" #accessoptions="matMenu">
+                <button (click)="selectAccessOption('Login')" mat-menu-item>
+                  <label title="{{ 'REPORTING.LABELS.PERMALINK.ACCESS-LOGIN-DESCRIPTION' | translate }}">
+                    <mat-icon class="menu-icon">group</mat-icon>
+                    {{ 'REPORTING.LABELS.PERMALINK.ACCESS-LOGIN' | translate }}
+                  </label>
+                </button>
+
+                <button (click)="selectAccessOption('noLogin')" mat-menu-item>
+                  <label title="{{ 'REPORTING.LABELS.PERMALINK.ACCESS-WITHOUT-LOGIN-DESCRIPTION' | translate }}">
+                    <mat-icon class="menu-icon">link_off</mat-icon>
+                    {{ 'REPORTING.LABELS.PERMALINK.ACCESS-WITHOUT-LOGIN' | translate }}
+                  </label>
+                </button>
+
+                <button (click)="selectAccessOption('Password')" mat-menu-item>
+                  <label title="{{ 'REPORTING.LABELS.PERMALINK.ACCESS-PASSWORD-DESCRIPTION' | translate }}">
+                    <mat-icon class="menu-icon">vpn_key</mat-icon>
+                    {{ 'REPORTING.LABELS.PERMALINK.ACCESS-PASSWORD' | translate }}
+                  </label>
+                </button>
+              </mat-menu>
+            </div>
+            <div class="option-item">
+              <div class="label-link">
+                <label>{{ 'REPORTING.LABELS.PERMALINK.ACCESS-URL-TITLE' | translate }}:</label>
+                <a id="urltag" [href]="accessURL + permalink.id" target="_blank">
+                  <mat-icon class="menu-icon">open_in_new</mat-icon>
+                </a>
+              </div>
+              <div class="access-url option-item">
+                <label>{{ accessURL }}{{ permalink.id }}</label>
+
+                <button
+                  class="copy-url"
+                  ngxClipboard
+                  [cbContent]="accessURL + permalink.id"
+                  color="accent"
+                  mat-flat-button
+                >
+                  {{ 'REPORTING.LABELS.COPY' | translate }}
+                </button>
+              </div>
+            </div>
+
+            <div class="option-item">
+              <label>{{ 'REPORTING.LABELS.PERMALINK.OPTIONS' | translate }}</label>
+              <div class="access-url" flex fxLayoutGap="20px">
+                <div style="border-right: 2px solid lightgray" fxFlex="50">
+                  <div flex="100">
+                    <label>{{ 'REPORTING.LABELS.PERMALINK.INCLUDE' | translate }}</label>
+                  </div>
+
+                  <br />
+                  <div flex fxLayoutGap="20px">
+                    <mat-checkbox [(ngModel)]="this.permalink.description" fxFlex="50">{{
+                      'REPORTING.LABELS.DESCRIPTION' | translate
+                    }}</mat-checkbox>
+                    <br />
+                    <mat-checkbox [(ngModel)]="this.permalink.toolbar" fxFlex="100">{{
+                      'REPORTING.LABELS.PERMALINK.TOOLBAR' | translate
+                    }}</mat-checkbox>
+                  </div>
+                </div>
+                <div fxFlex="50">
+                  <div flex="100">
+                    <label>{{ 'REPORTING.LABELS.PERMALINK.SETTINGS' | translate }}</label>
+                  </div>
+
+                  <div flex fxLayoutGap="20px">
+                    <label>{{ 'REPORTING.LABELS.PERMALINK.AUTO-REFRESH' | translate }}:</label>
+                    <mat-form-field id="refreshrateinput">
+                      <input matInput value="120" [(ngModel)]="permalink.refreshRate" />
+                    </mat-form-field>
+                    {{ 'REPORTING.LABELS.PERMALINK.SECONDS' | translate }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+
+        <mat-tab label="Embed">
+          <div class="ex-share-option-body">
+            <div class="access-opt option-item" [matMenuTriggerFor]="accessoptions">
+              <label>{{ 'REPORTING.LABELS.PERMALINK.ACCESS-PERMISSION' | translate }}:</label>
+              <span class="viewoption">
+                <mat-icon class="lable-icon">{{ accessOptionIcon }}</mat-icon>
+                <label class="access-label">{{ accessOptionTitle }}</label>
+                <mat-icon class="lable-icon">arrow_drop_down</mat-icon>
+              </span>
+              <mat-menu class="access-opt-menu" #accessoptions="matMenu">
+                <button (click)="selectAccessOption('Login')" mat-menu-item>
+                  <label title="{{ 'REPORTING.LABELS.PERMALINK.ACCESS-LOGIN-DESCRIPTION' | translate }}">
+                    <mat-icon class="menu-icon">group</mat-icon>
+                    {{ 'REPORTING.LABELS.PERMALINK.ACCESS-LOGIN' | translate }}
+                  </label>
+                </button>
+
+                <button (click)="selectAccessOption('noLogin')" mat-menu-item>
+                  <label title="{{ 'REPORTING.LABELS.PERMALINK.ACCESS-WITHOUT-LOGIN-DESCRIPTION' | translate }}">
+                    <mat-icon class="menu-icon">link_off</mat-icon>
+                    {{ 'REPORTING.LABELS.PERMALINK.ACCESS-WITHOUT-LOGIN' | translate }}
+                  </label>
+                </button>
+
+                <button (click)="selectAccessOption('Password')" mat-menu-item>
+                  <label title="{{ 'REPORTING.LABELS.PERMALINK.ACCESS-PASSWORD-DESCRIPTION' | translate }}">
+                    <mat-icon class="menu-icon">vpn_key</mat-icon>
+                    {{ 'REPORTING.LABELS.PERMALINK.ACCESS-PASSWORD' | translate }}
+                  </label>
+                </button>
+              </mat-menu>
+            </div>
+            <div class="option-item">
+              <div class="label-link">
+                <label>{{ 'REPORTING.LABELS.PERMALINK.EMBED-SNIPPET-TITLE' | translate }}:</label>
+              </div>
+              <div class="access-url option-item">
+                <label
+                  >"&lt;iframe frameborder=0 width="{{ permalink.width }}" height="{{ permalink.height }}" src= "{{
+                    window.origin
+                  }}/resourceView/{{ permalink.id }}"&gt; &lt;iframe&gt;"</label
+                >
+                <button
+                  class="copy-url"
+                  ngxClipboard
+                  cbContent="<iframe  frameborder=0 width=&quot;{{ permalink.width }}&quot; height=&quot;{{
+                    permalink.height
+                  }}&quot; src= &quot;{{ window.origin }}/resourceView/{{ permalink.id }}&quot;> <iframe>"
+                  color="accent"
+                  mat-flat-button
+                >
+                  {{ 'REPORTING.LABELS.COPY' | translate }}
+                </button>
+              </div>
+            </div>
+
+            <div class="option-item">
+              <label>{{ 'REPORTING.LABELS.PERMALINK.OPTIONS' | translate }}</label>
+              <div class="embed-options" flex fxLayoutGap="20px">
+                <div style="border-right: 2px solid lightgray" fxFlex="50">
+                  <div flex="100">
+                    <label>{{ 'REPORTING.LABELS.PERMALINK.INCLUDE' | translate }}</label>
+                  </div>
+
+                  <br />
+                  <div flex fxLayoutGap="20px">
+                    <mat-checkbox [(ngModel)]="this.permalink.description" fxFlex="50">{{
+                      'REPORTING.LABELS.DESCRIPTION' | translate
+                    }}</mat-checkbox>
+                    <br />
+                    <mat-checkbox [(ngModel)]="this.permalink.toolbar" fxFlex="100">{{
+                      'REPORTING.LABELS.PERMALINK.TOOLBAR' | translate
+                    }}</mat-checkbox>
+                  </div>
+                </div>
+                <div fxFlex="50">
+                  <div flex="100">
+                    <label>{{ 'REPORTING.LABELS.PERMALINK.SETTINGS' | translate }}</label>
+                  </div>
+
+                  <label>{{ 'REPORTING.LABELS.PERMALINK.SET-SCREEN-SIZE' | translate }}: </label>
+                  <mat-form-field class="settingsinput">
+                    <input
+                      matInput
+                      placeholder="{{ 'REPORTING.LABELS.PERMALINK.WIDTH' | translate }}"
+                      value=""
+                      [(ngModel)]="permalink.width"
+                    />
+                  </mat-form-field>
+                  {{ 'REPORTING.LABELS.PERMALINK.PX' | translate }} ,
+                  <mat-form-field class="settingsinput">
+                    <input
+                      matInput
+                      placeholder="{{ 'REPORTING.LABELS.PERMALINK.HEIGHT' | translate }}"
+                      value=""
+                      [(ngModel)]="permalink.height"
+                    />
+                  </mat-form-field>
+                  {{ 'REPORTING.LABELS.PERMALINK.PX' | translate }}
+                  <br />
+                  <label>{{ 'REPORTING.LABELS.PERMALINK.CHART-RENDERING' | translate }}: </label>
+                  <mat-form-field>
+                    <mat-select [(ngModel)]="permalink.rendering">
+                      <mat-option value="interactive">{{
+                        'REPORTING.LABELS.PERMALINK.INTERACTIVE' | translate
+                      }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <br />
+                  <label>{{ 'REPORTING.LABELS.PERMALINK.AUTO-REFRESH' | translate }}: </label>
+                  <mat-form-field id="refreshrateinput" class="settingsinput">
+                    <input
+                      matInput
+                      placeholder="{{ 'REPORTING.LABELS.PERMALINK.SECONDS' | translate }}"
+                      value="120"
+                      [(ngModel)]="permalink.refreshRate"
+                    />
+                  </mat-form-field>
+                  {{ 'REPORTING.LABELS.PERMALINK.SECONDS' | translate }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+    <mat-card-actions class="fc-text-right">
+      <button mat-raised-button color="primary" cdkFocusInitial (click)="saveAndShareExternally()">
+        {{ 'GENERAL.ACTIONS.SAVE' | translate }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

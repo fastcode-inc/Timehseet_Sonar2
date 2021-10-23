@@ -1,0 +1,25 @@
+@import 'src/styles/base.scss';
+
+.select-job-container {
+  min-height: 200px;
+  min-width: 500px;
+  table {
+    width: 100%;
+    box-shadow: none;
+    .mat-header-cell {
+      font-size: 15px !important;
+    }
+    td {
+      cursor: pointer;
+    }
+  }
+}
+
+.action-tool-bar {
+  height: $fc-row-height5;
+  justify-content: space-between;
+}
+
+.no-jobs-container {
+  text-align: center;
+}

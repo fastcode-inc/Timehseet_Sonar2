@@ -1,0 +1,382 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+        <changeSet author="fastCode, Inc" id="000000-000015">
+        <createTable tableName="dashboard">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="dashboard_pkey"/>
+            </column>
+            <column name="versiono" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_published" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+                 		<column name="is_shareable" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+  			<column name="owner_id" type="bigint"/>
+        </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="owner_id "
+        baseTableName="dashboard" 
+        constraintName="fk_dashboard_users" 
+        deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" 
+        onUpdate="NO ACTION" 
+        referencedColumnNames="id "
+        referencedTableName="users" 
+        validate="true"/>
+    
+    </changeSet>
+        
+        <changeSet author="fastCode, Inc" id="000000-000016">
+        <createTable tableName="report">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="report_pkey"/>
+            </column>
+            <column name="versiono" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_published" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+  			<column name="owner_id" type="bigint"/>
+        </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="owner_id "
+        baseTableName="report" 
+        constraintName="fk_report_users" 
+        deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" 
+        onUpdate="NO ACTION" 
+        referencedColumnNames="id "
+        referencedTableName="users" 
+        validate="true"/>
+   
+    </changeSet>
+        
+    <changeSet author="fastCode, Inc" id="000000-000017">
+        <createTable tableName="dashboardversion">
+            <column name="dashboard_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="dashboardversion_pkey"/>
+            </column>
+            <column name="dashboard_version" type="VARCHAR(20)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="dashboardversion_pkey"/>
+            </column>
+  			<column name="user_id" type="bigint">
+  			<constraints nullable="false" primaryKey="true" primaryKeyName="reportversion_pkey"/>
+            </column>
+            <column name="versiono" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="is_refreshed" type="BOOLEAN"/>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="dashboard_id" baseTableName="dashboardversion" 
+        constraintName="fk_dashboardversion_dashboard" deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="dashboard" validate="true"/>
+    
+        <addForeignKeyConstraint baseColumnNames="user_id "
+        baseTableName="dashboardversion" 
+        constraintName="fk_dashboardversion_user" deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" onUpdate="NO ACTION" 
+        referencedColumnNames="id "
+        referencedTableName="users" 
+        validate="true"/>
+    
+    </changeSet>
+    
+    <changeSet author="fastCode, Inc" id="000000-000018">
+        <createTable tableName="reportversion">
+            <column name="report_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="reportversion_pkey"/>
+            </column>
+            <column name="report_version" type="VARCHAR(20)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="reportversion_pkey"/>
+            </column>
+     		<column name="is_assigned_by_dashboard" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+  			<column name="user_id" type="bigint">
+  			<constraints nullable="false" primaryKey="true" primaryKeyName="reportversion_pkey"/>
+            </column>
+            <column name="versiono" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ctype" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="is_refreshed" type="BOOLEAN"/>
+            <column name="query" type="TEXT"/>
+            <column name="report_type" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="report_id" baseTableName="reportversion" constraintName="fk_reportversion_report" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="report" validate="true"/>
+   
+        <addForeignKeyConstraint baseColumnNames="user_id "
+         baseTableName="reportversion" constraintName="fk_reportversion_users" 
+         deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" 
+         referencedColumnNames="id "
+         referencedTableName="users" 
+         validate="true"/>
+    
+    </changeSet>
+    <changeSet author="fastCode, Inc" id="000000-000019">
+        <createTable tableName="dashboardversionreport">
+            <column name="dashboard_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="dashboardversionreport_pkey"/>
+            </column>
+            <column name="dashboard_version" type="VARCHAR(255)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="dashboardversionreport_pkey"/>
+            </column>
+            <column name="report_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="dashboardversionreport_pkey"/>
+            </column>
+  			<column name="user_id" type="bigint">
+  			<constraints nullable="false" primaryKey="true" primaryKeyName="reportversion_pkey"/>
+            </column>
+            <column name="versiono" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="order_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="report_width" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="dashboard_id,dashboard_version,user_id "
+        baseTableName="dashboardversionreport" 
+        constraintName="fk_dashboardversionreport_dashboardversion" 
+        deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" 
+        referencedColumnNames="dashboard_id,dashboard_version,user_id "
+        referencedTableName="dashboardversion" 
+        validate="true"/>
+        
+        <addForeignKeyConstraint baseColumnNames="report_id" 
+        baseTableName="dashboardversionreport" 
+        constraintName="fkdashboardversionreport_report" deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" onUpdate="NO ACTION" 
+        referencedColumnNames="id" referencedTableName="report" 
+        validate="true"/>
+    
+    </changeSet>
+     <changeSet author="fastCode, Inc" id="fc_reporting_reportuser">
+        <createTable tableName="reportuser">
+            <column name="report_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="reportuser_pkey"/>
+            </column>   
+  			<column name="user_id" type="bigint">
+  			<constraints nullable="false" primaryKey="true" primaryKeyName="reportuser_pkey"/>
+            </column>
+            <column name="versiono" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="editable" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_assigned_by_role" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_refreshed" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_resetted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_sharing_status" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_sharing_status" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="report_id" 
+        baseTableName="reportuser" 
+        constraintName="fk_reportuser_report" 
+        deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" 
+        onUpdate="NO ACTION" 
+        referencedColumnNames="id" 
+        referencedTableName="report" validate="true"/>
+    
+        <addForeignKeyConstraint baseColumnNames="user_id "
+        baseTableName="reportuser" 
+        constraintName="fk_reportuser_users" 
+        deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" 
+        onUpdate="NO ACTION" 
+        referencedColumnNames="id "
+        referencedTableName="users" 
+        validate="true"/>
+    
+    </changeSet>
+    
+     <changeSet author="fastCode, Inc" id="fc_reporting_dashboarduser">
+        <createTable tableName="dashboarduser">
+            <column name="dashboard_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="dashboarduser_pkey"/>
+            </column>
+  			<column name="user_id" type="bigint">
+  			<constraints nullable="false" primaryKey="true" primaryKeyName="dashboarduser_pkey"/>
+            </column>
+            <column name="versiono" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="editable" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_assigned_by_role" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_refreshed" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_resetted" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_sharing_status" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="recipient_sharing_status" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+   
+        <addForeignKeyConstraint baseColumnNames="dashboard_id" 
+        baseTableName="dashboarduser" 
+        constraintName="fk_dashboarduser_dashboard"
+        deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" onUpdate="NO ACTION" 
+        referencedColumnNames="id" 
+        referencedTableName="dashboard"
+        validate="true"/>
+    
+        <addForeignKeyConstraint baseColumnNames="user_id "
+        baseTableName="dashboarduser" 
+        constraintName="fk_dashboarduser_users" 
+        deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" 
+        onUpdate="NO ACTION" 
+        referencedColumnNames="id "
+        referencedTableName="users" 
+        validate="true"/>
+    </changeSet>
+    
+    <changeSet author="fastCode, Inc" id="fc_reporting_dashboardrole">
+        <createTable tableName="dashboardrole">
+            <column name="dashboard_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="dashboardrole_pkey"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="dashboardrole_pkey"/>
+            </column>
+            <column name="versiono" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="editable" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_sharing_status" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseColumnNames="dashboard_id" 
+        baseTableName="dashboardrole" 
+        constraintName="fk_dashboardrole_dashboard" 
+        deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" onUpdate="NO ACTION" 
+        referencedColumnNames="id" 
+        referencedTableName="dashboard" validate="true"/>
+   
+        <addForeignKeyConstraint baseColumnNames="role_id" 
+        baseTableName="dashboardrole" 
+        constraintName="fk_dashboardrole_role" 
+        deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" onUpdate="NO ACTION" 
+        referencedColumnNames="id" 
+        referencedTableName="role" validate="true"/>
+    </changeSet>
+    
+    <changeSet author="fastCode, Inc" id="fc_reporting_reportrole">
+        <createTable tableName="reportrole">
+            <column name="report_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="reportrole_pkey"/>
+            </column>
+            <column name="role_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="reportrole_pkey"/>
+            </column>
+            <column name="versiono" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="editable" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owner_sharing_status" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    
+       <addForeignKeyConstraint baseColumnNames="role_id" 
+       baseTableName="reportrole" 
+       constraintName="fk_reportrole_role" 
+       deferrable="false" initiallyDeferred="false" 
+       onDelete="NO ACTION" onUpdate="NO ACTION" 
+       referencedColumnNames="id" 
+       referencedTableName="role" validate="true"/>
+   
+       <addForeignKeyConstraint baseColumnNames="report_id" 
+       baseTableName="reportrole" 
+       constraintName="fk_reportrole_report" 
+       deferrable="false" initiallyDeferred="false" 
+       onDelete="NO ACTION" onUpdate="NO ACTION" 
+       referencedColumnNames="id" 
+       referencedTableName="report" validate="true"/>
+    </changeSet>
+    
+     <changeSet author="fastCode, Inc" id="fc_reporting_permalink">
+        <createTable tableName="permalink">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="permalink_pkey"/>
+            </column>
+            <column name="versiono" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="authentication" type="VARCHAR(30)"/>
+            <column name="description" type="BOOLEAN"/>
+            <column name="password" type="VARCHAR(256)"/>
+            <column name="refresh_rate" type="BIGINT"/>
+            <column name="rendering" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resource" type="VARCHAR(30)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resource_id" type="BIGINT"/>
+            <column name="toolbar" type="BOOLEAN"/>
+  			<column name="user_id" type="bigint">
+  				<constraints nullable="false"/>
+            </column>
+        </createTable>
+        
+        <addForeignKeyConstraint baseColumnNames="user_id " 
+        baseTableName="permalink" 
+        constraintName="fk_permalink_users" 
+        deferrable="false" initiallyDeferred="false" 
+        onDelete="NO ACTION" onUpdate="NO ACTION" 
+        referencedColumnNames="id "
+        referencedTableName="users" 
+        validate="true"/>
+    </changeSet>
+    
+    
+</databaseChangeLog>

@@ -1,0 +1,20 @@
+<div class="dashboard-conatiner" *ngIf="dashboard">
+  <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="10px" class="mb-20">
+    <div fxLayout="row" gdAlignRows="center" fxLayoutAlign="center" fxLayoutGap="10px">
+      <h3 class="mb-10">{{ dashboard.title }}</h3>
+      <small>{{ dashboard.description }}</small>
+    </div>
+    <div>
+      <button color="primary" mat-stroked-button (click)="editDashboard(dashboard.id)">
+        <mat-icon>edit</mat-icon>&nbsp; {{ 'GENERAL.ACTIONS.EDIT' | translate }}
+      </button>
+    </div>
+  </div>
+  <div fxLayout="row" class="charts-container">
+    <div *ngFor="let c of dashboard.reportDetails; let i = index" [class]="c.reportWidth">
+      <div class="innerChartBlock">
+        <app-chart [chartType]="c.reportType" [query]="c.query" [ctype]="c.ctype" [title]="c.title"> </app-chart>
+      </div>
+    </div>
+  </div>
+</div>

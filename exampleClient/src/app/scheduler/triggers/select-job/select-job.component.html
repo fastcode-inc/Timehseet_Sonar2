@@ -1,0 +1,34 @@
+<div>
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ 'TRIGGERS.SELECT-JOB' | translate }}</mat-card-title>
+      <a href="javascript:void(0)" (click)="onCancel()" class="cancle-btn"><i class="material-icons">add_circle</i></a>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="select-job-container">
+        <table mat-table [dataSource]="jobs" class="mat-elevation-z8">
+          <!-- name Column -->
+          <ng-container matColumnDef="jobName">
+            <th mat-header-cell *matHeaderCellDef>{{ 'JOBS.FIELDS.NAME' | translate }}&nbsp;&nbsp;</th>
+            <td mat-cell *matCellDef="let job">{{ job.jobName }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="jobGroup">
+            <th mat-header-cell *matHeaderCellDef>{{ 'JOBS.FIELDS.GROUP' | translate }}&nbsp;&nbsp;</th>
+            <td mat-cell *matCellDef="let job">{{ job.jobGroup }}</td>
+          </ng-container>
+          <ng-container matColumnDef="jobClass">
+            <th mat-header-cell *matHeaderCellDef>{{ 'JOBS.FIELDS.CLASS' | translate }}&nbsp;&nbsp;</th>
+            <td mat-cell *matCellDef="let job">{{ job.jobClass }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns" (click)="selectJob(row)"></tr>
+        </table>
+        <div class="no-jobs-container" *ngIf="!loading && (!jobs || jobs.length == 0)">
+          <span>{{ 'JOBS.MESSAGES.NO-JOBS-FOUND' | translate }}</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

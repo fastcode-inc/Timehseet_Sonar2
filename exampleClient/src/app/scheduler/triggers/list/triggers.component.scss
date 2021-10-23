@@ -1,0 +1,24 @@
+@import 'src/styles/base.scss';
+
+.container {
+  margin: $fc-margin3;
+  height: calc(100% - 152px);
+}
+
+.mat-table {
+  overflow: auto;
+  max-height: calc(100% - 135px);
+  min-width: 700px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.medium-device-width {
+  width: 50%;
+}
+
+.large-device-width {
+  width: 33%;
+}
