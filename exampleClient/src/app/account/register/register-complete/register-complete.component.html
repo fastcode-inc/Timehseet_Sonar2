@@ -1,0 +1,23 @@
+<div class="login-container">
+  <mat-card class="item-card">
+    <mat-card-title class="text-center">
+      <figure class="logo">
+        <img src="../../assets/images/logo.png" alt="logo" style="border-radius: 46px" />
+      </figure>
+    </mat-card-title>
+    <mat-card-content>
+      <div class="text-center">
+        <h2 class="sub-title">{{ 'ACCOUNT.REGISTER.COMPLETE-TITLE' | translate }}</h2>
+      </div>
+
+      <div class="text-center message">
+        <p>{{ 'ACCOUNT.REGISTER.CHECK-EMAIL-MESSAGE' | translate }}</p>
+      </div>
+      <p class="text-center message2">{{ 'ACCOUNT.REGISTER.CONTACT-MESSAGE' | translate }}</p>
+
+      <button routerLink="/login" mat-raised-button color="primary" class="btn-submit">
+        {{ 'LOGIN.LOGIN' | translate }}
+      </button>
+    </mat-card-content>
+  </mat-card>
+</div>

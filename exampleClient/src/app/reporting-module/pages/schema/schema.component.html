@@ -1,0 +1,97 @@
+<section fxLayout="row" fxLayout.lt-sm="column">
+  <div class="schema-left-panel" fxFlex.gt-xs="35" fxFlex.gt-sm="25" fxFlex.gt-md="25" fxLayout="column">
+    <button
+      mat-raised-button
+      color="primary"
+      fxFlexAlign="center"
+      fxFlexOffset="20px"
+      (click)="onClickGenerateSchema()"
+    >
+      <mat-icon>settings</mat-icon> {{ 'REPORTING.LABELS.REPORT.GENERATE-SCHEMA' | translate }}
+    </button>
+    <mat-tab-group fxFlexOffset="20px" style="height: calc(100% - 76px)">
+      <mat-tab class="schema-tabs">
+        <ng-template mat-tab-label>
+          {{ 'REPORTING.LABELS.REPORT.TABLES-LIST' | translate }}
+        </ng-template>
+        <form [formGroup]="schemaFormGroup">
+          <mat-accordion class="example-headers-align">
+            <ng-container *ngFor="let s of allSchemas">
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{ s }}
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div class="cb-container">
+                  <mat-checkbox (change)="switchAll($event)">Select All</mat-checkbox>
+                </div>
+                <mat-list formArrayName="schemaList">
+                  <mat-list-item *ngFor="let table of allData[s]; let i = index">
+                    <mat-checkbox
+                      [formControlName]="i"
+                      [(ngModel)]="selectedTables[s + '.' + table]"
+                      (change)="checkSelectedList(s, table, $event)"
+                      title="{{ table }}"
+                      >{{ table }}</mat-checkbox
+                    >
+                  </mat-list-item>
+                </mat-list>
+              </mat-expansion-panel>
+            </ng-container>
+          </mat-accordion>
+        </form>
+      </mat-tab>
+      <mat-tab>
+        <ng-template mat-tab-label>
+          {{ 'REPORTING.LABELS.REPORT.FILES' | translate }}
+        </ng-template>
+        <div fxLayout fxLayoutGap="20" class="list-container">
+          <div fxLayout="column" class="report-list">
+            <div class="list">
+              <div
+                *ngFor="let file of allFiles | keyvalue"
+                (click)="showFile(file.value)"
+                [ngClass]="{ 'list-item': true, active: fileContent.fileName === file.value.fileName }"
+                class="list-item"
+              >
+                <span class="report-icon">
+                  <mat-icon>description</mat-icon>
+                </span>
+                <div fxLayout="fc-row">
+                  <div class="title" fxFlex>
+                    {{ file.value.fileName }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+
+  <div
+    class="schema-right-panel"
+    fxFlex.gt-xs="65"
+    fxFlex.gt-sm="75"
+    fxFlex.gt-md="75"
+    fxLayout="column"
+    fxLayoutAlign="start"
+  >
+    <button
+      mat-raised-button
+      color="primary"
+      fxFlexAlign="end"
+      fxFlexOffset="0px"
+      (click)="onClickUpdateSchema()"
+      [disabled]="!fileContent.fileName"
+    >
+      <mat-icon>settings</mat-icon> {{ 'GENERAL.ACTIONS.UPDATE' | translate }}
+    </button>
+    <div class="schema-file" fxFlexOffset="20px" contenteditable="true" (input)="postContent = $event.target.innerText">
+      {{ fileContent.content }}
+    </div>
+  </div>
+</section>

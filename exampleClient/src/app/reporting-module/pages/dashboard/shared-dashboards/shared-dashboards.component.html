@@ -1,0 +1,63 @@
+<div class="list-container hide-scroll">
+  <div class="top-breadcrumb">
+    <h1 class="template-title">{{ 'REPORTING.LABELS.DASHBOARD.SHARED' | translate }}</h1>
+  </div>
+  <div class="table-conatiner">
+    <table mat-table [dataSource]="dashboards" class="mat-elevation-z8">
+      <ng-container matColumnDef="Title">
+        <th mat-header-cell *matHeaderCellDef>{{ 'REPORTING.LABELS.TITLE' | translate }}</th>
+        <td mat-cell *matCellDef="let dashboard">{{ dashboard.title }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Description">
+        <th mat-header-cell *matHeaderCellDef>{{ 'REPORTING.LABELS.DESCRIPTION' | translate }}</th>
+        <td mat-cell *matCellDef="let dashboard">{{ dashboard.description }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="Owner">
+        <th mat-header-cell *matHeaderCellDef>{{ 'REPORTING.LABELS.OWNER' | translate }}</th>
+        <td mat-cell *matCellDef="let dashboard">{{ dashboard.Owner }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="OwnerSharingStatus">
+        <th mat-header-cell *matHeaderCellDef>{{ 'REPORTING.LABELS.OWNER-SHARING-STATUS' | translate }}</th>
+        <td mat-cell *matCellDef="let dashboard">
+          <span *ngIf="dashboard.ownerSharingStatus">
+            {{ 'REPORTING.LABELS.SHARED' | translate }}
+          </span>
+          <span *ngIf="!dashboard.ownerSharingStatus">
+            {{ 'REPORTING.LABELS.NOT-SHARED' | translate }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="RecipientSharingStatus">
+        <th mat-header-cell *matHeaderCellDef>{{ 'REPORTING.LABELS.RECIPIENT-SHARING-STATUS' | translate }}</th>
+        <td mat-cell *matCellDef="let dashboard">
+          <mat-slide-toggle
+            (change)="changeRecipientSharingStatus(dashboard)"
+            [(ngModel)]="dashboard.recipientSharingStatus"
+            [disabled]="!dashboard.ownerSharingStatus"
+            class="toggle-button"
+          >
+          </mat-slide-toggle>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="Actions">
+        <th mat-header-cell *matHeaderCellDef>{{ 'GENERAL.ACTIONS.ACTIONS' | translate }}</th>
+        <td mat-cell *matCellDef="let dashboard">
+          <button mat-icon-button (click)="dashboardDetails(dashboard)">
+            <mat-icon>open_in_new</mat-icon>
+          </button>
+          <button mat-icon-button (click)="deleteDashboard(dashboard)">
+            <mat-icon color="warn">delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,62 @@
+<div class="report-container" *ngIf="report">
+  <mat-card class="report-container">
+    <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="10px" class="mb-20 details-container">
+      <div fxLayout="row" gdAlignRows="center" fxLayoutAlign="start" fxLayoutGap="10px">
+        <div class="top-breadcrumb">
+          <h3 class="template-title-small">{{ report.title }}</h3>
+        </div>
+        <p>{{ report.description }}</p>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="end center">
+        <button mat-button [matMenuTriggerFor]="menu" style="margin-bottom: auto">
+          <mat-icon color="accent"> more_vert </mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item *ngIf="!report.sharedWithMe || report.editable" (click)="editReport(report.id)">
+            <mat-icon class="menu-icon">edit</mat-icon>
+            {{ 'GENERAL.ACTIONS.EDIT' | translate }}
+          </button>
+          <button
+            mat-menu-item
+            *ngIf="
+              !report.isRefreshed && report.sharedWithMe && report.ownerSharingStatus && report.recipientSharingStatus
+            "
+            (click)="refreshReport(report.id)"
+          >
+            <mat-icon class="menu-icon">sync</mat-icon>
+            {{ 'REPORTING.LABELS.REFRESH' | translate }}
+          </button>
+          <button mat-menu-item *ngIf="report.sharedWithMe && !report.isResetted" (click)="resetReport(report.id)">
+            <mat-icon class="menu-icon">refresh</mat-icon>
+            {{ 'REPORTING.LABELS.RESET' | translate }}
+          </button>
+          <button mat-menu-item *ngIf="!report.sharedWithMe" (click)="share()">
+            <mat-icon class="menu-icon">people</mat-icon>
+            {{ 'REPORTING.LABELS.SHARE' | translate }}
+          </button>
+          <button
+            mat-menu-item
+            *ngIf="!report.isPublished && !report.sharedWithMe"
+            (click)="publishDashboard(report.id)"
+          >
+            <mat-icon class="menu-icon">publish</mat-icon>
+            {{ 'REPORTING.LABELS.PUBLISH' | translate }}
+          </button>
+          <button mat-menu-item (click)="deleteReport(report)">
+            <mat-icon class="menu-icon">delete</mat-icon>
+            {{ 'GENERAL.ACTIONS.DELETE' | translate }}
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+    <div class="innerChartBlock">
+      <app-chart
+        style="width: 100%"
+        [ctype]="report.ctype"
+        [chartType]="report.reportType"
+        [query]="report.query"
+        [title]="report.title"
+      ></app-chart>
+    </div>
+  </mat-card>
+</div>

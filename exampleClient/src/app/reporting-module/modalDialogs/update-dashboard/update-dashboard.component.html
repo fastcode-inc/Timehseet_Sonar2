@@ -1,0 +1,33 @@
+<div class="create-item">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ 'REPORTING.LABELS.DASHBOARD.SAVE' | translate }}</mat-card-title>
+      <a name="cancel" href="javascript:void(0)" (click)="onNoClick()" class="cancle-btn"
+        ><i class="material-icons">add_circle</i></a
+      >
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field>
+        <mat-label>{{ 'REPORTING.LABELS.TITLE' | translate }}</mat-label>
+        <input
+          matInput
+          placeholder="{{ 'REPORTING.LABELS.DASHBOARD.TITLE-PLACEHOLDER' | translate }}"
+          [(ngModel)]="dashboard.title"
+        />
+      </mat-form-field>
+      <mat-form-field class="example-full-width">
+        <mat-label>{{ 'REPORTING.LABELS.DESCRIPTION' | translate }}</mat-label>
+        <textarea
+          matInput
+          placeholder="{{ 'REPORTING.LABELS.DASHBOARD.DESCRIPTION-PLACEHOLDER' | translate }}"
+          [(ngModel)]="dashboard.description"
+        ></textarea>
+      </mat-form-field>
+    </mat-card-content>
+    <mat-card-actions class="fc-text-right">
+      <button mat-raised-button color="primary" cdkFocusInitial (click)="save()">
+        {{ 'GENERAL.ACTIONS.SAVE' | translate }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>

@@ -1,0 +1,29 @@
+<div fxLayout="row wrap" fxLayout.lt-sm="column">
+  <mat-card
+    fxFlex="0 1 calc(33.3% - 40px)"
+    fxFlex.lt-md="0 1 calc(50% - 40px)"
+    fxFlex.lt-sm="100%"
+    *ngFor="let dash of allDashboardsData"
+    class="dashboard-cards"
+  >
+    <mat-list>
+      <mat-list-item
+        ><h4>{{ dash.title }}</h4></mat-list-item
+      >
+      <mat-list-item
+        ><p>{{ dash.description }}</p></mat-list-item
+      >
+      <!-- <mat-list-item> Total Charts : {{dash.reportDetails.length}} </mat-list-item> -->
+      <mat-list-item fxLayout="row" fxLayoutAlign="end center">
+        <div fxLayoutGap="10px">
+          <button mat-stroked-button color="primary" [routerLink]="['/reporting/dashboard/edit/', dash.id]">
+            {{ 'REPORTING.LABELS.VIEW' | translate }}
+          </button>
+          <button mat-stroked-button color="warn">
+            <mat-icon (click)="deleteDashboard(dash.id)">delete</mat-icon>
+          </button>
+        </div>
+      </mat-list-item>
+    </mat-list>
+  </mat-card>
+</div>

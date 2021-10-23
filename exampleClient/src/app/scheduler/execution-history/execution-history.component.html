@@ -1,0 +1,51 @@
+<div class="list-container" (onScroll)="onTableScroll()" appVirtualScroll>
+  <div class="top-breadcrumb">
+    <h1 class="template-title">{{ 'EXECUTION-HISTORY.TITLE' | translate }}</h1>
+    <div class="fc-row">
+      <div class="fc-col-sm-12">
+        <ul class="breadcrumb">
+          <li>
+            <a [routerLink]="['/Home']"><i class="material-icons"> home </i> &nbsp;Dashboard</a>
+          </li>
+          <li>
+            <a>{{ 'EXECUTION-HISTORY.TITLE' | translate }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <mat-card>
+    <app-list-filters [columnsList]="columns" (onSearch)="applyFilter($event)"></app-list-filters>
+    <div class="table-container">
+      <mat-table matSort [dataSource]="dataSource">
+        <div *ngFor="let column of selectedColumns">
+          <ng-container matColumnDef="{{ column.column }}">
+            <mat-header-cell mat-sort-header *matHeaderCellDef [disabled]="column['sort'] ? false : true">
+              {{ column.label }}
+            </mat-header-cell>
+            <div *ngIf="column.type != 'Date'">
+              <mat-cell *matCellDef="let element">
+                <span class="mobile-label">{{ column.column }}</span>
+                {{ element[column.column] }}
+              </mat-cell>
+            </div>
+
+            <div *ngIf="column.type == 'Date'">
+              <mat-cell *matCellDef="let element">
+                <span class="mobile-label">{{ column.column }}</span>
+                {{ element[column.column] | date: 'medium' }}
+              </mat-cell>
+            </div>
+          </ng-container>
+        </div>
+
+        <mat-header-row *matHeaderRowDef="displayedColumnsExecutionHistory"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumnsExecutionHistory"></mat-row>
+      </mat-table>
+    </div>
+    <section class="small-spinner-container" *ngIf="isLoadingResults">
+      <mat-spinner></mat-spinner>
+    </section>
+  </mat-card>
+</div>

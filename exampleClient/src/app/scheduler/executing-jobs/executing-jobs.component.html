@@ -1,0 +1,85 @@
+<div class="list-container">
+  <div class="top-breadcrumb">
+    <h1 class="template-title">{{ 'EXECUTING-JOBS.TITLE' | translate }}</h1>
+    <div class="fc-row">
+      <div class="fc-col-sm-12">
+        <ul class="breadcrumb">
+          <li>
+            <a [routerLink]="['/dashboard']"><i class="material-icons"> home </i> &nbsp;Home</a>
+          </li>
+          <li>
+            <a>{{ 'EXECUTING-JOBS.TITLE' | translate }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <mat-card>
+    <div class="table-container">
+      <table mat-table [dataSource]="executingJobs" class="mat-elevation-z8 full-width">
+        <!-- Trigger Name Column -->
+        <ng-container matColumnDef="triggerName">
+          <th mat-header-cell *matHeaderCellDef>{{ 'EXECUTING-JOBS.FIELDS.TRIGGER-NAME' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.triggerName }}
+          </td>
+        </ng-container>
+
+        <!-- Trigger Group Column -->
+        <ng-container matColumnDef="triggerGroup">
+          <th mat-header-cell *matHeaderCellDef>{{ 'EXECUTING-JOBS.FIELDS.TRIGGER-GROUP' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.triggerGroup }}
+          </td>
+        </ng-container>
+
+        <!-- Job Name Column -->
+        <ng-container matColumnDef="jobName">
+          <th mat-header-cell *matHeaderCellDef>{{ 'EXECUTING-JOBS.FIELDS.JOB-NAME' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.jobName }}
+          </td>
+        </ng-container>
+
+        <!-- Job Group Column -->
+        <ng-container matColumnDef="jobGroup">
+          <th mat-header-cell *matHeaderCellDef>{{ 'EXECUTING-JOBS.FIELDS.JOB-GROUP' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.jobGroup }}
+          </td>
+        </ng-container>
+
+        <!-- Job class Column -->
+        <ng-container matColumnDef="jobClass">
+          <th mat-header-cell *matHeaderCellDef>{{ 'EXECUTING-JOBS.FIELDS.JOB-CLASS' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.jobClass }}
+          </td>
+        </ng-container>
+
+        <!-- Fire Time Column -->
+        <ng-container matColumnDef="fireTime">
+          <th mat-header-cell *matHeaderCellDef>{{ 'EXECUTING-JOBS.FIELDS.FIRE-TIME' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.firedTime | date: 'medium' }}
+          </td>
+        </ng-container>
+
+        <!-- Next Fire Time Column -->
+        <ng-container matColumnDef="nextExecutionTime">
+          <th mat-header-cell *matHeaderCellDef>{{ 'EXECUTING-JOBS.FIELDS.NEXT-FIRE-TIME' | translate }}</th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.nextExecutionTime | date: 'medium' }}
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumnsExecutingJobs"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumnsExecutingJobs"></tr>
+      </table>
+    </div>
+    <section class="small-spinner-container" *ngIf="loading">
+      <mat-spinner></mat-spinner>
+    </section>
+  </mat-card>
+</div>

@@ -1,0 +1,57 @@
+<div class="share-picker-container" (onScroll)="onPickerScroll()" appVirtualScroll>
+  <mat-chip-list #chipList aria-label="Selected options">
+    <mat-chip
+      *ngFor="let selectedItem of selectedItemsArray"
+      [removable]="removable"
+      (removed)="remove(selectedItem)"
+      [ngClass]="
+        selectedItem.editable === true ? 'chip-edit' : selectedItem.editable === false ? 'chip-read' : 'chip-delete'
+      "
+    >
+      {{ selectedItem[displayField] }}
+      <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+    </mat-chip>
+  </mat-chip-list>
+
+  <form class="search-form">
+    <mat-form-field class="form-field">
+      <input
+        matInput
+        placeholder="{{ 'REPORTING.LABELS.SEARCH' | translate }}"
+        (input)="onPickerSearch($event.target.value)"
+      />
+    </mat-form-field>
+  </form>
+  <mat-list>
+    <mat-list-item *ngFor="let item of items">
+      <h4 mat-line>{{ item[displayField] }}</h4>
+      <mat-select
+        [panelClass]="'access-select'"
+        (selectionChange)="onSelectionChange($event, item)"
+        [(ngModel)]="selectedItems[item.__uniqueIdentifier__]"
+      >
+        <mat-select-trigger>
+          <span *ngIf="!selectedItems[item.__uniqueIdentifier__]"
+            ><mat-icon>block</mat-icon>&nbsp;{{ 'REPORTING.LABELS.REPORT.SHARE-OPTIONS.NONE' | translate }}</span
+          >
+          <span *ngIf="selectedItems[item.__uniqueIdentifier__] == 'Edit'"
+            ><mat-icon>edit</mat-icon>&nbsp;{{ 'REPORTING.LABELS.REPORT.SHARE-OPTIONS.EDIT' | translate }}</span
+          >
+          <span *ngIf="selectedItems[item.__uniqueIdentifier__] == 'Read'"
+            ><mat-icon>visibility</mat-icon>&nbsp;{{ 'REPORTING.LABELS.REPORT.SHARE-OPTIONS.VIEW' | translate }}</span
+          >
+        </mat-select-trigger>
+        <mat-option value=""
+          ><mat-icon>block</mat-icon>{{ 'REPORTING.LABELS.REPORT.SHARE-OPTIONS.NONE' | translate }}</mat-option
+        >
+        <mat-option value="Edit"
+          ><mat-icon>edit</mat-icon>{{ 'REPORTING.LABELS.REPORT.SHARE-OPTIONS.EDIT' | translate }}</mat-option
+        >
+        <mat-option value="Read"
+          ><mat-icon>visibility</mat-icon>{{ 'REPORTING.LABELS.REPORT.SHARE-OPTIONS.VIEW' | translate }}</mat-option
+        >
+      </mat-select>
+      <mat-divider></mat-divider>
+    </mat-list-item>
+  </mat-list>
+</div>

@@ -1,0 +1,140 @@
+<div class="list-container" (onScroll)="onTableScroll()" appVirtualScroll>
+  <div class="top-breadcrumb">
+    <h1 class="template-title">{{ title }}</h1>
+    <div class="fc-row">
+      <div class="fc-col-md-6">
+        <ul class="breadcrumb">
+          <li>
+            <a [routerLink]="['/']"><i class="material-icons"> home </i> &nbsp;{{ 'HOME' | translate }}</a>
+          </li>
+          <li>
+            <a>{{ title }}</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <mat-card>
+    <form [formGroup]="basicFilterForm" class="filter-form">
+      <div class="fc-row filter-list">
+        <div class="fc-col-lg-3 fc-col-md-6">
+          <mat-form-field class="full-width">
+            <input formControlName="from" matInput [matDatepicker]="startDatePicker" placeholder="Enter Start Date" />
+            <mat-datepicker-toggle matSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #startDatePicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="fc-col-lg-3 fc-col-md-6">
+          <mat-form-field class="full-width">
+            <input formControlName="to" matInput [matDatepicker]="endDatePicker" placeholder="Enter End Date" />
+            <mat-datepicker-toggle matSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+            <mat-datepicker #endDatePicker></mat-datepicker>
+          </mat-form-field>
+        </div>
+
+        <div class="fc-col-lg-3 fc-col-md-6">
+          <mat-form-field class="full-width">
+            <mat-label>Entity</mat-label>
+            <mat-select formControlName="entity">
+              <mat-option value="">All</mat-option>
+              <mat-option *ngFor="let entity of entityList" [value]="entity">{{ entity }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="fc-col-lg-3 fc-col-md-6">
+          <mat-form-field class="full-width">
+            <input
+              matInput
+              placeholder="Author"
+              formControlName="author"
+              [matAutocomplete]="auto"
+              (click)="getUsers()"
+            />
+            <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete" (optionsScroll)="onPickerScroll()">
+              <mat-option *ngFor="let option of userList" [value]="option.username">
+                {{ option.username }}
+              </mat-option>
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+        <div class="fc-col-lg-3 fc-col-md-6">
+          <button mat-flat-button color="primary" (click)="applyFilter()" class="full-waidth" style="min-width: 120px">
+            {{ 'LIST-FILTERS.SEARCH-BUTTON-TEXT' | translate }}
+          </button>
+        </div>
+      </div>
+    </form>
+    <div class="table-container">
+      <mat-table [dataSource]="dataSource" class="history-table">
+        <ng-container matColumnDef="entity">
+          <mat-header-cell *matHeaderCellDef> Entity </mat-header-cell>
+          <mat-cell *matCellDef="let entityHistoryEntry">
+            {{ entityHistoryEntry.globalId.entity }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="cdoId">
+          <mat-header-cell *matHeaderCellDef> Entity Id </mat-header-cell>
+          <mat-cell *matCellDef="let entityHistoryEntry" class="text-center">
+            <a routerLink=""> {{ entityHistoryEntry.globalId.cdoId }} </a>
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="changeType">
+          <mat-header-cell *matHeaderCellDef> Change type </mat-header-cell>
+          <mat-cell *matCellDef="let entityHistoryEntry">
+            {{ entityHistoryEntry.changeType }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="author">
+          <mat-header-cell *matHeaderCellDef> Change author </mat-header-cell>
+          <mat-cell *matCellDef="let entityHistoryEntry">
+            <span
+              class="author"
+              [ngClass]="entityHistoryEntry.commitMetadata.author == 'admin' ? 'text-success' : 'text-danger'"
+              >{{ entityHistoryEntry.commitMetadata.author }}</span
+            >
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="commitDate">
+          <mat-header-cell *matHeaderCellDef> Change date </mat-header-cell>
+          <mat-cell *matCellDef="let entityHistoryEntry">
+            {{ entityHistoryEntry.commitMetadata.commitDate | date: 'medium' }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="propertyName">
+          <mat-header-cell *matHeaderCellDef> Property name </mat-header-cell>
+          <mat-cell *matCellDef="let entityHistoryEntry">
+            {{ entityHistoryEntry.property }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="previousValue">
+          <mat-header-cell *matHeaderCellDef> Previous value </mat-header-cell>
+          <mat-cell *matCellDef="let entityHistoryEntry">
+            {{ entityHistoryEntry.left }}
+          </mat-cell>
+        </ng-container>
+
+        <ng-container matColumnDef="currentValue">
+          <mat-header-cell *matHeaderCellDef> Current value </mat-header-cell>
+          <mat-cell *matCellDef="let entityHistoryEntry">
+            {{ entityHistoryEntry.right }}
+          </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+      </mat-table>
+    </div>
+    <section class="small-spinner-container" *ngIf="isLoadingResults">
+      <mat-spinner></mat-spinner>
+    </section>
+  </mat-card>
+</div>

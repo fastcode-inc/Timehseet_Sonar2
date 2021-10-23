@@ -1,0 +1,95 @@
+<div *ngIf="resource && showResourceView">
+  <!-- ----------------------------resource view dashboard------------------------------------- -->
+  <mat-card class="report-container chart-block">
+    <div class="report-container" *ngIf="resource.data && resource.resourceInfo.resource == 'report'">
+      <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="10px" class="mb-20 details-container">
+        <div fxLayout="row" gdAlignRows="center" fxLayoutAlign="start" fxLayoutGap="10px">
+          <div class="topbar" fxLayout="row" fxLayoutAlign="start">
+            <div class="top-breadcrumb">
+              <h3 class="template-title-small">{{ resource.data.title }}</h3>
+            </div>
+
+            <div
+              *ngIf="resource.resourceInfo.toolbar"
+              fxLayout="row"
+              fxLayoutAlign="end center"
+              class="toolbar chartoptions-container"
+            >
+              <!-- <div  class="chartoptions top-breadcrumb">
+                <h3 class="template-title-small">{{resource.data.title}}</h3>
+              </div> -->
+              <div class="chartoptions" appDropdown>
+                <button mat-stroked-button color="primary" [matMenuTriggerFor]="chartsize">
+                  {{ selectedChart }} <mat-icon>keyboard_arrow_down</mat-icon>
+                </button>
+                <mat-menu #chartsize="matMenu">
+                  <button mat-menu-item (click)="showChart('line', 'Line', 'show_chart')">
+                    <mat-icon>show_chart</mat-icon>{{ 'REPORTING.LABELS.REPORT.GRAPHS.LINE' | translate }}
+                  </button>
+                  <button mat-menu-item (click)="showChart('line', 'Area', 'multiline_chart')">
+                    <mat-icon>multiline_chart</mat-icon>{{ 'REPORTING.LABELS.REPORT.GRAPHS.AREA' | translate }}
+                  </button>
+                  <button mat-menu-item (click)="showChart('bar', 'Bar', 'bar_chart')">
+                    <mat-icon>bar_chart</mat-icon>{{ 'REPORTING.LABELS.REPORT.GRAPHS.BAR' | translate }}
+                  </button>
+                  <button mat-menu-item (click)="showChart('stackedBar', 'Stacked Bar', 'insert_chart')">
+                    <mat-icon>insert_chart</mat-icon>{{ 'REPORTING.LABELS.REPORT.GRAPHS.STACKED-BAR' | translate }}
+                  </button>
+                  <button mat-menu-item (click)="showChart('pie', 'Pie', 'pie_chart')">
+                    <mat-icon>pie_chart</mat-icon>{{ 'REPORTING.LABELS.REPORT.GRAPHS.PIE' | translate }}
+                  </button>
+                  <button mat-menu-item (click)="showChart('doughnut', 'Doughnut', 'donut_large')">
+                    <mat-icon>donut_large</mat-icon>{{ 'REPORTING.LABELS.REPORT.GRAPHS.DONUT' | translate }}
+                  </button>
+                  <button mat-menu-item (click)="showChart('polarArea', 'Polar Area', 'support')">
+                    <mat-icon>support</mat-icon>{{ 'REPORTING.LABELS.REPORT.GRAPHS.POLAR-AREA' | translate }}
+                  </button>
+                  <button mat-menu-item (click)="showChart('table', 'Table', 'table_chart')">
+                    <mat-icon>table_chart</mat-icon>{{ 'REPORTING.LABELS.REPORT.GRAPHS.TABLE' | translate }}
+                  </button>
+                  <button mat-menu-item (click)="showChart('singleValue', 'Number', 'format_list_numbered')">
+                    <mat-icon>format_list_numbered</mat-icon>{{ 'REPORTING.LABELS.REPORT.GRAPHS.NUMBER' | translate }}
+                  </button>
+                </mat-menu>
+              </div>
+              <div class="chartoptions">
+                <button mat-stroked-button color="primary" (click)="reload()">
+                  <mat-icon>replay</mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p *ngIf="resource.resourceInfo.description">{{ resource.data.description }}</p>
+        </div>
+      </div>
+      <div class="innerChartBlock">
+        <app-chart
+          style="width: 100%"
+          [ctype]="resource.data?.ctype"
+          [chartType]="resource.data?.reportType"
+          [query]="query"
+          [title]="resource.data?.title"
+        ></app-chart>
+      </div>
+    </div>
+
+    <!-- ----------------------------resource view dashboard start------------------------------------- -->
+
+    <div class="dashboard-conatiner" *ngIf="resource.resourceInfo.resource == 'dashboard'">
+      <div fxLayout="row" fxLayoutAlign="space-between" fxLayoutGap="10px" class="mb-20">
+        <div fxLayout="row" gdAlignRows="center" fxLayoutAlign="center" fxLayoutGap="10px">
+          <h3 class="mb-10">{{ resource.data.title }}</h3>
+          <small *ngIf="resource.resourceInfo.description">{{ resource.data.description }}</small>
+        </div>
+      </div>
+      <div fxLayout="row" class="charts-container">
+        <div *ngFor="let c of resource.data.reportDetails; let i = index" [class]="c.reportWidth">
+          <div class="innerChartBlock">
+            <app-chart [chartType]="c.reportType" [query]="c.query" [ctype]="c.ctype" [title]="c.title"> </app-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+  </mat-card>
+</div>

@@ -1,0 +1,29 @@
+.report-container {
+  padding: 25px;
+}
+
+.topbar {
+  flex-direction: row;
+  box-sizing: border-box;
+  display: flex;
+
+  // place-content: center flex-end;
+  // align-items: center
+}
+.title {
+  flex-direction: row;
+  box-sizing: border-box;
+  display: flex;
+  place-content: center flex-start;
+  align-items: center;
+}
+
+.toolbar {
+  position: absolute;
+  right: 0px;
+  flex-direction: row;
+  box-sizing: border-box;
+  display: flex;
+  place-content: center flex-end;
+  align-items: center;
+}
