@@ -20,6 +20,7 @@ public class DbException extends SQLIntegrityConstraintViolationException {
         this.message = reason;
     }
 
+    @Override
     public String getMessage() {
         return message;
     }

@@ -31,6 +31,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
+    public static final String RANGE = "range";
     @Qualifier("timesheetdetailsRepository")
     @NonNull
     protected final ITimesheetdetailsRepository _timesheetdetailsRepository;
@@ -65,7 +69,6 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
 
             if (foundTask != null) {
                 foundTask.addTimesheetdetails(timesheetdetails);
-                //timesheetdetails.setTask(foundTask);
             }
         }
         if (input.getTimeofftypeid() != null) {
@@ -73,7 +76,6 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
 
             if (foundTimeofftype != null) {
                 foundTimeofftype.addTimesheetdetails(timesheetdetails);
-                //timesheetdetails.setTimeofftype(foundTimeofftype);
             }
         }
         if (input.getTimesheetid() != null) {
@@ -81,7 +83,6 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
 
             if (foundTimesheet != null) {
                 foundTimesheet.addTimesheetdetails(timesheetdetails);
-                //timesheetdetails.setTimesheet(foundTimesheet);
             } else {
                 return null;
             }
@@ -95,7 +96,7 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateTimesheetdetailsOutput update(Long timesheetdetailsId, UpdateTimesheetdetailsInput input) {
-        Timesheetdetails existing = _timesheetdetailsRepository.findById(timesheetdetailsId).get();
+        _timesheetdetailsRepository.findById(timesheetdetailsId).get();
 
         Timesheetdetails timesheetdetails = mapper.updateTimesheetdetailsInputToTimesheetdetails(input);
         Task foundTask = null;
@@ -107,7 +108,6 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
 
             if (foundTask != null) {
                 foundTask.addTimesheetdetails(timesheetdetails);
-                //	timesheetdetails.setTask(foundTask);
             }
         }
 
@@ -116,7 +116,6 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
 
             if (foundTimeofftype != null) {
                 foundTimeofftype.addTimesheetdetails(timesheetdetails);
-                //	timesheetdetails.setTimeofftype(foundTimeofftype);
             }
         }
 
@@ -125,7 +124,6 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
 
             if (foundTimesheet != null) {
                 foundTimesheet.addTimesheetdetails(timesheetdetails);
-                //	timesheetdetails.setTimesheet(foundTimesheet);
             } else {
                 return null;
             }
@@ -259,21 +257,21 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("hours")) {
                 if (
-                    details.getValue().getOperator().equals("contains") &&
+                    details.getValue().getOperator().equals(CONTAINS) &&
                     NumberUtils.isCreatable(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.hours.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     NumberUtils.isCreatable(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.hours.eq(new BigDecimal(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     NumberUtils.isCreatable(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.hours.ne(new BigDecimal(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         NumberUtils.isCreatable(details.getValue().getStartingValue()) &&
                         NumberUtils.isCreatable(details.getValue().getEndingValue())
@@ -292,19 +290,19 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("id")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(timesheetdetails.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.id.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())
@@ -323,30 +321,30 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("notes")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(timesheetdetails.notes.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(timesheetdetails.notes.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(timesheetdetails.notes.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("workdate")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(
                         timesheetdetails.workdate.eq(SearchUtils.stringToLocalDate(details.getValue().getSearchValue()))
                     );
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(
                         timesheetdetails.workdate.ne(SearchUtils.stringToLocalDate(details.getValue().getSearchValue()))
                     );
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     LocalDate startLocalDate = SearchUtils.stringToLocalDate(details.getValue().getStartingValue());
                     LocalDate endLocalDate = SearchUtils.stringToLocalDate(details.getValue().getEndingValue());
                     if (startLocalDate != null && endLocalDate != null) {
@@ -361,21 +359,21 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
 
             if (details.getKey().replace("%20", "").trim().equals("task")) {
                 if (
-                    details.getValue().getOperator().equals("contains") &&
+                    details.getValue().getOperator().equals(CONTAINS) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.task.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.task.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.task.id.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())
@@ -395,21 +393,21 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("timeofftype")) {
                 if (
-                    details.getValue().getOperator().equals("contains") &&
+                    details.getValue().getOperator().equals(CONTAINS) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.timeofftype.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.timeofftype.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.timeofftype.id.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())
@@ -433,21 +431,21 @@ public class TimesheetdetailsAppService implements ITimesheetdetailsAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("timesheet")) {
                 if (
-                    details.getValue().getOperator().equals("contains") &&
+                    details.getValue().getOperator().equals(CONTAINS) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.timesheet.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.timesheet.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheetdetails.timesheet.id.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())

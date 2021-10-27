@@ -19,10 +19,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("permissionAppService")
 @RequiredArgsConstructor
 public class PermissionAppService implements IPermissionAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
     @Qualifier("permissionRepository")
     @NonNull
     protected final IPermissionRepository _permissionRepository;
@@ -44,7 +49,12 @@ public class PermissionAppService implements IPermissionAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdatePermissionOutput update(Long permissionId, UpdatePermissionInput input) {
-        Permission existing = _permissionRepository.findById(permissionId).get();
+        Permission existing = null;
+        Optional<Permission> e = _permissionRepository.findById(permissionId);
+        if(e.isPresent())
+            existing = e.get();
+        else
+            throw new EntityNotFoundException("Entity not found");
 
         Permission permission = mapper.updatePermissionInputToPermission(input);
         permission.setRolepermissionsSet(existing.getRolepermissionsSet());
@@ -130,24 +140,24 @@ public class PermissionAppService implements IPermissionAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("displayName")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(permission.displayName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(permission.displayName.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(permission.displayName.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("id")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(permission.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(permission.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(permission.id.ne(Long.valueOf(details.getValue().getSearchValue())));
@@ -170,11 +180,11 @@ public class PermissionAppService implements IPermissionAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("name")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(permission.name.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(permission.name.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(permission.name.ne(details.getValue().getSearchValue()));
                 }
             }

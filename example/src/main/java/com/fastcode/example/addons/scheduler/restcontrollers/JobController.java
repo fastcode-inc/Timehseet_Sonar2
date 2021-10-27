@@ -80,7 +80,7 @@ public class JobController {
     public ResponseEntity<FindByJobOutput> returnJob(@PathVariable String jobName, @PathVariable String jobGroup)
         throws SchedulerException, IOException {
         if (jobName == null || jobGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
 
         FindByJobOutput detail = jobAppService.returnJob(jobName, jobGroup);
@@ -103,7 +103,7 @@ public class JobController {
         consumes = { "application/json" },
         produces = { "application/json" }
     )
-    public ResponseEntity<List<String>> listAllJobClasses() throws URISyntaxException {
+    public ResponseEntity<List<String>> listAllJobClasses() throws URISyntaxException, IOException, ClassNotFoundException {
         List<String> list = jobAppService.listAllJobClasses();
 
         return new ResponseEntity(list, HttpStatus.OK);
@@ -127,7 +127,7 @@ public class JobController {
     public ResponseEntity<Boolean> deleteJob(@PathVariable String jobName, @PathVariable String jobGroup)
         throws SchedulerException, IOException {
         if (jobName == null || jobGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
 
         boolean status = jobAppService.deleteJob(jobName, jobGroup);
@@ -157,7 +157,7 @@ public class JobController {
     )
         throws SchedulerException, IOException {
         if (jobName == null || jobGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
         obj.setJobName(jobName);
         obj.setJobGroup(jobGroup);
@@ -184,7 +184,7 @@ public class JobController {
     public ResponseEntity<Boolean> pauseJob(@PathVariable String jobName, @PathVariable String jobGroup)
         throws SchedulerException, IOException {
         if (jobName == null || jobGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
 
         boolean status = jobAppService.pauseJob(jobName, jobGroup);
@@ -210,7 +210,7 @@ public class JobController {
     public ResponseEntity<Boolean> resumeJob(@PathVariable String jobName, @PathVariable String jobGroup)
         throws SchedulerException, IOException {
         if (jobName == null || jobGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
 
         boolean status = jobAppService.resumeJob(jobName, jobGroup);
@@ -231,7 +231,7 @@ public class JobController {
     public ResponseEntity<CreateJobInput> createJob(@RequestBody @Valid CreateJobInput obj)
         throws SchedulerException, ClassNotFoundException, IOException {
         if (obj.getJobClass() == null || obj.getJobName() == null || obj.getJobGroup() == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
 
         boolean status = jobAppService.createJob(obj);
@@ -264,7 +264,7 @@ public class JobController {
     )
         throws SchedulerException, IOException {
         if (jobName == null || jobGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
 
         List<FindByTriggerOutput> triggerDetails = jobAppService.returnTriggersForAJob(new JobKey(jobName, jobGroup));
@@ -293,7 +293,7 @@ public class JobController {
     )
         throws IOException {
         if (jobName == null || jobGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
 
         List<GetJobOutput> list = jobAppService.executionHistoryByJob(jobName, jobGroup);

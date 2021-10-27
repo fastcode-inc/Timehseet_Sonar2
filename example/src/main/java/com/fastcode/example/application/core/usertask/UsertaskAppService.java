@@ -28,6 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UsertaskAppService implements IUsertaskAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
+    public static final String RANGE = "range";
     @Qualifier("usertaskRepository")
     @NonNull
     protected final IUsertaskRepository _usertaskRepository;
@@ -57,7 +61,6 @@ public class UsertaskAppService implements IUsertaskAppService {
 
             if (foundTask != null) {
                 foundTask.addUsertasks(usertask);
-                //usertask.setTask(foundTask);
             }
         }
         if (input.getUserid() != null) {
@@ -65,7 +68,6 @@ public class UsertaskAppService implements IUsertaskAppService {
 
             if (foundUsers != null) {
                 foundUsers.addUsertasks(usertask);
-                //usertask.setUsers(foundUsers);
             }
         }
 
@@ -86,7 +88,6 @@ public class UsertaskAppService implements IUsertaskAppService {
 
             if (foundTask != null) {
                 foundTask.addUsertasks(usertask);
-                //	usertask.setTask(foundTask);
             }
         }
 
@@ -95,7 +96,6 @@ public class UsertaskAppService implements IUsertaskAppService {
 
             if (foundUsers != null) {
                 foundUsers.addUsertasks(usertask);
-                //	usertask.setUsers(foundUsers);
             }
         }
 
@@ -204,19 +204,19 @@ public class UsertaskAppService implements IUsertaskAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("taskid")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(usertask.taskid.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usertask.taskid.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usertask.taskid.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())
@@ -235,19 +235,19 @@ public class UsertaskAppService implements IUsertaskAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("userid")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(usertask.userid.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usertask.userid.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usertask.userid.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())
@@ -268,21 +268,21 @@ public class UsertaskAppService implements IUsertaskAppService {
 
             if (details.getKey().replace("%20", "").trim().equals("task")) {
                 if (
-                    details.getValue().getOperator().equals("contains") &&
+                    details.getValue().getOperator().equals(CONTAINS) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usertask.task.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usertask.task.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usertask.task.id.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())
@@ -302,21 +302,21 @@ public class UsertaskAppService implements IUsertaskAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("users")) {
                 if (
-                    details.getValue().getOperator().equals("contains") &&
+                    details.getValue().getOperator().equals(CONTAINS) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usertask.users.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usertask.users.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usertask.users.id.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())

@@ -55,7 +55,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
         UsernamePasswordAuthenticationToken authentication = null;
         ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED);
-        LoggingHelper logHelper = new LoggingHelper();
         try {
             authentication = getAuthentication(req);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -63,27 +62,21 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         } catch (ExpiredJwtException exception) {
             apiError.setMessage(ExceptionMessageConstants.TOKEN_EXPIRED);
-            logHelper.getLogger().error("An Exception Occurred:", exception);
             res.setStatus(401);
         } catch (UnsupportedJwtException exception) {
             apiError.setMessage(ExceptionMessageConstants.TOKEN_UNSUPPORTED);
-            logHelper.getLogger().error("An Exception Occurred:", exception);
             res.setStatus(401);
         } catch (MalformedJwtException exception) {
             apiError.setMessage(ExceptionMessageConstants.TOKEN_MALFORMED);
-            logHelper.getLogger().error("An Exception Occurred:", exception);
             res.setStatus(401);
         } catch (SignatureException exception) {
             apiError.setMessage(ExceptionMessageConstants.TOKEN_INCORRECT_SIGNATURE);
-            logHelper.getLogger().error("An Exception Occurred:", exception);
             res.setStatus(401);
         } catch (IllegalArgumentException exception) {
             apiError.setMessage(ExceptionMessageConstants.TOKEN_ILLEGAL_ARGUMENT);
-            logHelper.getLogger().error("An Exception Occurred:", exception);
             res.setStatus(401);
         } catch (JwtException exception) {
             apiError.setMessage(ExceptionMessageConstants.TOKEN_UNAUTHORIZED);
-            logHelper.getLogger().error("An Exception Occurred:", exception);
             res.setStatus(401);
         }
 
@@ -93,10 +86,6 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
         out.flush();
     }
 
-    private ResponseEntity<Object> buildResponseEntity(ApiError apiError) {
-        return new ResponseEntity<>(apiError, apiError.getStatus());
-    }
-
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) throws JwtException {
         String authorizationToken = request.getHeader(SecurityConstants.HEADER_STRING);
         String authenticationToken = securityUtils.getTokenFromCookies(request.getCookies());
@@ -104,23 +93,11 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
         // Check that the token is inactive in the JwtEntity table
         JwtEntity jwt = jwtRepo.findByAuthorizationTokenAndAuthenticationToken(authorizationToken, authenticationToken);
-        ApiError apiError = new ApiError(HttpStatus.UNAUTHORIZED);
 
         if (jwt == null) {
             throw new JwtException("Token Does Not Exist");
         }
         Claims claims;
-        if (
-            StringUtils.isNotEmpty(authenticationToken) &&
-            authenticationToken.startsWith(SecurityConstants.TOKEN_PREFIX)
-        ) {
-            claims =
-                Jwts
-                    .parser()
-                    .setSigningKey(SecurityConstants.SECRET.getBytes())
-                    .parseClaimsJws(authenticationToken.replace(SecurityConstants.TOKEN_PREFIX, ""))
-                    .getBody();
-        }
 
         if (
             StringUtils.isNotEmpty(authorizationToken) && authorizationToken.startsWith(SecurityConstants.TOKEN_PREFIX)

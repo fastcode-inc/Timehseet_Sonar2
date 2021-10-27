@@ -51,7 +51,7 @@ public class ProjectController {
     @RequestMapping(method = RequestMethod.POST, consumes = { "application/json" }, produces = { "application/json" })
     public ResponseEntity<CreateProjectOutput> create(@RequestBody @Valid CreateProjectInput project) {
         CreateProjectOutput output = _projectAppService.create(project);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
 
         return new ResponseEntity(output, HttpStatus.OK);
     }
@@ -92,7 +92,7 @@ public class ProjectController {
 
         project.setVersiono(currentProject.getVersiono());
         UpdateProjectOutput output = _projectAppService.update(Long.valueOf(id), project);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
         return new ResponseEntity(output, HttpStatus.OK);
     }
 
@@ -174,7 +174,7 @@ public class ProjectController {
         Map<String, String> joinColDetails = _projectAppService.parseTasksJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 

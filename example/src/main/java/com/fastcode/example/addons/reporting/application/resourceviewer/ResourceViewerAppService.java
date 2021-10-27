@@ -56,14 +56,12 @@ public class ResourceViewerAppService implements IResourceViewerAppService {
     }
 
     public boolean isAuthorized(FindPermalinkByIdOutput output, String password) {
-        if (output.getAuthentication() == "login") {
+        if (output.getAuthentication().equals("login")) {
             if (_usersAppService.getUsers() == null) {
                 return false;
             }
-        } else if (output.getAuthentication() == "password") {
-            if (!pEncoder.matches(password, output.getPassword())) {
+        } else if (output.getAuthentication().equals("password") && (!pEncoder.matches(password, output.getPassword()))) {
                 return false;
-            }
         }
 
         return true;

@@ -11,6 +11,8 @@ import org.springframework.core.annotation.AnnotationUtils;
  */
 public abstract class EncryptionUtils {
 
+    private EncryptionUtils(){}
+
     public static boolean isFieldEncrypted(Field field) {
         return AnnotationUtils.findAnnotation(field, encryptMe.class) != null;
     }

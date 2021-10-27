@@ -46,7 +46,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse res)
         throws AuthenticationException {
         try {
-            System.out.println("I am here ...");
             LoginUserInput creds = new ObjectMapper().readValue(request.getInputStream(), LoginUserInput.class);
             Users user = _userRepository.findByUsernameIgnoreCase(creds.getUserName());
             if (user != null && user.getIsactive()) {
@@ -73,14 +72,12 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
 
-        if (auth != null) {
-            if (auth.getPrincipal() instanceof org.springframework.security.core.userdetails.User) {
-                userName = ((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername();
-                claims.setSubject(userName);
-                cookieClaims.setSubject(userName);
-            }
+        if ((auth != null) && (auth.getPrincipal() instanceof org.springframework.security.core.userdetails.User)) {
+            userName = ((org.springframework.security.core.userdetails.User) auth.getPrincipal()).getUsername();
+            claims.setSubject(userName);
+            cookieClaims.setSubject(userName);
+            claims.put("scopes", (auth.getAuthorities().stream().map(s -> s.toString()).collect(Collectors.toList())));
         }
-        claims.put("scopes", (auth.getAuthorities().stream().map(s -> s.toString()).collect(Collectors.toList())));
         Users user = _userRepository.findByUsernameIgnoreCase(userName);
         if (user != null && (user.getIsemailconfirmed() == null || !user.getIsemailconfirmed())) {
             out.println("{");

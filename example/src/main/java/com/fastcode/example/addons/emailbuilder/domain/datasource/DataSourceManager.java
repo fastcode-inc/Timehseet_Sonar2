@@ -21,6 +21,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public class DataSourceManager implements IDataSourceManager {
 
+    public static final String NORECORD = "NORECORD";
     @Autowired
     IDataSourceRepository _dataSourceRepository;
 
@@ -111,7 +112,7 @@ public class DataSourceManager implements IDataSourceManager {
         if (mappedList != null && mappedList.size() > 0) {
             return String.join(",", mappedList);
         } else {
-            return "NORECORD";
+            return NORECORD;
         }
     }
 
@@ -121,7 +122,7 @@ public class DataSourceManager implements IDataSourceManager {
         if (mappedList != null && mappedList.size() > 0) {
             return String.join(",", mappedList);
         } else {
-            return "NORECORD";
+            return NORECORD;
         }
     }
 
@@ -131,7 +132,7 @@ public class DataSourceManager implements IDataSourceManager {
         if (mappedList != null && mappedList.size() > 0) {
             return String.join(",", mappedList);
         } else {
-            return "NORECORD";
+            return NORECORD;
         }
     }
 }

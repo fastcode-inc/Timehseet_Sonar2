@@ -45,7 +45,6 @@ public class JobsListener implements JobListener {
             mapDataJson = new ObjectMapper().writeValueAsString(map);
         } catch (JsonProcessingException e) {
             // TODO Auto-generated catch block
-            e.printStackTrace();
         }
         jobentity.setJobName(context.getJobDetail().getKey().getName());
         jobentity.setJobGroup(context.getJobDetail().getKey().getGroup());

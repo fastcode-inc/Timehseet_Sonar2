@@ -42,8 +42,6 @@ public class UpdateEmailTemplateInput {
     private Boolean active;
     private String attachmentpath;
 
-    // private Long versiono;
-
     @Length(max = 512, message = "Description Name must be less than 512 characters")
     private String description;
 

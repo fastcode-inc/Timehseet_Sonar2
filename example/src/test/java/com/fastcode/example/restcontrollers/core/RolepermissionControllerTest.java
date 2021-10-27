@@ -37,6 +37,8 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
+
+import org.assertj.core.api.Assertions;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -269,7 +271,7 @@ public class RolepermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindById_IdIsNotValid_ReturnStatusNotFound() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -318,7 +320,7 @@ public class RolepermissionControllerTest extends DatabaseContainerConfig {
 
         String json = ow.writeValueAsString(rolepermission);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(
+        Assertions.assertThatThrownBy(
             () ->
                 mvc
                     .perform(post("/rolepermission").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -337,7 +339,7 @@ public class RolepermissionControllerTest extends DatabaseContainerConfig {
 
         String json = ow.writeValueAsString(rolepermission);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(
+        Assertions.assertThatThrownBy(
             () ->
                 mvc
                     .perform(post("/rolepermission").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -348,7 +350,7 @@ public class RolepermissionControllerTest extends DatabaseContainerConfig {
     @Test
     public void DeleteRolepermission_IdIsNotValid_ThrowEntityNotFoundException() {
         doReturn(null).when(rolepermissionAppService).findById(new RolepermissionId(999L, 999L));
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -413,7 +415,7 @@ public class RolepermissionControllerTest extends DatabaseContainerConfig {
             .withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(rolepermission);
 
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -491,7 +493,7 @@ public class RolepermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindAll_SearchIsNotNullAndPropertyIsNotValid_ThrowException() throws Exception {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -506,7 +508,7 @@ public class RolepermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetPermission_IdIsNotEmptyAndIdIsNotValid_ThrowException() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -520,7 +522,7 @@ public class RolepermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetPermission_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -551,7 +553,7 @@ public class RolepermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetRole_IdIsNotEmptyAndIdIsNotValid_ThrowException() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -563,7 +565,7 @@ public class RolepermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetRole_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc

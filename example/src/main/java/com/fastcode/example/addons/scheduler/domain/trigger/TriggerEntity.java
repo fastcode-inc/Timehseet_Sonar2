@@ -17,10 +17,6 @@ public class TriggerEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    //@Column(name = "id", nullable = true)
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
-    //private Long id;
-
     @Basic
     @Column(name = "sched_name", nullable = false, length = 256)
     private String schedName;

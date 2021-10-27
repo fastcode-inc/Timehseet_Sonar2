@@ -69,7 +69,7 @@ public class RoleAppServiceTest {
     public void findRoleById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Role> nullOptional = Optional.ofNullable(null);
         Mockito.when(_roleRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(ID)).isNull();
     }
 
     @Test
@@ -84,7 +84,7 @@ public class RoleAppServiceTest {
     @Test
     public void findRoleByName_NameIsNotNullAndRoleDoesNotExist_ReturnNull() {
         Mockito.when(_roleRepository.findByRoleName(anyString())).thenReturn(null);
-        Assertions.assertThat(_appService.findByRoleName("Role1")).isEqualTo(null);
+        Assertions.assertThat(_appService.findByRoleName("Role1")).isNull();
     }
 
     @Test
@@ -217,7 +217,7 @@ public class RoleAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     @Test

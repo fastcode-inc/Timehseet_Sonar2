@@ -174,12 +174,12 @@ public class TaskController {
         Map<String, String> joinColDetails = _taskAppService.parseTimesheetdetailsJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 
         List<FindTimesheetdetailsByIdOutput> output = _timesheetdetailsAppService.find(searchCriteria, pageable);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         return new ResponseEntity(output, HttpStatus.OK);
     }
@@ -212,12 +212,12 @@ public class TaskController {
         Map<String, String> joinColDetails = _taskAppService.parseUsertasksJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 
         List<FindUsertaskByIdOutput> output = _usertaskAppService.find(searchCriteria, pageable);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         return new ResponseEntity(output, HttpStatus.OK);
     }

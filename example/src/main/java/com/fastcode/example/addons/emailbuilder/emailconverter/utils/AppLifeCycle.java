@@ -19,32 +19,28 @@ public class AppLifeCycle {
     private String mjmlFileBase;
 
     @PostConstruct
-    public void init() {
+    public void init() throws IOException {
         File file = new File(mjmlFileBase);
         if (!file.exists()) {
             file.mkdirs();
         }
 
         ClassPathResource resourceMailTem1 = new ClassPathResource("templates/emailTemplate/basicTemp.txt");
-        if (resourceMailTem1.exists()) {
-            if (new File(mjmlFileBase).exists()) {
-                try {
-                    InputStream inputStream = resourceMailTem1.getInputStream();
-                    Path targetPath = Paths.get(mjmlFileBase).resolve(resourceMailTem1.getFilename());
-                    Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {}
-            }
+        if (resourceMailTem1.exists() && (new File(mjmlFileBase).exists())) {
+            try {
+                InputStream inputStream = resourceMailTem1.getInputStream();
+                Path targetPath = Paths.get(mjmlFileBase).resolve(resourceMailTem1.getFilename());
+                Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {throw e;}
         }
 
         ClassPathResource resourceMailTemp2 = new ClassPathResource("templates/emailTemplate/sectionTemp.txt");
-        if (resourceMailTemp2.exists()) {
-            if (new File(mjmlFileBase).exists()) {
-                try {
-                    InputStream inputStream = resourceMailTemp2.getInputStream();
-                    Path targetPath = Paths.get(mjmlFileBase).resolve(resourceMailTemp2.getFilename());
-                    Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {}
-            }
+        if (resourceMailTemp2.exists() && (new File(mjmlFileBase).exists())) {
+            try {
+                InputStream inputStream = resourceMailTemp2.getInputStream();
+                Path targetPath = Paths.get(mjmlFileBase).resolve(resourceMailTemp2.getFilename());
+                Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {throw e;}
         }
     }
 

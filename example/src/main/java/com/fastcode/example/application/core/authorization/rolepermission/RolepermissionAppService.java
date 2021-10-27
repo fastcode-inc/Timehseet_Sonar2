@@ -31,6 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RolepermissionAppService implements IRolepermissionAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
     @NonNull
     protected final JWTAppService _jwtAppService;
 
@@ -110,8 +113,6 @@ public class RolepermissionAppService implements IRolepermissionAppService {
             if (checkIfPermissionAlreadyAssigned(foundRole, foundPermission)) {
                 foundPermission.addRolepermissions(rolepermission);
                 foundRole.addRolepermissions(rolepermission);
-                //rolepermission.setPermission(foundPermission);
-                //rolepermission.setRole(foundRole);
             }
         } else {
             return null;
@@ -245,15 +246,15 @@ public class RolepermissionAppService implements IRolepermissionAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("permissionId")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(rolepermission.permissionId.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(rolepermission.permissionId.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(rolepermission.permissionId.ne(Long.valueOf(details.getValue().getSearchValue())));
@@ -278,15 +279,15 @@ public class RolepermissionAppService implements IRolepermissionAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("roleId")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(rolepermission.roleId.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(rolepermission.roleId.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(rolepermission.roleId.ne(Long.valueOf(details.getValue().getSearchValue())));
@@ -310,26 +311,26 @@ public class RolepermissionAppService implements IRolepermissionAppService {
             }
 
             if (details.getKey().replace("%20", "").trim().equals("permission")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(
                         rolepermission.permission.displayName.likeIgnoreCase(
                             "%" + details.getValue().getSearchValue() + "%"
                         )
                     );
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(rolepermission.permission.displayName.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(rolepermission.permission.displayName.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("role")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(
                         rolepermission.role.displayName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
                     );
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(rolepermission.role.displayName.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(rolepermission.role.displayName.ne(details.getValue().getSearchValue()));
                 }
             }

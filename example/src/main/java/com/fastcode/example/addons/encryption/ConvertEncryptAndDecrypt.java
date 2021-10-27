@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -19,20 +20,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Converter
 public class ConvertEncryptAndDecrypt implements AttributeConverter<String, String> {
 
-    // @Value("${encryption.key}") // public static String key ;
-
     public static String key = "qwertyuiopqwerty";
-    public static String initVector = "asdfghjklasdfghj";
-
-    // @Value("${encryption.intvector}") // public static String initVector;
 
     @Autowired
     private LoggingHelper logHelper;
 
+    SecureRandom random = new SecureRandom();
+
     @Override
     public String convertToDatabaseColumn(String attribute) {
         try {
-            IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
+            byte[] bytesIV = new byte[16];
+            random.nextBytes(bytesIV);
+            IvParameterSpec iv = new IvParameterSpec(bytesIV);
             SecretKeySpec secret = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.ENCRYPT_MODE, secret, iv);
@@ -47,7 +47,6 @@ public class ConvertEncryptAndDecrypt implements AttributeConverter<String, Stri
             | InvalidKeyException
             | InvalidAlgorithmParameterException e
         ) {
-            logHelper.getLogger().error("error" + e);
             return " exception >";
         }
     }
@@ -55,7 +54,9 @@ public class ConvertEncryptAndDecrypt implements AttributeConverter<String, Stri
     @Override
     public String convertToEntityAttribute(String dbData) {
         try {
-            IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
+            byte[] bytesIV = new byte[16];
+            random.nextBytes(bytesIV);
+            IvParameterSpec iv = new IvParameterSpec(bytesIV);
             SecretKeySpec secret = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, secret, iv);
@@ -70,7 +71,6 @@ public class ConvertEncryptAndDecrypt implements AttributeConverter<String, Stri
             | InvalidKeyException
             | InvalidAlgorithmParameterException e
         ) {
-            logHelper.getLogger().error("error" + e);
             return " exception >";
         }
     }

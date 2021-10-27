@@ -21,10 +21,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("projectAppService")
 @RequiredArgsConstructor
 public class ProjectAppService implements IProjectAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
+    public static final String RANGE = "range";
     @Qualifier("projectRepository")
     @NonNull
     protected final IProjectRepository _projectRepository;
@@ -49,7 +55,6 @@ public class ProjectAppService implements IProjectAppService {
 
             if (foundCustomer != null) {
                 foundCustomer.addProjects(project);
-                //project.setCustomer(foundCustomer);
             } else {
                 return null;
             }
@@ -63,7 +68,11 @@ public class ProjectAppService implements IProjectAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateProjectOutput update(Long projectId, UpdateProjectInput input) {
-        Project existing = _projectRepository.findById(projectId).get();
+        Project existing = null;
+        Optional<Project> p = _projectRepository.findById(projectId);
+        if(p.isPresent())
+            existing = p.get();
+        else throw new EntityNotFoundException("Entity not found");
 
         Project project = mapper.updateProjectInputToProject(input);
         project.setTasksSet(existing.getTasksSet());
@@ -74,7 +83,6 @@ public class ProjectAppService implements IProjectAppService {
 
             if (foundCustomer != null) {
                 foundCustomer.addProjects(project);
-                //	project.setCustomer(foundCustomer);
             } else {
                 return null;
             }
@@ -172,26 +180,26 @@ public class ProjectAppService implements IProjectAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("description")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(project.description.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(project.description.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(project.description.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("enddate")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(project.enddate.eq(SearchUtils.stringToLocalDate(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(project.enddate.ne(SearchUtils.stringToLocalDate(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     LocalDate startLocalDate = SearchUtils.stringToLocalDate(details.getValue().getStartingValue());
                     LocalDate endLocalDate = SearchUtils.stringToLocalDate(details.getValue().getEndingValue());
                     if (startLocalDate != null && endLocalDate != null) {
@@ -204,19 +212,19 @@ public class ProjectAppService implements IProjectAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("id")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(project.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(project.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(project.id.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())
@@ -235,30 +243,30 @@ public class ProjectAppService implements IProjectAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("name")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(project.name.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(project.name.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(project.name.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("startdate")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(
                         project.startdate.eq(SearchUtils.stringToLocalDate(details.getValue().getSearchValue()))
                     );
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(
                         project.startdate.ne(SearchUtils.stringToLocalDate(details.getValue().getSearchValue()))
                     );
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     LocalDate startLocalDate = SearchUtils.stringToLocalDate(details.getValue().getStartingValue());
                     LocalDate endLocalDate = SearchUtils.stringToLocalDate(details.getValue().getEndingValue());
                     if (startLocalDate != null && endLocalDate != null) {
@@ -273,21 +281,21 @@ public class ProjectAppService implements IProjectAppService {
 
             if (details.getKey().replace("%20", "").trim().equals("customer")) {
                 if (
-                    details.getValue().getOperator().equals("contains") &&
+                    details.getValue().getOperator().equals(CONTAINS) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(project.customer.customerid.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(project.customer.customerid.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(project.customer.customerid.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())

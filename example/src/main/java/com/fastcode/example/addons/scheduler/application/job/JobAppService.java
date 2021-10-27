@@ -16,7 +16,7 @@ import com.fastcode.example.commons.search.SearchFields;
 import com.google.gson.Gson;
 import com.querydsl.core.BooleanBuilder;
 import java.io.IOException;
-import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.CodeSource;
@@ -52,9 +52,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class JobAppService implements IJobAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
+    static final int CASE1 = 1;
+    static final int CASE2 = 2;
+    static final int CASE3 = 3;
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
 
     @Autowired
     protected Environment env;
@@ -74,12 +77,9 @@ public class JobAppService implements IJobAppService {
     protected IJobRepository jobDetailsRepository;
 
     protected Scheduler scheduler;
-
-    protected QuartzConstants quartzConstant;
-
+    
     public Scheduler getScheduler() {
         scheduler = schedulerFactoryBean.getScheduler();
-        //scheduler.start();
         return scheduler;
     }
 
@@ -99,7 +99,7 @@ public class JobAppService implements IJobAppService {
             obj.setJobDescription(jobList.get(i).getDescription());
 
             if (isJobRunning(jobList.get(i).getJobName(), jobList.get(i).getJobGroup())) obj.setJobStatus(
-                quartzConstant.JOB_STATUS_RUNNING
+                QuartzConstants.JOB_STATUS_RUNNING
             ); else obj.setJobStatus(getJobState(jobList.get(i).getJobName(), jobList.get(i).getJobGroup()));
 
             list.add(obj);
@@ -134,16 +134,16 @@ public class JobAppService implements IJobAppService {
     public BooleanBuilder searchJobDetails(SearchCriteria search) throws Exception {
         QJobEntity job = QJobEntity.jobEntity;
         if (search != null) {
-            if (search.getType() == case1) {
+            if (search.getType() == CASE1) {
                 return searchAllPropertiesForJobDetails(job, search.getValue(), search.getOperator());
-            } else if (search.getType() == case2) {
+            } else if (search.getType() == CASE2) {
                 List<String> keysList = new ArrayList<String>();
                 for (SearchFields f : search.getFields()) {
                     keysList.add(f.getFieldName());
                 }
                 checkPropertiesForJobDetails(keysList);
                 return searchSpecificPropertyForJobDetails(job, keysList, search.getValue(), search.getOperator());
-            } else if (search.getType() == case3) {
+            } else if (search.getType() == CASE3) {
                 Map<String, SearchFields> map = new HashMap<>();
                 for (SearchFields fieldDetails : search.getFields()) {
                     map.put(fieldDetails.getFieldName(), fieldDetails);
@@ -159,11 +159,11 @@ public class JobAppService implements IJobAppService {
     public BooleanBuilder searchAllPropertiesForJobDetails(QJobEntity jobDetails, String value, String operator) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (operator.equals("contains")) {
+        if (operator.equals(CONTAINS)) {
             builder.or(jobDetails.jobName.likeIgnoreCase("%" + value + "%"));
             builder.or(jobDetails.jobGroup.likeIgnoreCase("%" + value + "%"));
             builder.or(jobDetails.jobClassName.likeIgnoreCase("%" + value + "%"));
-        } else if (operator.equals("equals")) {
+        } else if (operator.equals(EQUALS_TO)) {
             builder.or(jobDetails.jobName.eq(value));
             builder.or(jobDetails.jobGroup.eq(value));
             builder.or(jobDetails.jobClassName.eq(value));
@@ -197,23 +197,23 @@ public class JobAppService implements IJobAppService {
 
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).replace("%20", "").trim().equals("jobName")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(jobDetails.jobName.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(jobDetails.jobName.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("jobGroup")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(jobDetails.jobGroup.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(jobDetails.jobGroup.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("jobClassName")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(jobDetails.jobClassName.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(jobDetails.jobClassName.eq(value));
                 }
             }
@@ -226,31 +226,31 @@ public class JobAppService implements IJobAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("jobName")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(jobDetails.jobName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(jobDetails.jobName.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(jobDetails.jobName.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("jobGroup")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(jobDetails.jobGroup.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(jobDetails.jobGroup.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(jobDetails.jobGroup.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("jobClassName")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(
                         jobDetails.jobClassName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
                     );
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(jobDetails.jobClassName.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(jobDetails.jobClassName.ne(details.getValue().getSearchValue()));
                 }
             }
@@ -283,10 +283,12 @@ public class JobAppService implements IJobAppService {
         return jobsList;
     }
 
-    public List<String> listAllJobClasses() throws URISyntaxException {
+    public List<String> listAllJobClasses() throws URISyntaxException, ClassNotFoundException, IOException, MalformedURLException {
         String packageName = env.getProperty("fastCode.jobs.default");
         URI uri = ExampleApplication.class.getResource("/").toURI();
-
+            if(packageName==null){
+                throw new IOException("Property not found");
+            }
         if (uri.getScheme().equals("jar")) {
             List<String> jobClasses = new ArrayList<String>();
             jobClasses = getFilesFromJar("/" + packageName.replace(".", "/"));
@@ -297,7 +299,7 @@ public class JobAppService implements IJobAppService {
             try {
                 jobClasses = loader.findClasses(packageName);
             } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+                throw e;
             }
 
             List<String> classNameList = new ArrayList<String>();
@@ -310,7 +312,7 @@ public class JobAppService implements IJobAppService {
         }
     }
 
-    public List<String> getFilesFromJar(String path) {
+    public List<String> getFilesFromJar(String path) throws IOException {
         CodeSource src = this.getClass().getProtectionDomain().getCodeSource();
         List<String> list = new ArrayList<String>();
         if (src != null) {
@@ -334,14 +336,11 @@ public class JobAppService implements IJobAppService {
                     }
                 }
             } catch (IOException e) {
-                logHelper.getLogger().error("IO Exception Occured while reading files ", e.getMessage());
-            } finally {
-                try {
-                    zip.close();
-                } catch (IOException e) {
-                    logHelper.getLogger().error("IO Exception Occured while closing stream ", e.getMessage());
-                    e.printStackTrace();
-                }
+                throw e;
+            }
+            finally {
+                assert zip != null;
+                zip.close();
             }
         }
         return list;
@@ -405,7 +404,6 @@ public class JobAppService implements IJobAppService {
             List<Trigger> triggers = (List<Trigger>) getScheduler().getTriggersOfJob(jobKey);
             List<FindByTriggerOutput> triggerDetails = new ArrayList<FindByTriggerOutput>();
             for (int i = 0; i < triggers.size(); i++) {
-                System.out.println("sizee ");
                 triggerDetails.add(returnTriggerDetails(triggers.get(i)));
             }
             jobDetails.setTriggerDetails(triggerDetails);
@@ -422,9 +420,9 @@ public class JobAppService implements IJobAppService {
         TriggerKey triggKey = trigger.getKey();
         String trigName = triggKey.getName();
         String trigGroup = triggKey.getGroup();
-        String trigType = quartzConstant.SIMPLE_TRIGGER;
-        if (trigger.getClass().toString().equals(quartzConstant.CRON_TRIGGER_CLASS)) trigType =
-            quartzConstant.CRON_TRIGGER;
+        String trigType = QuartzConstants.SIMPLE_TRIGGER;
+        if (trigger.getClass().toString().equals(QuartzConstants.CRON_TRIGGER_CLASS)) trigType =
+            QuartzConstants.CRON_TRIGGER;
 
         Date nextFireTime = trigger.getNextFireTime();
         Date endTime = trigger.getEndTime();
@@ -552,8 +550,6 @@ public class JobAppService implements IJobAppService {
     protected Date millisToDate(long durationInMillis) throws ParseException {
         if (durationInMillis > 0) {
             SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-            //SimpleDateFormat formatter = new SimpleDateFormat("EEE MMM dd HH:mm:ss Z yyyy", Locale.ENGLISH);
-            //formatter.setTimeZone(TimeZone.getTimeZone("GMT"));
             String formattedDate = formatter.format(new Date(durationInMillis));
             Date date = formatter.parse(formattedDate);
             return date;
@@ -576,9 +572,9 @@ public class JobAppService implements IJobAppService {
     protected BooleanBuilder searchExecutionHistory(SearchCriteria search) throws Exception {
         QJobHistoryEntity jobHistory = QJobHistoryEntity.jobHistoryEntity;
         if (search != null) {
-            if (search.getType() == case1) {
+            if (search.getType() == CASE1) {
                 return searchAllPropertiesForJobHistory(jobHistory, search.getValue(), search.getOperator());
-            } else if (search.getType() == case2) {
+            } else if (search.getType() == CASE2) {
                 List<String> keysList = new ArrayList<String>();
                 for (SearchFields f : search.getFields()) {
                     keysList.add(f.getFieldName());
@@ -590,7 +586,7 @@ public class JobAppService implements IJobAppService {
                     search.getValue(),
                     search.getOperator()
                 );
-            } else if (search.getType() == case3) {
+            } else if (search.getType() == CASE3) {
                 Map<String, SearchFields> map = new HashMap<>();
                 for (SearchFields fieldDetails : search.getFields()) {
                     map.put(fieldDetails.getFieldName(), fieldDetails);
@@ -610,12 +606,12 @@ public class JobAppService implements IJobAppService {
     ) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (operator.equals("contains")) {
+        if (operator.equals(CONTAINS)) {
             builder.or(jobHistory.jobName.likeIgnoreCase("%" + value + "%"));
             builder.or(jobHistory.jobGroup.likeIgnoreCase("%" + value + "%"));
             builder.or(jobHistory.triggerGroup.likeIgnoreCase("%" + value + "%"));
             builder.or(jobHistory.triggerName.likeIgnoreCase("%" + value + "%"));
-        } else if (operator.equals("equals")) {
+        } else if (operator.equals(EQUALS_TO)) {
             builder.or(jobHistory.jobName.eq(value));
             builder.or(jobHistory.jobGroup.eq(value));
             builder.or(jobHistory.triggerGroup.eq(value));
@@ -659,42 +655,42 @@ public class JobAppService implements IJobAppService {
 
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).replace("%20", "").trim().equals("jobName")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(jobHistory.jobName.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(jobHistory.jobName.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("jobGroup")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(jobHistory.jobGroup.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(jobHistory.jobGroup.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("triggerName")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(jobHistory.triggerName.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(jobHistory.triggerName.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("triggerGroup")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(jobHistory.triggerGroup.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(jobHistory.triggerGroup.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("firedTime")) {
                 Date date = stringToDate(value);
-                if (operator.equals("equals") && date != null) {
+                if (operator.equals(EQUALS_TO) && date != null) {
                     builder.or(jobHistory.firedTime.eq(date));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("finishedTime")) {
                 Date date = stringToDate(value);
-                if (operator.equals("equals") && date != null) {
+                if (operator.equals(EQUALS_TO) && date != null) {
                     builder.or(jobHistory.finishedTime.eq(date));
                 }
             }
@@ -710,38 +706,38 @@ public class JobAppService implements IJobAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("jobName")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(jobHistory.jobName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(jobHistory.jobName.eq(details.getValue().getSearchValue()));
                 } else if (details.getValue().getOperator().equals("notEqual")) {
                     builder.and(jobHistory.jobName.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("jobGroup")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(jobHistory.jobGroup.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(jobHistory.jobGroup.eq(details.getValue().getSearchValue()));
                 } else if (details.getValue().getOperator().equals("notEqual")) {
                     builder.and(jobHistory.jobGroup.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("triggerName")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(jobHistory.triggerName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(jobHistory.triggerName.eq(details.getValue().getSearchValue()));
                 } else if (details.getValue().getOperator().equals("notEqual")) {
                     builder.and(jobHistory.triggerName.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("triggerGroup")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(
                         jobHistory.triggerGroup.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
                     );
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(jobHistory.triggerGroup.eq(details.getValue().getSearchValue()));
                 } else if (details.getValue().getOperator().equals("notEqual")) {
                     builder.and(jobHistory.triggerGroup.ne(details.getValue().getSearchValue()));
@@ -749,7 +745,7 @@ public class JobAppService implements IJobAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("firedTime")) {
                 Date date = stringToDate(details.getValue().getSearchValue());
-                if (details.getValue().getOperator().equals("equals") && date != null) builder.and(
+                if (details.getValue().getOperator().equals(EQUALS_TO) && date != null) builder.and(
                     jobHistory.firedTime.eq(date)
                 ); else if (details.getValue().getOperator().equals("notEqual") && date != null) builder.and(
                     jobHistory.firedTime.ne(date)
@@ -765,7 +761,7 @@ public class JobAppService implements IJobAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("finishedTime")) {
                 Date date = stringToDate(details.getValue().getSearchValue());
-                if (details.getValue().getOperator().equals("equals") && date != null) builder.and(
+                if (details.getValue().getOperator().equals(EQUALS_TO) && date != null) builder.and(
                     jobHistory.finishedTime.eq(date)
                 ); else if (details.getValue().getOperator().equals("notEqual") && date != null) builder.and(
                     jobHistory.finishedTime.ne(date)
@@ -792,7 +788,7 @@ public class JobAppService implements IJobAppService {
         boolean isDurable = getScheduler().getJobDetail(jobKey).isDurable();
 
         if (isJobRunning(jobKey.getName(), jobKey.getGroup())) jobStatus =
-            quartzConstant.JOB_STATUS_RUNNING; else jobStatus = getJobState(jobKey.getName(), jobKey.getGroup());
+            QuartzConstants.JOB_STATUS_RUNNING; else jobStatus = getJobState(jobKey.getName(), jobKey.getGroup());
 
         String[] jobKeyValues = getScheduler().getJobDetail(jobKey).getJobDataMap().getKeys();
         Map<String, String> map = new HashMap<String, String>();
@@ -815,7 +811,6 @@ public class JobAppService implements IJobAppService {
     }
 
     protected boolean isJobRunning(String jobName, String jobGroup) throws SchedulerException {
-        JobKey jobkey = new JobKey(jobName, jobGroup);
 
         List<JobExecutionContext> executingJobs = getScheduler().getCurrentlyExecutingJobs();
         for (int i = 0; i < executingJobs.size(); i++) {
@@ -828,13 +823,16 @@ public class JobAppService implements IJobAppService {
         return false;
     }
 
-    protected String getJobState(String jobName, String jobGroup) {
+    protected String getJobState(String jobName, String jobGroup) throws SchedulerException {
         try {
             JobKey jobKey = new JobKey(jobName, jobGroup);
             JobDetail jobDetail = getScheduler().getJobDetail(jobKey);
             int pausedTriggersLength = 0;
 
             List<? extends Trigger> triggers = getScheduler().getTriggersOfJob(jobDetail.getKey());
+            if(triggers==null){
+                throw new SchedulerException("Triggers not found");
+            }
             if (triggers != null && triggers.size() > 0) {
                 for (Trigger trigger : triggers) {
                     TriggerState triggerState = getScheduler().getTriggerState(trigger.getKey());
@@ -849,8 +847,7 @@ public class JobAppService implements IJobAppService {
                 return "PAUSED";
             }
         } catch (SchedulerException e) {
-            logHelper.getLogger().error("SchedulerException while fetching all jobs. error message :" + e.getMessage());
-            e.printStackTrace();
+            throw e;
         }
         return "ACTIVE";
     }

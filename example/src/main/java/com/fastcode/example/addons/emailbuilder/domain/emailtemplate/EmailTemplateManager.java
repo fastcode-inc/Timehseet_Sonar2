@@ -49,8 +49,7 @@ public class EmailTemplateManager implements IEmailTemplateManager {
 
     private void saveEmailMergeFieldData(EmailTemplateEntity email, List<Long> ids, boolean isUpdate) {
         List<EmailMergeFieldEntity> emailMergeFieldList = new ArrayList<>();
-        List<EmailTemplateMappingEntity> emailTemplateEntityMapping = new ArrayList<>();
-
+        List<EmailTemplateMappingEntity> emailTemplateEntityMapping = null;
         for (Long id : ids) {
             EmailMergeFieldEntity emailMergeField = new EmailMergeFieldEntity();
             emailMergeField.setEmailTemplate(email);
@@ -69,10 +68,8 @@ public class EmailTemplateManager implements IEmailTemplateManager {
                     .filter(obj -> ids.contains(obj.getMergeField().getId()))
                     .map(obj2 -> obj2.getId())
                     .collect(Collectors.toList());
-                //			if(idsNotToBeDeleted!=null && idsNotToBeDeleted.size()>0)
-                //			{
+
                 emailTemplateMappingRepo.deleteAllExceptTheseForEmailTemplate(idsNotToBeDeleted, email);
-                //}
             }
         }
 
@@ -140,7 +137,7 @@ public class EmailTemplateManager implements IEmailTemplateManager {
                 }
             }
         }
-        if (allNames != null && allNames.size() > 0) {
+        if (allNames.size() > 0) {
             List<Long> tagInfo = emailVariableAppService.findByNameIn(allNames);
             return tagInfo;
         }

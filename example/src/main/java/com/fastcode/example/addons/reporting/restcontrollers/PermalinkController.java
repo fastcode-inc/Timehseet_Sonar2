@@ -81,7 +81,7 @@ public class PermalinkController {
     public ResponseEntity<CreatePermalinkOutput> create(@RequestBody @Valid CreatePermalinkInput permalink) {
         Users users = _usersAppService.getUsers();
 
-        if (permalink.getResource() == "report") {
+        if (permalink.getResource().equals("report")) {
             FindReportByIdOutput report = _reportAppService.findById(Long.valueOf(permalink.getResourceId()));
             Optional
                 .ofNullable(report)
@@ -96,17 +96,14 @@ public class PermalinkController {
                 new ReportuserId(Long.valueOf(permalink.getResourceId()), users.getId())
             );
 
-            if (report.getOwnerId() != users.getId() && reportuser == null) {
-                logHelper
-                    .getLogger()
-                    .error("You do not have access to the report with a id=%s", permalink.getResourceId());
+            if (!(report.getOwnerId().equals(users.getId())) && reportuser == null) {
                 throw new EntityNotFoundException(
                     String.format("You do not have access to the report with a id=%s", permalink.getResourceId())
                 );
             }
         }
 
-        if (permalink.getResource() == "dashboard") {
+        if (permalink.getResource().equals("dashboard")) {
             FindDashboardByIdOutput dashboard = _dashboardAppService.findById(Long.valueOf(permalink.getResourceId()));
             Optional
                 .ofNullable(dashboard)
@@ -121,10 +118,7 @@ public class PermalinkController {
                 new DashboarduserId(Long.valueOf(permalink.getResourceId()), users.getId())
             );
 
-            if (dashboard.getOwnerId() != users.getId() && dashboarduser == null) {
-                logHelper
-                    .getLogger()
-                    .error("You do not have access to the dashboard with a id=%s", permalink.getResourceId());
+            if (!(dashboard.getOwnerId().equals(users.getId())) && dashboarduser == null) {
                 throw new EntityNotFoundException(
                     String.format("You do not have access to the dashboard with a id=%s", permalink.getResourceId())
                 );

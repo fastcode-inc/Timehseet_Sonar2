@@ -16,6 +16,8 @@ import java.util.List;
 
 public class SearchUtils {
 
+    private SearchUtils(){}
+
     public static SearchCriteria generateSearchCriteriaObject(String searchString) {
         SearchCriteria searchCriteria = new SearchCriteria();
         searchCriteria.setType(3);

@@ -32,7 +32,6 @@ public class JSONObjectConverter implements AttributeConverter<JSONObject, Strin
             return jsonData;
         } catch (ParseException e) {
             // TODO Auto-generated catch block
-            //	e.printStackTrace();
             return null;
         }
     }

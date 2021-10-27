@@ -320,14 +320,11 @@ public class EmailMjmlTemplateGenrator {
             backgroundSize,
             elementsString
         );
-        // System.out.println(finalTemplate);
         return finalTemplate;
     }
 
     public String genrateTemplateBody() throws IOException {
-        System.out.println(mjmlFileBase + "/basicTemp.txt");
         String template = this.text2String(mjmlFileBase + "/basicTemp.txt");
-        System.out.println(template);
         return template;
     }
 
@@ -346,10 +343,10 @@ public class EmailMjmlTemplateGenrator {
             .getStructures()
             .stream()
             .map(
-                structure -> { // System.out.println(structure.getType());
+                structure -> {
                     try {
                         String templateTest = this.genrateTemplateSection(structure);
-                        // System.out.println(templateTest);
+
                         return templateTest;
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -358,7 +355,6 @@ public class EmailMjmlTemplateGenrator {
                 }
             )
             .reduce("", (a, b) -> a + " " + b);
-        System.out.println(this.genrateTemplateBody());
         String templatae = String.format(
             this.genrateTemplateBody(),
             hederPadding,
@@ -370,7 +366,6 @@ public class EmailMjmlTemplateGenrator {
             bodyBackgroundColor,
             structures
         );
-        System.out.println(templatae);
         return templatae;
     }
 }

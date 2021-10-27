@@ -53,7 +53,6 @@ public class RegistrationController {
         FindUsersByUsernameOutput foundUsers = _usersAppService.findByUsername(users.getUsername());
 
         if (foundUsers != null) {
-            logHelper.getLogger().error("There already exists a users with a Username=%s", users.getUsername());
             throw new EntityExistsException(
                 String.format("There already exists a users with Username =%s", users.getUsername())
             );
@@ -61,7 +60,6 @@ public class RegistrationController {
         foundUsers = _usersAppService.findByEmailaddress(users.getEmailaddress());
 
         if (foundUsers != null) {
-            logHelper.getLogger().error("There already exists a users with a email =%s", users.getEmailaddress());
             throw new EntityExistsException(
                 String.format("There already exists a users with email =%s", users.getEmailaddress())
             );
@@ -72,7 +70,7 @@ public class RegistrationController {
         users.setIsemailconfirmed(false);
 
         CreateUsersOutput output = _usersAppService.create(users);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
 
         sendVerificationEmail(clientUrl, output.getEmailaddress(), output.getId());
         String msg = "Account verfication link has been sent to " + users.getEmailaddress();
@@ -93,19 +91,18 @@ public class RegistrationController {
 
         Optional
             .ofNullable(tokenEntity)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid verification link.")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid verification link."));
 
         FindUsersWithAllFieldsByIdOutput output = _usersAppService.findWithAllFieldsById(tokenEntity.getUsersId());
         Optional
             .ofNullable(output)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid verification link.")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid verification link."));
 
         if (new Date().after(tokenEntity.getExpirationTime())) {
             _tokenAppService.deleteToken(tokenEntity);
             _usersAppService.delete(tokenEntity.getUsersId());
 
-            logHelper.getLogger().error("Token has expired, please register again");
-            throw new EntityNotFoundException(String.format("Token has expired, please register again"));
+            throw new EntityNotFoundException("Token has expired, please register again");
         }
 
         output.setIsemailconfirmed(true);
@@ -131,14 +128,12 @@ public class RegistrationController {
         FindUsersByUsernameOutput foundUsers = _usersAppService.findByUsername(username);
 
         if (foundUsers == null) {
-            logHelper.getLogger().error("There does not exist a users with Username=%s", foundUsers.getUsername());
             throw new EntityExistsException(
                 String.format("There does not exist a users with Username =%s", foundUsers.getUsername())
             );
         }
 
-        if (foundUsers != null && Boolean.TRUE.equals(foundUsers.getIsemailconfirmed())) {
-            logHelper.getLogger().error("Users with Username=%s is already verified.", username);
+        if (Boolean.TRUE.equals(foundUsers.getIsemailconfirmed())) {
             throw new EntityExistsException(String.format("Users with Username=%s is already verified.", username));
         }
 

@@ -77,7 +77,6 @@ public class PasswordController {
     )
         throws InvalidInputException {
         if (passwordInput.getEmail() == null || !validate(passwordInput.getEmail())) {
-            logHelper.getLogger().error("Email is not valid");
             throw new InvalidInputException("Email is not valid");
         }
 
@@ -92,7 +91,6 @@ public class PasswordController {
             );
 
         String appUrl = request.getScheme() + "://" + request.getServerName();
-        System.out.println("App url " + appUrl);
 
         Tokenverification token = _tokenAppService.generateToken("password", foundUsers.getId());
 
@@ -120,7 +118,7 @@ public class PasswordController {
         Tokenverification tokenEntity = _tokenAppService.findByTokenAndType(input.getToken(), "password");
         Optional
             .ofNullable(tokenEntity)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid password reset link.")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid password reset link."));
 
         FindUsersWithAllFieldsByIdOutput output = _usersAppService.findWithAllFieldsById(tokenEntity.getUsersId());
         Optional
@@ -128,8 +126,7 @@ public class PasswordController {
             .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid password reset link.")));
 
         if (new Date().after(tokenEntity.getExpirationTime())) {
-            logHelper.getLogger().error("Token has expired, please request a new password reset");
-            throw new EntityNotFoundException(String.format("Token has expired, please request a new password reset"));
+            throw new EntityNotFoundException("Token has expired, please request a new password reset");
         }
 
         output.setPassword(pEncoder.encode(input.getPassword()));
@@ -153,12 +150,10 @@ public class PasswordController {
         throws InvalidInputException {
         Users loggedInUser = _usersAppService.getUsers();
         if (!pEncoder.matches(input.getOldPassword(), loggedInUser.getPassword())) {
-            logHelper.getLogger().error("Invalid Old password");
-            throw new InvalidInputException(String.format("Invalid Old password"));
+            throw new InvalidInputException("Invalid Old password");
         }
         if (pEncoder.matches(input.getNewPassword(), loggedInUser.getPassword())) {
-            logHelper.getLogger().error("You cannot set prevoius password again");
-            throw new InvalidInputException(String.format("You cannot set prevoius password again"));
+            throw new InvalidInputException("You cannot set prevoius password again");
         }
 
         loggedInUser.setPassword(pEncoder.encode(input.getNewPassword()));

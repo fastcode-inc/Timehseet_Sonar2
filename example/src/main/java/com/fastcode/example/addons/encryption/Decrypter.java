@@ -5,6 +5,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -29,17 +30,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class Decrypter {
 
-    //	@Value("${encryption.key}")
-    //	public static String key ;
-
     public static String key = "qwertyuiopqwerty";
-    public static String initVector = "asdfghjklasdfghj";
-
-    //	@Value("${encryption.intvector}")
-    //	public static String initVector;
 
     @Autowired
     private LoggingHelper logHelper;
+
+    SecureRandom random = new SecureRandom();
 
     /*
      * it takes encoded string as a parameter
@@ -49,7 +45,9 @@ public class Decrypter {
 
     public String decrypt(String encodedString) {
         try {
-            IvParameterSpec iv = new IvParameterSpec(initVector.getBytes("UTF-8"));
+            byte[] bytesIV = new byte[16];
+            random.nextBytes(bytesIV);
+            IvParameterSpec iv = new IvParameterSpec(bytesIV);
             SecretKeySpec secret = new SecretKeySpec(key.getBytes("UTF-8"), "AES");
             Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, secret, iv);
@@ -64,7 +62,6 @@ public class Decrypter {
             | InvalidKeyException
             | InvalidAlgorithmParameterException e
         ) {
-            logHelper.getLogger().error("error" + e);
             return " exception >";
         }
     }

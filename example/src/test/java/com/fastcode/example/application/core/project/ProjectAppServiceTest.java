@@ -74,7 +74,7 @@ public class ProjectAppServiceTest {
     public void findProjectById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Project> nullOptional = Optional.ofNullable(null);
         Mockito.when(_projectRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(ID)).isNull();
     }
 
     @Test
@@ -110,7 +110,7 @@ public class ProjectAppServiceTest {
         CreateProjectInput project = mock(CreateProjectInput.class);
 
         Mockito.when(_mapper.createProjectInputToProject(any(CreateProjectInput.class))).thenReturn(null);
-        Assertions.assertThat(_appService.create(project)).isEqualTo(null);
+        Assertions.assertThat(_appService.create(project)).isNull();
     }
 
     @Test
@@ -123,7 +123,7 @@ public class ProjectAppServiceTest {
         Mockito.when(_customerRepository.findById(any(Long.class))).thenReturn(nullOptional);
 
         //		Mockito.when(_customerRepository.findById(any(Long.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.create(project)).isEqualTo(null);
+        Assertions.assertThat(_appService.create(project)).isNull();
     }
 
     @Test
@@ -135,7 +135,7 @@ public class ProjectAppServiceTest {
         Mockito.when(_projectRepository.findById(anyLong())).thenReturn(projectOptional);
 
         Mockito.when(_mapper.updateProjectInputToProject(any(UpdateProjectInput.class))).thenReturn(project);
-        Assertions.assertThat(_appService.update(ID, projectInput)).isEqualTo(null);
+        Assertions.assertThat(_appService.update(ID, projectInput)).isNull();
     }
 
     @Test
@@ -153,7 +153,7 @@ public class ProjectAppServiceTest {
         Mockito.when(_customerRepository.findById(any(Long.class))).thenReturn(nullOptional);
 
         //	Mockito.when(_customerRepository.findById(any(Long.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.update(ID, projectInput)).isEqualTo(null);
+        Assertions.assertThat(_appService.update(ID, projectInput)).isNull();
     }
 
     @Test
@@ -269,7 +269,7 @@ public class ProjectAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     //Customer
@@ -291,7 +291,7 @@ public class ProjectAppServiceTest {
     public void GetCustomer_IfProjectIdAndCustomerIdIsNotNullAndProjectDoesNotExist_ReturnNull() {
         Optional<Project> nullOptional = Optional.ofNullable(null);
         Mockito.when(_projectRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getCustomer(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.getCustomer(ID)).isNull();
     }
 
     @Test

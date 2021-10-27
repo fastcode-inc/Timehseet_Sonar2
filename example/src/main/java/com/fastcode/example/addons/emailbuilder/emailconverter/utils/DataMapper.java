@@ -6,6 +6,8 @@ import java.util.function.Function;
 
 public class DataMapper {
 
+    private DataMapper(){}
+
     public static final Function<Object, String> object2Json = object -> new Gson().toJson(object);
 
     public static final BiFunction<String, Class<?>, Object> json2Object = (json, objectClass) ->

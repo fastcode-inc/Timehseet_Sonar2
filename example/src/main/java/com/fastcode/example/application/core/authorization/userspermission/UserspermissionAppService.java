@@ -24,10 +24,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("userspermissionAppService")
 @RequiredArgsConstructor
 public class UserspermissionAppService implements IUserspermissionAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
     @Qualifier("userspermissionRepository")
     @NonNull
     protected final IUserspermissionRepository _userspermissionRepository;
@@ -57,17 +62,22 @@ public class UserspermissionAppService implements IUserspermissionAppService {
         } else {
             return null;
         }
+
         if (input.getUsersId() != null) {
             foundUsers = _usersRepository.findById(input.getUsersId()).orElse(null);
         } else {
             return null;
         }
+
+        if(foundUsers==null){
+            throw new EntityNotFoundException("Entity not found");
+        }
+
         if (foundUsers != null || foundPermission != null) {
             if (!checkIfPermissionAlreadyAssigned(foundUsers, foundPermission)) {
                 foundPermission.addUserspermissions(userspermission);
                 foundUsers.addUserspermissions(userspermission);
-                //	userspermission.setPermission(foundPermission);
-                //	userspermission.setUsers(foundUsers);
+
             }
         } else {
             return null;
@@ -101,10 +111,13 @@ public class UserspermissionAppService implements IUserspermissionAppService {
         } else {
             return null;
         }
+
+        if(foundUsers==null){
+            throw new EntityNotFoundException("Entity not found");
+        }
+
         if (foundUsers != null || foundPermission != null) {
             if (checkIfPermissionAlreadyAssigned(foundUsers, foundPermission)) {
-                //userspermission.setPermission(foundPermission);
-                //userspermission.setUsers(foundUsers);
                 userspermission.setRevoked(input.getRevoked());
                 foundPermission.addUserspermissions(userspermission);
                 foundUsers.addUserspermissions(userspermission);
@@ -232,15 +245,15 @@ public class UserspermissionAppService implements IUserspermissionAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("permissionId")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(userspermission.permissionId.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(userspermission.permissionId.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(userspermission.permissionId.ne(Long.valueOf(details.getValue().getSearchValue())));
@@ -268,7 +281,7 @@ public class UserspermissionAppService implements IUserspermissionAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("revoked")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     (
                         details.getValue().getSearchValue().equalsIgnoreCase("true") ||
                         details.getValue().getSearchValue().equalsIgnoreCase("false")
@@ -276,7 +289,7 @@ public class UserspermissionAppService implements IUserspermissionAppService {
                 ) {
                     builder.and(userspermission.revoked.eq(Boolean.parseBoolean(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     (
                         details.getValue().getSearchValue().equalsIgnoreCase("true") ||
                         details.getValue().getSearchValue().equalsIgnoreCase("false")
@@ -286,15 +299,15 @@ public class UserspermissionAppService implements IUserspermissionAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("usersId")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(userspermission.usersId.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(userspermission.usersId.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(userspermission.usersId.ne(Long.valueOf(details.getValue().getSearchValue())));
@@ -318,26 +331,26 @@ public class UserspermissionAppService implements IUserspermissionAppService {
             }
 
             if (details.getKey().replace("%20", "").trim().equals("permission")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(
                         userspermission.permission.displayName.likeIgnoreCase(
                             "%" + details.getValue().getSearchValue() + "%"
                         )
                     );
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(userspermission.permission.displayName.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(userspermission.permission.displayName.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("users")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(
                         userspermission.users.username.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
                     );
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(userspermission.users.username.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(userspermission.users.username.ne(details.getValue().getSearchValue()));
                 }
             }

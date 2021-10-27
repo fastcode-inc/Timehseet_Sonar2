@@ -45,7 +45,6 @@ public class DataSourceMetaManager implements IDataSourceMetaManager {
         String message = "";
         String tableName = "";
         String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-        // String multiLineRegex = "((.|\\n)*)";
         Pattern pattern = Pattern.compile(regex);
         String regexEmail = "^(.+)@(.+)$";
         Pattern patternEmail = Pattern.compile(regex);
@@ -63,7 +62,7 @@ public class DataSourceMetaManager implements IDataSourceMetaManager {
             if (managerQuery.getMaxResults() > 0) {
                 dataList = managerQuery.list();
             }
-            query = query.toLowerCase();
+            query.toLowerCase();
             // Logic to fetch the Table name
             String columns = lowerCaseQuery.split("from")[0];
             if (lowerCaseQuery.contains("where")) {
@@ -115,7 +114,6 @@ public class DataSourceMetaManager implements IDataSourceMetaManager {
                     for (int i = 0; i < arrdata.length; i++) {
                         Object objji = arrdata[i];
 
-                        System.out.println("data : {} " + (String) objji);
                         if (objji instanceof String && StringUtils.isNotBlank((String) objji)) {
                             Matcher matcher = pattern.matcher((String) objji);
                             Matcher matcher2 = patternMultiLine.matcher((String) objji);
@@ -124,17 +122,12 @@ public class DataSourceMetaManager implements IDataSourceMetaManager {
                                     positionDataTypeMap.put(i, "email");
                                     positions.add(i);
                                 }
-                            } else if (matcher2.matches()) {
-                                System.out.println(" coming matcher");
-                                if (!positions.contains(i)) {
-                                    positionDataTypeMap.put(i, "Multi-line Text");
-                                    positions.add(i);
-                                }
-                            }
-                        } else if (objji instanceof String && StringUtils.isNotBlank((String) objji)) {
-                            if (!positions.contains(i)) {
+                            } else if (matcher2.matches() && (!positions.contains(i))) {
+                                positionDataTypeMap.put(i, "Multi-line Text");
                                 positions.add(i);
                             }
+                        } else if (objji instanceof String && StringUtils.isNotBlank((String) objji) && (!positions.contains(i))) {
+                            positions.add(i);
                         }
                     }
                 } else {

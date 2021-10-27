@@ -26,10 +26,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class ReportroleAppService implements IReportroleAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
-
     @Autowired
     @Qualifier("reportroleRepository")
     private IReportroleRepository _reportroleRepository;

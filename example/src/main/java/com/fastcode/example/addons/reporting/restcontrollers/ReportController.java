@@ -111,8 +111,7 @@ public class ReportController {
             new ReportuserId(Long.valueOf(id), users.getId())
         );
 
-        if (output.getOwnerId() != users.getId() && reportuser == null) {
-            logHelper.getLogger().error("You do not have access to update a report with a id=%s", id);
+        if (!(output.getOwnerId().equals(users.getId())) && reportuser == null) {
             throw new EntityNotFoundException(
                 String.format("You do not have access to update a report with a id=%s", id)
             );
@@ -145,8 +144,7 @@ public class ReportController {
             new ReportuserId(Long.valueOf(id), users.getId())
         );
 
-        if (currentReport.getOwnerId() != users.getId() && reportuser == null) {
-            logHelper.getLogger().error("You do not have access to update a report with a id=%s", id);
+        if (!(currentReport.getOwnerId().equals(users.getId()) && reportuser == null)) {
             throw new EntityNotFoundException(
                 String.format("You do not have access to update a report with a id=%s", id)
             );
@@ -226,12 +224,12 @@ public class ReportController {
         Map<String, String> joinColDetails = _reportAppService.parseReportdashboardJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid Join Column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid Join Column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 
         List<FindDashboardversionreportByIdOutput> output = _reportdashboardAppService.find(searchCriteria, pageable);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         return new ResponseEntity(output, HttpStatus.OK);
     }
@@ -257,9 +255,8 @@ public class ReportController {
             .ofNullable(currentReport)
             .orElseThrow(() -> new EntityNotFoundException(String.format("Report with id=%s not found.", id)));
 
-        if ((currentReport.getOwnerId() == null || users.getId() != currentReport.getOwnerId())) {
-            logHelper.getLogger().error("Unable to get users for report with id '{}'.", id);
-            throw new EntityNotFoundException(String.format("Unable to get users for report with id '{}'.", id));
+        if ((currentReport.getOwnerId() == null || !(users.getId().equals(currentReport.getOwnerId())))) {
+            throw new EntityNotFoundException(String.format("Unable to get users for report with id=%s", id));
         }
 
         if (offset == null) {
@@ -299,9 +296,8 @@ public class ReportController {
             .ofNullable(currentReport)
             .orElseThrow(() -> new EntityNotFoundException(String.format("Report with id=%s not found.", id)));
 
-        if ((currentReport.getOwnerId() == null || users.getId() != currentReport.getOwnerId())) {
-            logHelper.getLogger().error("Unable to get users for report with id {}.", id);
-            throw new EntityNotFoundException(String.format("Unable to users for report with id {}.", id));
+        if ((currentReport.getOwnerId() == null || !(users.getId().equals(currentReport.getOwnerId())))) {
+            throw new EntityNotFoundException(String.format("Unable to users for report with id=%s", id));
         }
 
         if (offset == null) {
@@ -337,9 +333,8 @@ public class ReportController {
             .ofNullable(currentReport)
             .orElseThrow(() -> new EntityNotFoundException(String.format("Report with id=%s not found.", id)));
 
-        if ((currentReport.getOwnerId() == null || users.getId() != currentReport.getOwnerId())) {
-            logHelper.getLogger().error("Unable to get users for report with id {}.", id);
-            throw new EntityNotFoundException(String.format("Unable to users for report with id {}.", id));
+        if ((currentReport.getOwnerId() == null || !(users.getId().equals(currentReport.getOwnerId())))) {
+            throw new EntityNotFoundException(String.format("Unable to users for report with id=%s", id));
         }
 
         if (offset == null) {
@@ -375,9 +370,8 @@ public class ReportController {
             .ofNullable(currentReport)
             .orElseThrow(() -> new EntityNotFoundException(String.format("Report with id=%s not found.", id)));
 
-        if ((currentReport.getOwnerId() == null || users.getId() != currentReport.getOwnerId())) {
-            logHelper.getLogger().error("Unable to get users for report with id {}.", id);
-            throw new EntityNotFoundException(String.format("Unable to get users for report with id {}.", id));
+        if ((currentReport.getOwnerId() == null || !(users.getId().equals(currentReport.getOwnerId())))) {
+            throw new EntityNotFoundException(String.format("Unable to get users for report with id=%s", id));
         }
 
         if (offset == null) {
@@ -463,9 +457,8 @@ public class ReportController {
             .ofNullable(currentReport)
             .orElseThrow(() -> new EntityNotFoundException(String.format("Report with id=%s not found.", id)));
 
-        if ((currentReport.getOwnerId() == null || users.getId() != currentReport.getOwnerId())) {
-            logHelper.getLogger().error("Unable to share report with id '{}'.", id);
-            throw new EntityNotFoundException(String.format("Unable to share report with id {}.", id));
+        if ((currentReport.getOwnerId() == null || !(users.getId().equals(currentReport.getOwnerId())))) {
+            throw new EntityNotFoundException(String.format("Unable to share report with id=%s", id));
         }
 
         List<ShareReportInputByRole> rolesList;
@@ -527,9 +520,8 @@ public class ReportController {
             .ofNullable(currentReport)
             .orElseThrow(() -> new EntityNotFoundException(String.format("Report with id=%s not found.", id)));
 
-        if ((currentReport.getOwnerId() == null || users.getId() != currentReport.getOwnerId())) {
-            logHelper.getLogger().error("Unable to share report with id '{}'.", id);
-            throw new EntityNotFoundException(String.format("Unable to share report with id {}.", id));
+        if ((currentReport.getOwnerId() == null || !(users.getId().equals(currentReport.getOwnerId())))) {
+            throw new EntityNotFoundException(String.format("Unable to share report with id=%s", id));
         }
 
         List<ShareReportInputByRole> rolesList;
@@ -623,14 +615,12 @@ public class ReportController {
             );
 
         if (!users.getId().equals(currentReport.getOwnerId())) {
-            logHelper.getLogger().error("You do not have access to publish a report with a id=%s", id);
             throw new EntityNotFoundException(
                 String.format("You do not have access to publish a report with a id=%s", id)
             );
         }
 
         if (currentReport.getIsPublished()) {
-            logHelper.getLogger().error("Report is already published with a id=%s", id);
             throw new EntityExistsException(String.format("Report is already published with a id=%s", id));
         }
 
@@ -658,7 +648,6 @@ public class ReportController {
         );
 
         if (reportuser == null && !users.getId().equals(report.getOwnerId())) {
-            logHelper.getLogger().error("You do not have access to refresh report with a id=%s", id);
             throw new EntityNotFoundException(
                 String.format("You do not have access to refresh report with a id=%s", id)
             );
@@ -694,19 +683,16 @@ public class ReportController {
             );
 
         if (output == null) {
-            logHelper.getLogger().error("User does not exist with id=%s", id);
             throw new EntityNotFoundException(String.format("User does not exist with id=%s", id));
         }
 
         if (!users.getId().equals(currentReport.getOwnerId())) {
-            logHelper.getLogger().error("You do not have access to update owner of a report with a id=%s", id);
             throw new EntityNotFoundException(
                 String.format("You do not have access to update owner of a report with a id=%s", id)
             );
         }
 
-        if (currentReport.getOwnerId() == output.getId()) {
-            logHelper.getLogger().error("Report is already owned by user with id= %s", id);
+        if (currentReport.getOwnerId().equals(output.getId())) {
             throw new EntityExistsException(String.format("Report is already owned by userwith a id=%s", id));
         }
 

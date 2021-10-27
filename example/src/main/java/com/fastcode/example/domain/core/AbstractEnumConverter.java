@@ -9,7 +9,7 @@ public abstract class AbstractEnumConverter<T extends Enum<T> & PersistableEnum<
 
     private final Class<T> clazz;
 
-    public AbstractEnumConverter(Class<T> clazz) {
+    AbstractEnumConverter(Class<T> clazz) {
         this.clazz = clazz;
     }
 

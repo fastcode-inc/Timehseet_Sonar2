@@ -82,7 +82,7 @@ public class UsersroleAppServiceTest {
     public void findUsersroleById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Usersrole> nullOptional = Optional.ofNullable(null);
         Mockito.when(_usersroleRepository.findById(any(UsersroleId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(usersroleId)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(usersroleId)).isNull();
     }
 
     @Test
@@ -128,7 +128,7 @@ public class UsersroleAppServiceTest {
         CreateUsersroleInput usersrole = mock(CreateUsersroleInput.class);
 
         Mockito.when(_mapper.createUsersroleInputToUsersrole(any(CreateUsersroleInput.class))).thenReturn(null);
-        Assertions.assertThat(_appService.create(usersrole)).isEqualTo(null);
+        Assertions.assertThat(_appService.create(usersrole)).isNull();
     }
 
     @Test
@@ -141,7 +141,7 @@ public class UsersroleAppServiceTest {
         Mockito.when(_roleRepository.findById(any(Long.class))).thenReturn(nullOptional);
 
         //		Mockito.when(_roleRepository.findById(any(Long.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.create(usersrole)).isEqualTo(null);
+        Assertions.assertThat(_appService.create(usersrole)).isNull();
     }
 
     @Test
@@ -153,7 +153,7 @@ public class UsersroleAppServiceTest {
         Mockito.when(_usersroleRepository.findById(any(UsersroleId.class))).thenReturn(usersroleOptional);
 
         Mockito.when(_mapper.updateUsersroleInputToUsersrole(any(UpdateUsersroleInput.class))).thenReturn(usersrole);
-        Assertions.assertThat(_appService.update(usersroleId, usersroleInput)).isEqualTo(null);
+        Assertions.assertThat(_appService.update(usersroleId, usersroleInput)).isNull();
     }
 
     @Test
@@ -171,7 +171,7 @@ public class UsersroleAppServiceTest {
         Mockito.when(_roleRepository.findById(any(Long.class))).thenReturn(nullOptional);
 
         //	Mockito.when(_roleRepository.findById(any(Long.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.update(usersroleId, usersroleInput)).isEqualTo(null);
+        Assertions.assertThat(_appService.update(usersroleId, usersroleInput)).isNull();
     }
 
     @Test
@@ -283,7 +283,7 @@ public class UsersroleAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     //Role
@@ -305,7 +305,7 @@ public class UsersroleAppServiceTest {
     public void GetRole_IfUsersroleIdAndRoleIdIsNotNullAndUsersroleDoesNotExist_ReturnNull() {
         Optional<Usersrole> nullOptional = Optional.ofNullable(null);
         Mockito.when(_usersroleRepository.findById(any(UsersroleId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getRole(usersroleId)).isEqualTo(null);
+        Assertions.assertThat(_appService.getRole(usersroleId)).isNull();
     }
 
     //Users
@@ -327,7 +327,7 @@ public class UsersroleAppServiceTest {
     public void GetUsers_IfUsersroleIdAndUsersIdIsNotNullAndUsersroleDoesNotExist_ReturnNull() {
         Optional<Usersrole> nullOptional = Optional.ofNullable(null);
         Mockito.when(_usersroleRepository.findById(any(UsersroleId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getUsers(usersroleId)).isEqualTo(null);
+        Assertions.assertThat(_appService.getUsers(usersroleId)).isNull();
     }
 
     @Test
@@ -344,13 +344,13 @@ public class UsersroleAppServiceTest {
     @Test
     public void ParseUsersroleKey_KeysStringIsEmpty_ReturnNull() {
         String keyString = "";
-        Assertions.assertThat(_appService.parseUsersroleKey(keyString)).isEqualTo(null);
+        Assertions.assertThat(_appService.parseUsersroleKey(keyString)).isNull();
     }
 
     @Test
     public void ParseUsersroleKey_KeysStringIsNotEmptyAndKeyValuePairDoesNotExist_ReturnNull() {
         String keyString = "roleId";
 
-        Assertions.assertThat(_appService.parseUsersroleKey(keyString)).isEqualTo(null);
+        Assertions.assertThat(_appService.parseUsersroleKey(keyString)).isNull();
     }
 }

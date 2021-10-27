@@ -22,7 +22,6 @@ public class FindDashboardByIdOutput {
     private Long versiono;
     private Boolean editable;
     private Boolean isResetted;
-    //	private Boolean isRefreshed;
     private Boolean ownerSharingStatus;
     private Boolean recipientSharingStatus;
     private Boolean isAssignedByRole;

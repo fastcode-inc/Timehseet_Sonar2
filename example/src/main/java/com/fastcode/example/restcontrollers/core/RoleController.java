@@ -10,7 +10,6 @@ import com.fastcode.example.commons.logging.LoggingHelper;
 import com.fastcode.example.commons.search.OffsetBasedPageRequest;
 import com.fastcode.example.commons.search.SearchCriteria;
 import com.fastcode.example.commons.search.SearchUtils;
-import java.time.*;
 import java.util.*;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
@@ -155,12 +154,12 @@ public class RoleController {
         Map<String, String> joinColDetails = _roleAppService.parseRolepermissionsJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 
         List<FindRolepermissionByIdOutput> output = _rolepermissionAppService.find(searchCriteria, pageable);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         return new ResponseEntity(output, HttpStatus.OK);
     }
@@ -193,12 +192,12 @@ public class RoleController {
         Map<String, String> joinColDetails = _roleAppService.parseUsersrolesJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 
         List<FindUsersroleByIdOutput> output = _usersroleAppService.find(searchCriteria, pageable);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         return new ResponseEntity(output, HttpStatus.OK);
     }

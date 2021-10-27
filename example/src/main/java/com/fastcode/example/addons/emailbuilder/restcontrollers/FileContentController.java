@@ -31,7 +31,7 @@ public class FileContentController {
     private IFileHistoryRepository fileHistoryRepo;
 
     @RequestMapping(value = "/files/{fileId}", method = RequestMethod.PUT)
-    public ResponseEntity<?> setContent(@PathVariable("fileId") Long id, @RequestParam("file") MultipartFile file)
+    public ResponseEntity<Object> setContent(@PathVariable("fileId") Long id, @RequestParam("file") MultipartFile file)
         throws IOException {
         Optional<FileEntity> f = filesRepo.findById(id);
         if (f.isPresent()) {
@@ -45,7 +45,7 @@ public class FileContentController {
     }
 
     @RequestMapping(value = "/files/{fileId}", method = RequestMethod.GET)
-    public ResponseEntity<?> getContent(@PathVariable("fileId") Long id) {
+    public ResponseEntity<Object> getContent(@PathVariable("fileId") Long id) {
         Optional<FileEntity> f = filesRepo.findById(id);
         if (f.isPresent()) {
             InputStreamResource inputStreamResource = new InputStreamResource(contentStore.getContent(f.get()));

@@ -10,7 +10,6 @@ import com.fastcode.example.commons.logging.LoggingHelper;
 import com.fastcode.example.commons.search.OffsetBasedPageRequest;
 import com.fastcode.example.commons.search.SearchCriteria;
 import com.fastcode.example.commons.search.SearchUtils;
-import java.time.*;
 import java.util.*;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
@@ -159,12 +158,12 @@ public class PermissionController {
         Map<String, String> joinColDetails = _permissionAppService.parseRolepermissionsJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 
         List<FindRolepermissionByIdOutput> output = _rolepermissionAppService.find(searchCriteria, pageable);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         return new ResponseEntity(output, HttpStatus.OK);
     }
@@ -197,7 +196,7 @@ public class PermissionController {
         Map<String, String> joinColDetails = _permissionAppService.parseUserspermissionsJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 

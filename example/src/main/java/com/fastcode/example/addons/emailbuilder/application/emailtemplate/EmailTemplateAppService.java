@@ -7,9 +7,7 @@ import com.fastcode.example.addons.docmgmt.domain.filehistory.FileHistory;
 import com.fastcode.example.addons.docmgmt.domain.filehistory.IFileHistoryRepository;
 import com.fastcode.example.addons.emailbuilder.application.datasource.dto.FindDataSourceMetaOutputForMapping;
 import com.fastcode.example.addons.emailbuilder.application.emailtemplate.dto.*;
-import com.fastcode.example.addons.emailbuilder.application.emailtemplate.dto.*;
 import com.fastcode.example.addons.emailbuilder.application.emailvariable.IEmailVariableMapper;
-import com.fastcode.example.addons.emailbuilder.domain.emailtemplate.IEmailTemplateManager;
 import com.fastcode.example.addons.emailbuilder.domain.emailtemplate.IEmailTemplateManager;
 import com.fastcode.example.addons.emailbuilder.domain.emailtemplate.IEmailTemplateManagerHistory;
 import com.fastcode.example.addons.emailbuilder.domain.irepository.DataSourceMetaEntityRepo;
@@ -19,7 +17,6 @@ import com.fastcode.example.addons.emailbuilder.domain.irepository.IEmailTemplat
 import com.fastcode.example.addons.emailbuilder.domain.model.DataSourceEntity;
 import com.fastcode.example.addons.emailbuilder.domain.model.DataSourceMetaEntity;
 import com.fastcode.example.addons.emailbuilder.domain.model.EmailMergeFieldEntity;
-import com.fastcode.example.addons.emailbuilder.domain.model.EmailTemplateEntity;
 import com.fastcode.example.addons.emailbuilder.domain.model.EmailTemplateEntity;
 import com.fastcode.example.addons.emailbuilder.domain.model.EmailTemplateMappingEntity;
 import com.fastcode.example.addons.emailbuilder.domain.model.EmailVariableEntity;
@@ -32,7 +29,6 @@ import com.fastcode.example.commons.logging.LoggingHelper;
 import com.fastcode.example.commons.search.*;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.querydsl.core.BooleanBuilder;
 import java.io.IOException;
@@ -44,30 +40,24 @@ import java.util.Map;
 import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EmailTemplateAppService implements IEmailTemplateAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
+    static final int CASE1 = 1;
+    static final int CASE2 = 2;
+    static final int CASE3 = 3;
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
 
     @Autowired
     private IEmailTemplateManager _emailTemplateManager;
@@ -258,16 +248,16 @@ public class EmailTemplateAppService implements IEmailTemplateAppService {
     public BooleanBuilder search(SearchCriteria search) throws Exception {
         QEmailTemplateEntity emailTemplate = QEmailTemplateEntity.emailTemplateEntity;
         if (search != null) {
-            if (search.getType() == case1) {
+            if (search.getType() == CASE1) {
                 return searchAllProperties(emailTemplate, search.getValue(), search.getOperator());
-            } else if (search.getType() == case2) {
+            } else if (search.getType() == CASE2) {
                 List<String> keysList = new ArrayList<String>();
                 for (SearchFields f : search.getFields()) {
                     keysList.add(f.getFieldName());
                 }
                 checkProperties(keysList);
                 return searchSpecificProperty(emailTemplate, keysList, search.getValue(), search.getOperator());
-            } else if (search.getType() == case3) {
+            } else if (search.getType() == CASE3) {
                 Map<String, SearchFields> map = new HashMap<>();
                 for (SearchFields fieldDetails : search.getFields()) {
                     map.put(fieldDetails.getFieldName(), fieldDetails);
@@ -283,14 +273,14 @@ public class EmailTemplateAppService implements IEmailTemplateAppService {
     public BooleanBuilder searchAllProperties(QEmailTemplateEntity emailTemplate, String value, String operator) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (operator.equals("contains")) {
+        if (operator.equals(CONTAINS)) {
             builder.or(emailTemplate.templateName.likeIgnoreCase("%" + value + "%"));
             builder.or(emailTemplate.category.likeIgnoreCase("%" + value + "%"));
             builder.or(emailTemplate.to.likeIgnoreCase("%" + value + "%"));
             builder.or(emailTemplate.cc.likeIgnoreCase("%" + value + "%"));
             builder.or(emailTemplate.bcc.likeIgnoreCase("%" + value + "%"));
             builder.or(emailTemplate.subject.likeIgnoreCase("%" + value + "%"));
-        } else if (operator.equals("equals")) {
+        } else if (operator.equals(EQUALS_TO)) {
             builder.or(emailTemplate.templateName.eq(value));
             builder.or(emailTemplate.category.eq(value));
             builder.or(emailTemplate.to.eq(value));
@@ -330,44 +320,44 @@ public class EmailTemplateAppService implements IEmailTemplateAppService {
 
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).replace("%20", "").trim().equals("templateName")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(emailTemplate.templateName.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(emailTemplate.templateName.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("category")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(emailTemplate.category.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(emailTemplate.category.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("to")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(emailTemplate.to.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(emailTemplate.to.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("cc")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(emailTemplate.cc.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(emailTemplate.cc.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("bcc")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(emailTemplate.bcc.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(emailTemplate.bcc.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("subject")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(emailTemplate.subject.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(emailTemplate.subject.eq(value));
                 }
             }
@@ -380,58 +370,58 @@ public class EmailTemplateAppService implements IEmailTemplateAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("templateName")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(
                         emailTemplate.templateName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
                     );
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(emailTemplate.templateName.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(emailTemplate.templateName.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("category")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(emailTemplate.category.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(emailTemplate.category.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(emailTemplate.category.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("to")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(emailTemplate.to.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(emailTemplate.to.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(emailTemplate.to.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("cc")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(emailTemplate.cc.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(emailTemplate.cc.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(emailTemplate.cc.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("bcc")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(emailTemplate.bcc.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(emailTemplate.bcc.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(emailTemplate.bcc.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("subject")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(emailTemplate.subject.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(emailTemplate.subject.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(emailTemplate.subject.ne(details.getValue().getSearchValue()));
                 }
             }
@@ -448,13 +438,10 @@ public class EmailTemplateAppService implements IEmailTemplateAppService {
 
     public String convertJsonToHtml(String jsonString) throws IOException {
         String html = "";
-        //ObjectMapper mapper = new ObjectMapper();
 
         ObjectMapper mapper = JsonMapper.builder().enable(JsonReadFeature.ALLOW_UNESCAPED_CONTROL_CHARS).build();
-        //mapper.configure(com.fasterxml.jackson.core.JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
         Request request = mapper.readValue(jsonString, Request.class);
         Response response = mjmlOwnService.genrateHtml(request);
-        logHelper.getLogger().error("Error", response.getErrors());
         html = response.getHtml();
 
         return html;

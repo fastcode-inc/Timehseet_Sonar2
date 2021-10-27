@@ -29,10 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("dashboardversionreportAppService")
 public class DashboardversionreportAppService implements IDashboardversionreportAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
-
     @Autowired
     @Qualifier("dashboardversionreportRepository")
     protected IDashboardversionreportRepository _reportdashboardRepository;

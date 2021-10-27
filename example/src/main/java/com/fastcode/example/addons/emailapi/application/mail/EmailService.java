@@ -5,6 +5,9 @@ import com.fastcode.example.addons.docmgmt.domain.file.IFileContentStore;
 import com.fastcode.example.addons.docmgmt.domain.file.IFileRepository;
 import com.fastcode.example.addons.emailapi.domain.emailhistory.EmailHistory;
 import com.fastcode.example.addons.emailapi.domain.emailhistory.EmailHistoryRepository;
+
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -88,8 +91,6 @@ public class EmailService implements IEmailService {
                         "image/jpeg"
                     );
                 } catch (Exception e) {
-                    // ignore
-                    //e.printStackTrace();
                 }
             }
 
@@ -98,8 +99,7 @@ public class EmailService implements IEmailService {
                 ByteArrayResource fileStreamResource = getFileStreamResource(file.getId(), imageDataSourceMap);
                 if (fileStreamResource != null) helper.addAttachment(file.getName(), fileStreamResource);
             }
-        } catch (MessagingException ex) {
-            //ex.printStackTrace();
+        } catch (MessagingException | IOException ex) {
         }
 
         emailSender.send(message);
@@ -116,28 +116,21 @@ public class EmailService implements IEmailService {
         emailHistoryRepository.save(emailHistory);
     }
 
-    public ByteArrayResource getFileStreamResource(Long fileId, Map<Long, byte[]> imageDataSourceMap) { // This method will download file using RestTemplate
+    public ByteArrayResource getFileStreamResource(Long fileId, Map<Long, byte[]> imageDataSourceMap) throws IOException { // This method will download file using RestTemplate
         try {
             if (imageDataSourceMap.get(fileId) != null) {
                 return new ByteArrayResource(imageDataSourceMap.get(fileId));
             }
-            Optional<FileEntity> f = filesRepo.findById(fileId);
-            // InputStreamResource inputStreamResource = new
-            // InputStreamResource(contentStore.getContent(f.get()));
+            FileEntity file = null;
 
-            InputStream content = contentStore.getContent(f.get());
+            Optional<FileEntity> f = filesRepo.findById(fileId);
+            if(f.isPresent())
+                file = f.get();
+            InputStream content = contentStore.getContent(file);
             return content != null ? new ByteArrayResource(IOUtils.toByteArray(content)) : null;
         } catch (Exception e) {
-            e.printStackTrace();
+            throw e;
         }
-        return null;
     }
 
-    private String appendInlineImagePrifix(String name) {
-        if (name.startsWith("cid:")) {
-            return name;
-        } else {
-            return "cid:" + name;
-        }
-    }
 }

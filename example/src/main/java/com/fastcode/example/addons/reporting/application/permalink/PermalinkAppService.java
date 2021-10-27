@@ -22,10 +22,11 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class PermalinkAppService implements IPermalinkAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
-
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
     @Autowired
     @Qualifier("permalinkRepository")
     private IPermalinkRepository _permalinkRepository;
@@ -126,37 +127,37 @@ public class PermalinkAppService implements IPermalinkAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("authentication")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     permalink.authentication.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     permalink.authentication.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     permalink.authentication.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("description")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     (
-                        details.getValue().getSearchValue().equalsIgnoreCase("true") ||
-                        details.getValue().getSearchValue().equalsIgnoreCase("false")
+                        details.getValue().getSearchValue().equalsIgnoreCase(TRUE) ||
+                        details.getValue().getSearchValue().equalsIgnoreCase(FALSE)
                     )
                 ) builder.and(
                     permalink.description.eq(Boolean.parseBoolean(details.getValue().getSearchValue()))
                 ); else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     (
-                        details.getValue().getSearchValue().equalsIgnoreCase("true") ||
-                        details.getValue().getSearchValue().equalsIgnoreCase("false")
+                        details.getValue().getSearchValue().equalsIgnoreCase(TRUE) ||
+                        details.getValue().getSearchValue().equalsIgnoreCase(FALSE)
                     )
                 ) builder.and(permalink.description.ne(Boolean.parseBoolean(details.getValue().getSearchValue())));
             }
             if (details.getKey().replace("%20", "").trim().equals("refreshRate")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(permalink.refreshRate.eq(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(permalink.refreshRate.ne(Long.valueOf(details.getValue().getSearchValue()))); else if (
                     details.getValue().getOperator().equals("range")
@@ -177,29 +178,29 @@ public class PermalinkAppService implements IPermalinkAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("rendering")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     permalink.rendering.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     permalink.rendering.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     permalink.rendering.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("resource")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     permalink.resource.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     permalink.resource.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     permalink.resource.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("resourceId")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(permalink.resourceId.eq(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(permalink.resourceId.ne(Long.valueOf(details.getValue().getSearchValue()))); else if (
                     details.getValue().getOperator().equals("range")
@@ -221,18 +222,18 @@ public class PermalinkAppService implements IPermalinkAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("toolbar")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     (
-                        details.getValue().getSearchValue().equalsIgnoreCase("true") ||
-                        details.getValue().getSearchValue().equalsIgnoreCase("false")
+                        details.getValue().getSearchValue().equalsIgnoreCase(TRUE) ||
+                        details.getValue().getSearchValue().equalsIgnoreCase(FALSE)
                     )
                 ) builder.and(
                     permalink.toolbar.eq(Boolean.parseBoolean(details.getValue().getSearchValue()))
                 ); else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     (
-                        details.getValue().getSearchValue().equalsIgnoreCase("true") ||
-                        details.getValue().getSearchValue().equalsIgnoreCase("false")
+                        details.getValue().getSearchValue().equalsIgnoreCase(TRUE) ||
+                        details.getValue().getSearchValue().equalsIgnoreCase(FALSE)
                     )
                 ) builder.and(permalink.toolbar.ne(Boolean.parseBoolean(details.getValue().getSearchValue())));
             }

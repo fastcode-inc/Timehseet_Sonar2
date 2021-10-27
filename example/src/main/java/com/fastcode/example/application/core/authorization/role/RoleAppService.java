@@ -19,10 +19,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("roleAppService")
 @RequiredArgsConstructor
 public class RoleAppService implements IRoleAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
     @Qualifier("roleRepository")
     @NonNull
     protected final IRoleRepository _roleRepository;
@@ -44,7 +49,12 @@ public class RoleAppService implements IRoleAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateRoleOutput update(Long roleId, UpdateRoleInput input) {
-        Role existing = _roleRepository.findById(roleId).get();
+        Role existing = null;
+        Optional<Role> r = _roleRepository.findById(roleId);
+        if(r.isPresent())
+            existing=r.get();
+        else
+            throw new EntityNotFoundException("Entity not found");
 
         Role role = mapper.updateRoleInputToRole(input);
         role.setRolepermissionsSet(existing.getRolepermissionsSet());
@@ -130,24 +140,24 @@ public class RoleAppService implements IRoleAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("displayName")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(role.displayName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(role.displayName.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(role.displayName.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("id")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(role.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(role.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(role.id.ne(Long.valueOf(details.getValue().getSearchValue())));
@@ -170,11 +180,11 @@ public class RoleAppService implements IRoleAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("name")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(role.name.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(role.name.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(role.name.ne(details.getValue().getSearchValue()));
                 }
             }

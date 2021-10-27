@@ -6,7 +6,9 @@ import com.fastcode.example.addons.emailbuilder.emailconverter.exception.GenralE
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
-public class ExceptionGenrater {
+public class ExceptionGenerator {
+
+    private ExceptionGenerator(){}
 
     public static final BiFunction<String, Integer, Supplier<GenralException>> genralException = (message, status) ->
         () -> new GenralException(DataMapper.object2Json.apply(new ResponseDto<>(message, status)));

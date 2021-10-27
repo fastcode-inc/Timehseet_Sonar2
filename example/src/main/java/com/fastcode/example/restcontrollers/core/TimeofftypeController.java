@@ -155,12 +155,12 @@ public class TimeofftypeController {
         Map<String, String> joinColDetails = _timeofftypeAppService.parseTimesheetdetailsJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 
         List<FindTimesheetdetailsByIdOutput> output = _timesheetdetailsAppService.find(searchCriteria, pageable);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         return new ResponseEntity(output, HttpStatus.OK);
     }

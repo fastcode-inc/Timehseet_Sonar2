@@ -19,11 +19,8 @@ import com.fastcode.example.domain.core.authorization.users.Users;
 import com.fastcode.example.domain.extended.authorization.users.IUsersRepositoryExtended;
 import com.querydsl.core.BooleanBuilder;
 import java.time.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
@@ -32,13 +29,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("reportversionAppService")
 public class ReportversionAppService implements IReportversionAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
-
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
     @Autowired
     @Qualifier("reportversionRepository")
     protected IReportversionRepository _reportversionRepository;
@@ -78,7 +76,7 @@ public class ReportversionAppService implements IReportversionAppService {
         reportversion = mapper.createReportversionInputToReportversion(input);
         reportversion.setReportVersion("published");
 
-        Reportversion createdPublishedReportversion = _reportversionRepository.save(reportversion);
+        _reportversionRepository.save(reportversion);
 
         return mapper.reportversionToCreateReportversionOutput(createdRunningReportversion);
     }
@@ -107,10 +105,22 @@ public class ReportversionAppService implements IReportversionAppService {
     public void delete(ReportversionId reportversionId) {
         Reportversion existing = _reportversionRepository.findById(reportversionId).orElse(null);
 
-        Report report = _reportRepository.findById(reportversionId.getReportId()).get();
+        Report report = null;
+        Optional<Report> rep = _reportRepository.findById(reportversionId.getReportId());
+        if(rep.isPresent())
+            report = rep.get();
+        else
+            throw new EntityNotFoundException("Entity not found");
+
         report.removeReportversion(existing);
 
-        Users users = _usersRepository.findById(reportversionId.getUserId()).get();
+        Users users = null;
+        Optional<Users> u = _usersRepository.findById(reportversionId.getUserId());
+        if(u.isPresent())
+            users = u.get();
+        else
+            throw new EntityNotFoundException("Entity not found");
+
         users.removeReportversions(existing);
 
         _reportversionRepository.delete(existing);
@@ -207,39 +217,39 @@ public class ReportversionAppService implements IReportversionAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("ctype")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     reportversion.ctype.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     reportversion.ctype.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     reportversion.ctype.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("description")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     reportversion.description.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     reportversion.description.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     reportversion.description.ne(details.getValue().getSearchValue())
                 );
             }
 
             if (details.getKey().replace("%20", "").trim().equals("reportType")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     reportversion.reportType.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     reportversion.reportType.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     reportversion.reportType.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("title")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     reportversion.title.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     reportversion.title.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     reportversion.title.ne(details.getValue().getSearchValue())
                 );
             }

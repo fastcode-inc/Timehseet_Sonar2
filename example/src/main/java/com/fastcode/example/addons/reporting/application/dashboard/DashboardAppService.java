@@ -51,6 +51,8 @@ import com.fastcode.example.domain.core.authorization.usersrole.Usersrole;
 import com.fastcode.example.domain.extended.authorization.users.IUsersRepositoryExtended;
 import com.fastcode.example.domain.extended.authorization.usersrole.IUsersroleRepositoryExtended;
 import com.querydsl.core.BooleanBuilder;
+
+import java.net.MalformedURLException;
 import java.time.*;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -66,10 +68,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service("dashboardAppService")
 public class DashboardAppService implements IDashboardAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
-
+    public static final String RUNNING = "running";
+    public static final String MEDIUMCHART = "mediumchart";
+    public static final String PUBLISHED = "published";
     @Autowired
     @Qualifier("dashboardRepository")
     protected IDashboardRepository _dashboardRepository;
@@ -170,7 +171,7 @@ public class DashboardAppService implements IDashboardAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateDashboardOutput update(Long dashboardId, UpdateDashboardInput input) {
-        DashboardversionId dashboardversionId = new DashboardversionId(input.getUserId(), dashboardId, "running");
+        DashboardversionId dashboardversionId = new DashboardversionId(input.getUserId(), dashboardId, RUNNING);
 
         Dashboardversion rv = _dashboardversionRepository.findById(dashboardversionId).orElse(null);
         UpdateDashboardversionInput dashboardversion = mapper.updateDashboardInputToUpdateDashboardversionInput(input);
@@ -192,7 +193,7 @@ public class DashboardAppService implements IDashboardAppService {
             _dashboarduserRepository.save(dashboarduser);
         }
         Dashboard foundDashboard = _dashboardRepository.findById(dashboardId).orElse(null);
-        if (foundDashboard.getUsers() != null && foundDashboard.getUsers().getId() == input.getUserId()) {
+        if (foundDashboard.getUsers() != null && foundDashboard.getUsers().getId().equals(input.getUserId())) {
             foundDashboard.setIsPublished(false);
             foundDashboard = _dashboardRepository.save(foundDashboard);
         }
@@ -200,17 +201,17 @@ public class DashboardAppService implements IDashboardAppService {
         Long count = 0L;
         for (UpdateReportInput reportInput : input.getReportDetails()) {
             Dashboardversionreport dashboardreport = _reportDashboardRepository
-                .findById(new DashboardversionreportId(dashboardId, input.getUserId(), "running", reportInput.getId()))
+                .findById(new DashboardversionreportId(dashboardId, input.getUserId(), RUNNING, reportInput.getId()))
                 .orElse(null);
             if (reportInput.getReportWidth() != null) {
                 dashboardreport.setReportWidth(reportInput.getReportWidth());
             } else {
-                dashboardreport.setReportWidth("mediumchart");
+                dashboardreport.setReportWidth(MEDIUMCHART);
             }
             dashboardreport.setOrderId(count);
             count++;
 
-            Dashboardversionreport dashboardVersionReport = _reportDashboardRepository.save(dashboardreport);
+            _reportDashboardRepository.save(dashboardreport);
         }
 
         return mapper.dashboardAndUpdateDashboardversionOutputToUpdateDashboardOutput(
@@ -223,14 +224,14 @@ public class DashboardAppService implements IDashboardAppService {
     public void delete(Long dashboardId, Long userId) {
         Dashboard existing = _dashboardRepository.findById(dashboardId).orElse(null);
         existing.removeDashboardversion(
-            _dashboardversionRepository.findById(new DashboardversionId(userId, dashboardId, "running")).orElse(null)
+            _dashboardversionRepository.findById(new DashboardversionId(userId, dashboardId, RUNNING)).orElse(null)
         );
         existing.removeDashboardversion(
-            _dashboardversionRepository.findById(new DashboardversionId(userId, dashboardId, "published")).get()
+            _dashboardversionRepository.findById(new DashboardversionId(userId, dashboardId, PUBLISHED)).get()
         );
 
-        _dashboardversionAppservice.delete(new DashboardversionId(userId, dashboardId, "running"));
-        _dashboardversionAppservice.delete(new DashboardversionId(userId, dashboardId, "published"));
+        _dashboardversionAppservice.delete(new DashboardversionId(userId, dashboardId, RUNNING));
+        _dashboardversionAppservice.delete(new DashboardversionId(userId, dashboardId, PUBLISHED));
 
         List<Dashboarduser> reportUserList = _dashboarduserRepository.findByDashboardId(existing.getId());
         for (Dashboarduser reportuser : reportUserList) {
@@ -246,20 +247,20 @@ public class DashboardAppService implements IDashboardAppService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void deleteReportFromDashboard(Long dashboardId, Long reportId, Long userId) {
         Dashboardversionreport existing = _reportDashboardRepository
-            .findById(new DashboardversionreportId(dashboardId, userId, "running", reportId))
+            .findById(new DashboardversionreportId(dashboardId, userId, RUNNING, reportId))
             .get();
 
         _dashboardversionRepository
-            .findById(new DashboardversionId(userId, dashboardId, "running"))
+            .findById(new DashboardversionId(userId, dashboardId, RUNNING))
             .get()
             .removeDashboardversionreport(existing);
         _reportRepository.findByReportIdAndUsersId(reportId, userId).removeDashboardversionreport(existing);
 
-        _reportDashboardAppService.delete(new DashboardversionreportId(dashboardId, userId, "running", reportId));
+        _reportDashboardAppService.delete(new DashboardversionreportId(dashboardId, userId, RUNNING, reportId));
 
         List<Dashboardversionreport> dashboardReportList = _reportDashboardRepository.findByDashboardIdAndVersionAndUsersId(
             dashboardId,
-            "running",
+                RUNNING,
             userId
         );
 
@@ -339,13 +340,13 @@ public class DashboardAppService implements IDashboardAppService {
 
         Dashboardversion dashboardVersion, publishedversion;
         publishedversion =
-            _dashboardversionRepository.findById(new DashboardversionId(userId, dashboardId, "published")).orElse(null);
-        if (StringUtils.isNotBlank(version) && version.equalsIgnoreCase("published")) {
+            _dashboardversionRepository.findById(new DashboardversionId(userId, dashboardId, PUBLISHED)).orElse(null);
+        if (StringUtils.isNotBlank(version) && version.equalsIgnoreCase(PUBLISHED)) {
             dashboardVersion = publishedversion;
         } else {
             dashboardVersion =
                 _dashboardversionRepository
-                    .findById(new DashboardversionId(userId, dashboardId, "running"))
+                    .findById(new DashboardversionId(userId, dashboardId, RUNNING))
                     .orElse(null);
         }
         FindDashboardByIdOutput output = mapper.dashboardEntitiesToFindDashboardByIdOutput(
@@ -476,7 +477,7 @@ public class DashboardAppService implements IDashboardAppService {
     ) {
         Dashboard dashboard = _dashboardRepository.findById(dashboardId).orElse(null);
         Dashboardversion ownerPublishedVersion = _dashboardversionRepository
-            .findById(new DashboardversionId(dashboard.getUsers().getId(), dashboard.getId(), "published"))
+            .findById(new DashboardversionId(dashboard.getUsers().getId(), dashboard.getId(), PUBLISHED))
             .orElse(null);
         if (ownerPublishedVersion == null) {
             return null;
@@ -484,7 +485,7 @@ public class DashboardAppService implements IDashboardAppService {
 
         List<Dashboardversionreport> dashboardReportsList = _reportDashboardRepository.findByDashboardIdAndVersionAndUsersId(
             dashboardId,
-            "published",
+                PUBLISHED,
             dashboard.getUsers().getId()
         );
         List<ShareReportInputByUser> reportUsers = new ArrayList<>();
@@ -574,7 +575,7 @@ public class DashboardAppService implements IDashboardAppService {
                         new DashboardversionreportId(
                             dvr.getDashboardId(),
                             reportuser.getId(),
-                            "running",
+                                RUNNING,
                             dvr.getReportId()
                         )
                     )
@@ -585,7 +586,7 @@ public class DashboardAppService implements IDashboardAppService {
                         dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                             dvr,
                             reportuser.getId(),
-                            "running"
+                                RUNNING
                         );
                     _reportDashboardRepository.save(running);
                 }
@@ -595,7 +596,7 @@ public class DashboardAppService implements IDashboardAppService {
                             new DashboardversionreportId(
                                 dvr.getDashboardId(),
                                 reportuser.getId(),
-                                "published",
+                                    PUBLISHED,
                                 dvr.getReportId()
                             )
                         )
@@ -606,7 +607,7 @@ public class DashboardAppService implements IDashboardAppService {
                             dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                                 running,
                                 reportuser.getId(),
-                                "published"
+                                    PUBLISHED
                             );
                         _reportDashboardRepository.save(published);
                     }
@@ -631,7 +632,7 @@ public class DashboardAppService implements IDashboardAppService {
     ) {
         Dashboard dashboard = _dashboardRepository.findById(dashboardId).orElse(null);
         Dashboardversion ownerPublishedVersion = _dashboardversionRepository
-            .findById(new DashboardversionId(dashboard.getUsers().getId(), dashboard.getId(), "published"))
+            .findById(new DashboardversionId(dashboard.getUsers().getId(), dashboard.getId(), PUBLISHED))
             .orElse(null);
         if (ownerPublishedVersion == null) {
             return null;
@@ -639,7 +640,7 @@ public class DashboardAppService implements IDashboardAppService {
 
         List<Dashboardversionreport> dashboardReportsList = _reportDashboardRepository.findByDashboardIdAndVersionAndUsersId(
             dashboardId,
-            "published",
+                PUBLISHED,
             dashboard.getUsers().getId()
         );
         List<ShareReportInputByUser> reportUsers = new ArrayList<>();
@@ -699,7 +700,7 @@ public class DashboardAppService implements IDashboardAppService {
                         _dashboarduserRepository.save(dashboarduser);
                     } else if (userInput.getEditable() == null && dashboarduser != null) {
                         dashboarduser.setOwnerSharingStatus(false);
-                        dashboarduser = _dashboarduserRepository.save(dashboarduser);
+                        _dashboarduserRepository.save(dashboarduser);
                     }
 
                     ShareReportInputByUser reportInput = new ShareReportInputByUser();
@@ -720,7 +721,7 @@ public class DashboardAppService implements IDashboardAppService {
                             new DashboardversionreportId(
                                 dvr.getDashboardId(),
                                 reportuser.getId(),
-                                "running",
+                                    RUNNING,
                                 dvr.getReportId()
                             )
                         )
@@ -730,7 +731,7 @@ public class DashboardAppService implements IDashboardAppService {
                             dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                                 dvr,
                                 reportuser.getId(),
-                                "published"
+                                    PUBLISHED
                             );
                         _reportDashboardRepository.save(running);
                     }
@@ -741,7 +742,7 @@ public class DashboardAppService implements IDashboardAppService {
                                 new DashboardversionreportId(
                                     dvr.getDashboardId(),
                                     reportuser.getId(),
-                                    "published",
+                                        PUBLISHED,
                                     dvr.getReportId()
                                 )
                             )
@@ -752,7 +753,7 @@ public class DashboardAppService implements IDashboardAppService {
                                 dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                                     running,
                                     reportuser.getId(),
-                                    "published"
+                                        PUBLISHED
                                 );
                         }
 
@@ -794,14 +795,14 @@ public class DashboardAppService implements IDashboardAppService {
             Dashboardversion publishedDashboardversion = dashboardversionMapper.dashboardversionToDashboardversion(
                 ownerReportversion,
                 users.getId(),
-                "published"
+                    PUBLISHED
             );
             publishedDashboardversion.setUsers(users);
             _dashboardversionRepository.save(publishedDashboardversion);
             Dashboardversion runningDashboardversion = dashboardversionMapper.dashboardversionToDashboardversion(
                 ownerReportversion,
                 users.getId(),
-                "running"
+                    RUNNING
             );
             runningDashboardversion.setUsers(users);
             _dashboardversionRepository.save(runningDashboardversion);
@@ -809,7 +810,7 @@ public class DashboardAppService implements IDashboardAppService {
             Dashboardversion runningdashboardversion = dashboardversionMapper.dashboardversionToDashboardversion(
                 ownerReportversion,
                 users.getId(),
-                "running"
+                    RUNNING
             );
 
             runningdashboardversion.setUsers(users);
@@ -825,10 +826,10 @@ public class DashboardAppService implements IDashboardAppService {
     ) {
         Users users = _usersRepository.findById(dashboarduser.getUserId()).orElse(null);
         Dashboardversion dashboardPublishedVersion = _dashboardversionRepository
-            .findById(new DashboardversionId(users.getId(), dashboarduser.getDashboardId(), "published"))
+            .findById(new DashboardversionId(users.getId(), dashboarduser.getDashboardId(), PUBLISHED))
             .orElse(null);
         Dashboardversion dashboardRunningVersion = _dashboardversionRepository
-            .findById(new DashboardversionId(users.getId(), dashboarduser.getDashboardId(), "running"))
+            .findById(new DashboardversionId(users.getId(), dashboarduser.getDashboardId(), RUNNING))
             .orElse(null);
 
         if (dashboarduser.getEditable() && !editable) {
@@ -841,7 +842,7 @@ public class DashboardAppService implements IDashboardAppService {
                     Dashboardversion publishedVersion = dashboardversionMapper.dashboardversionToDashboardversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "running"
+                            RUNNING
                     );
                     publishedVersion.setUsers(users);
                     _dashboardversionRepository.save(publishedVersion);
@@ -849,17 +850,15 @@ public class DashboardAppService implements IDashboardAppService {
                     Dashboardversion publishedVersion = dashboardversionMapper.dashboardversionToDashboardversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "published"
+                            PUBLISHED
                     );
 
                     publishedVersion.setUsers(users);
                     _dashboardversionRepository.save(publishedVersion);
                 }
             } else {
-                if (dashboarduser.getIsResetted()) {
-                    if (dashboardPublishedVersion != null) {
+                if (dashboarduser.getIsResetted() && (dashboardPublishedVersion != null)) {
                         _dashboardversionRepository.delete(dashboardPublishedVersion);
-                    }
                 }
             }
         } else if (!dashboarduser.getEditable() && !editable) {
@@ -868,7 +867,7 @@ public class DashboardAppService implements IDashboardAppService {
                     Dashboardversion publishedVersion = dashboardversionMapper.dashboardversionToDashboardversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "published"
+                            PUBLISHED
                     );
                     publishedVersion.setUsers(users);
                     _dashboardversionRepository.save(publishedVersion);
@@ -879,7 +878,7 @@ public class DashboardAppService implements IDashboardAppService {
                     Dashboardversion publishedVersion = dashboardversionMapper.dashboardversionToDashboardversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "running"
+                            RUNNING
                     );
 
                     publishedVersion.setUsers(users);
@@ -891,7 +890,7 @@ public class DashboardAppService implements IDashboardAppService {
                 Dashboardversion publishedVersion = dashboardversionMapper.dashboardversionToDashboardversion(
                     ownerPublishedVersion,
                     users.getId(),
-                    "published"
+                        PUBLISHED
                 );
                 publishedVersion.setUsers(users);
                 _dashboardversionRepository.save(publishedVersion);
@@ -902,7 +901,7 @@ public class DashboardAppService implements IDashboardAppService {
                     Dashboardversion publishedVersion = dashboardversionMapper.dashboardversionToDashboardversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "published"
+                            PUBLISHED
                     );
                     publishedVersion.setUsers(users);
                     _dashboardversionRepository.save(publishedVersion);
@@ -914,7 +913,7 @@ public class DashboardAppService implements IDashboardAppService {
                     Dashboardversion publishedVersion = dashboardversionMapper.dashboardversionToDashboardversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "published"
+                            PUBLISHED
                     );
                     publishedVersion.setUsers(users);
                     _dashboardversionRepository.save(publishedVersion);
@@ -923,7 +922,7 @@ public class DashboardAppService implements IDashboardAppService {
                 Dashboardversion publishedVersion = dashboardversionMapper.dashboardversionToDashboardversion(
                     dashboardRunningVersion,
                     users.getId(),
-                    "published"
+                        PUBLISHED
                 );
                 publishedVersion.setUsers(users);
                 _dashboardversionRepository.save(publishedVersion);
@@ -991,7 +990,7 @@ public class DashboardAppService implements IDashboardAppService {
         foundDashboarduser = _dashboarduserRepository.save(foundDashboarduser);
 
         Dashboardversion foundDashboardversion = _dashboardversionRepository
-            .findById(new DashboardversionId(userId, dashboardId, "running"))
+            .findById(new DashboardversionId(userId, dashboardId, RUNNING))
             .orElse(null);
         Dashboard foundDashboard = _dashboardRepository.findById(dashboardId).orElse(null);
 
@@ -1015,15 +1014,15 @@ public class DashboardAppService implements IDashboardAppService {
         foundDashboard = _dashboardRepository.save(foundDashboard);
 
         Dashboardversion foundDashboardversion = _dashboardversionRepository
-            .findById(new DashboardversionId(userId, dashboardId, "running"))
+            .findById(new DashboardversionId(userId, dashboardId, RUNNING))
             .orElse(null);
         Dashboardversion foundPublishedversion = _dashboardversionRepository
-            .findById(new DashboardversionId(userId, dashboardId, "published"))
+            .findById(new DashboardversionId(userId, dashboardId, PUBLISHED))
             .orElse(null);
         Dashboardversion publishedVersion = dashboardversionMapper.dashboardversionToDashboardversion(
             foundDashboardversion,
             userId,
-            "published"
+                PUBLISHED
         );
 
         if (foundPublishedversion != null) {
@@ -1034,13 +1033,13 @@ public class DashboardAppService implements IDashboardAppService {
         //check if report is added in running version
         List<Dashboardversionreport> dashboardreportList = _reportDashboardRepository.findByDashboardIdAndVersionAndUsersId(
             dashboardId,
-            "running",
+                RUNNING,
             userId
         );
 
         for (Dashboardversionreport dashboardreport : dashboardreportList) {
             Dashboardversionreport publishedDashboardreport = _reportDashboardRepository
-                .findById(new DashboardversionreportId(dashboardId, userId, "published", dashboardreport.getReportId()))
+                .findById(new DashboardversionreportId(dashboardId, userId, PUBLISHED, dashboardreport.getReportId()))
                 .orElse(null);
             if (publishedDashboardreport != null) {
                 publishedDashboardreport.setOrderId(dashboardreport.getOrderId());
@@ -1051,7 +1050,7 @@ public class DashboardAppService implements IDashboardAppService {
                     dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                         dashboardreport,
                         userId,
-                        "published"
+                            PUBLISHED
                     );
                 _reportDashboardRepository.save(publishedDashboardreport);
             }
@@ -1062,27 +1061,27 @@ public class DashboardAppService implements IDashboardAppService {
         //check if report is removed from running version
         List<Dashboardversionreport> dashboardPublishedreportList = _reportDashboardRepository.findByDashboardIdAndVersionAndUsersId(
             dashboardId,
-            "published",
+                PUBLISHED,
             userId
         );
 
         for (Dashboardversionreport dashboardeport : dashboardPublishedreportList) {
             Dashboardversionreport runningDashboardreport = _reportDashboardRepository
-                .findById(new DashboardversionreportId(dashboardId, userId, "running", dashboardeport.getReportId()))
+                .findById(new DashboardversionreportId(dashboardId, userId, RUNNING, dashboardeport.getReportId()))
                 .orElse(null);
             if (runningDashboardreport == null) {
                 runningDashboardreport =
                     dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                         dashboardeport,
                         userId,
-                        "published"
+                            PUBLISHED
                     );
                 runningDashboardreport.getReport().removeDashboardversionreport(runningDashboardreport);
                 runningDashboardreport.getDashboardversionEntity().removeDashboardversionreport(runningDashboardreport);
 
                 _reportDashboardRepository.delete(runningDashboardreport);
                 Reportversion reportversion = _reportversionRepository
-                    .findById(new ReportversionId(dashboardeport.getUserId(), dashboardeport.getReportId(), "running"))
+                    .findById(new ReportversionId(dashboardeport.getUserId(), dashboardeport.getReportId(), RUNNING))
                     .orElse(null);
 
                 if (reportversion.getIsAssignedByDashboard()) {
@@ -1103,11 +1102,11 @@ public class DashboardAppService implements IDashboardAppService {
 
         if (foundDashboarduser != null && foundDashboarduser.getOwnerSharingStatus()) {
             Dashboardversion ownerPublishedversion = _dashboardversionRepository
-                .findById(new DashboardversionId(foundDashboard.getUsers().getId(), dashboardId, "published"))
+                .findById(new DashboardversionId(foundDashboard.getUsers().getId(), dashboardId, PUBLISHED))
                 .orElse(null);
             Users foundUsers = _usersRepository.findById(userId).orElse(null);
             Dashboardversion publishedversion = _dashboardversionRepository
-                .findById(new DashboardversionId(userId, dashboardId, "published"))
+                .findById(new DashboardversionId(userId, dashboardId, PUBLISHED))
                 .orElse(null);
             Dashboardversion updatedVersion;
             if (publishedversion == null) {
@@ -1115,11 +1114,11 @@ public class DashboardAppService implements IDashboardAppService {
                     dashboardversionMapper.dashboardversionToDashboardversion(
                         ownerPublishedversion,
                         userId,
-                        "published"
+                            PUBLISHED
                     );
             } else {
                 updatedVersion =
-                    dashboardversionMapper.dashboardversionToDashboardversion(publishedversion, userId, "running");
+                    dashboardversionMapper.dashboardversionToDashboardversion(publishedversion, userId, RUNNING);
             }
 
             updatedVersion.setUsers(foundUsers);
@@ -1130,21 +1129,21 @@ public class DashboardAppService implements IDashboardAppService {
 
             List<Dashboardversionreport> dvrList = _reportDashboardRepository.findByDashboardIdAndVersionAndUsersId(
                 dashboardId,
-                "published",
+                    PUBLISHED,
                 foundDashboard.getUsers().getId()
             );
             for (Dashboardversionreport dvr : dvrList) {
                 Dashboardversionreport updateDashboardreport = dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                     dvr,
                     userId,
-                    "published"
+                        PUBLISHED
                 );
                 _reportDashboardRepository.save(updateDashboardreport);
                 _reportAppService.refreshReport(userId, dvr.getReportId());
             }
 
             Dashboardversion runningversion = _dashboardversionRepository
-                .findById(new DashboardversionId(userId, dashboardId, "running"))
+                .findById(new DashboardversionId(userId, dashboardId, RUNNING))
                 .orElse(null);
 
             FindDashboardByIdOutput output = mapper.dashboardEntitiesToFindDashboardByIdOutput(
@@ -1155,13 +1154,13 @@ public class DashboardAppService implements IDashboardAppService {
             output.setSharedWithMe(true);
             return output;
         } else if (
-            foundDashboard != null && foundDashboard.getUsers() != null && foundDashboard.getUsers().getId() == userId
+            foundDashboard != null && foundDashboard.getUsers() != null && foundDashboard.getUsers().getId().equals(userId)
         ) {
             Dashboardversion ownerPublishedversion = _dashboardversionRepository
-                .findById(new DashboardversionId(userId, dashboardId, "published"))
+                .findById(new DashboardversionId(userId, dashboardId, PUBLISHED))
                 .orElse(null);
             Dashboardversion ownerRunningversion = _dashboardversionRepository
-                .findById(new DashboardversionId(userId, dashboardId, "running"))
+                .findById(new DashboardversionId(userId, dashboardId, RUNNING))
                 .orElse(null);
 
             Users foundUsers = _usersRepository.findById(userId).orElse(null);
@@ -1169,7 +1168,7 @@ public class DashboardAppService implements IDashboardAppService {
             Dashboardversion updatedVersion = dashboardversionMapper.dashboardversionToDashboardversion(
                 ownerPublishedversion,
                 userId,
-                "running"
+                    RUNNING
             );
             updatedVersion.setUsers(foundUsers);
             updatedVersion.setVersiono(ownerRunningversion.getVersiono());
@@ -1178,21 +1177,21 @@ public class DashboardAppService implements IDashboardAppService {
 
             List<Dashboardversionreport> dvrList = _reportDashboardRepository.findByDashboardIdAndVersionAndUsersId(
                 dashboardId,
-                "published",
+                    PUBLISHED,
                 userId
             );
             for (Dashboardversionreport dvr : dvrList) {
                 Dashboardversionreport updateDashboardreport = dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                     dvr,
                     userId,
-                    "running"
+                        RUNNING
                 );
                 _reportDashboardRepository.save(updateDashboardreport);
                 _reportAppService.refreshReport(userId, dvr.getReportId());
             }
 
             Dashboardversion runningversion = _dashboardversionRepository
-                .findById(new DashboardversionId(userId, dashboardId, "running"))
+                .findById(new DashboardversionId(userId, dashboardId, RUNNING))
                 .orElse(null);
 
             FindDashboardByIdOutput output = mapper.dashboardEntitiesToFindDashboardByIdOutput(
@@ -1220,10 +1219,10 @@ public class DashboardAppService implements IDashboardAppService {
         if (dashboarduser != null) {
             dashboardRunningversion =
                 _dashboardversionRepository
-                    .findById(new DashboardversionId(newOwnerId, dashboardId, "running"))
+                    .findById(new DashboardversionId(newOwnerId, dashboardId, RUNNING))
                     .orElse(null);
             Dashboardversion dashboardPublishedversion = _dashboardversionRepository
-                .findById(new DashboardversionId(newOwnerId, dashboardId, "published"))
+                .findById(new DashboardversionId(newOwnerId, dashboardId, PUBLISHED))
                 .orElse(null);
 
             if (dashboardPublishedversion == null) {
@@ -1231,7 +1230,7 @@ public class DashboardAppService implements IDashboardAppService {
                     dashboardversionMapper.dashboardversionToDashboardversion(
                         dashboardRunningversion,
                         newOwnerId,
-                        "published"
+                            PUBLISHED
                     );
                 dashboardPublishedversion.setUsers(foundUsers);
                 _dashboardversionRepository.save(dashboardPublishedversion);
@@ -1240,16 +1239,16 @@ public class DashboardAppService implements IDashboardAppService {
             _dashboarduserRepository.delete(dashboarduser);
         } else {
             Dashboardversion foundOwnerDashboardRunningversion = _dashboardversionRepository
-                .findById(new DashboardversionId(ownerId, dashboardId, "running"))
+                .findById(new DashboardversionId(ownerId, dashboardId, RUNNING))
                 .orElse(null);
             Dashboardversion foundOwnerDashboardPublishedversion = _dashboardversionRepository
-                .findById(new DashboardversionId(ownerId, dashboardId, "published"))
+                .findById(new DashboardversionId(ownerId, dashboardId, PUBLISHED))
                 .orElse(null);
             dashboardRunningversion =
                 dashboardversionMapper.dashboardversionToDashboardversion(
                     foundOwnerDashboardRunningversion,
                     foundUsers.getId(),
-                    "running"
+                        RUNNING
                 );
             dashboardRunningversion.setUsers(foundUsers);
             _dashboardversionRepository.save(dashboardRunningversion);
@@ -1257,7 +1256,7 @@ public class DashboardAppService implements IDashboardAppService {
             Dashboardversion dashboardPublishedversion = dashboardversionMapper.dashboardversionToDashboardversion(
                 foundOwnerDashboardPublishedversion,
                 foundUsers.getId(),
-                "published"
+                    PUBLISHED
             );
 
             dashboardPublishedversion.setUsers(foundUsers);
@@ -1266,12 +1265,12 @@ public class DashboardAppService implements IDashboardAppService {
 
         List<Dashboardversionreport> dvrRunningList = _reportDashboardRepository.findByDashboardIdAndVersionAndUsersId(
             dashboardId,
-            "running",
+                RUNNING,
             ownerId
         );
         List<Dashboardversionreport> dvrPublishedList = _reportDashboardRepository.findByDashboardIdAndVersionAndUsersId(
             dashboardId,
-            "published",
+                PUBLISHED,
             ownerId
         );
 
@@ -1282,7 +1281,7 @@ public class DashboardAppService implements IDashboardAppService {
                 Dashboardversionreport updatedRunning = dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                     dvr,
                     newOwnerId,
-                    "running"
+                        RUNNING
                 );
                 _reportDashboardRepository.save(updatedRunning);
             }
@@ -1290,7 +1289,7 @@ public class DashboardAppService implements IDashboardAppService {
 
             Dashboardversionreport ownerPublished = _reportDashboardRepository
                 .findById(
-                    new DashboardversionreportId(dvr.getDashboardId(), dvr.getUserId(), "published", dvr.getReportId())
+                    new DashboardversionreportId(dvr.getDashboardId(), dvr.getUserId(), PUBLISHED, dvr.getReportId())
                 )
                 .orElse(null);
             if (ownerPublished != null) _reportDashboardRepository.delete(ownerPublished);
@@ -1308,7 +1307,7 @@ public class DashboardAppService implements IDashboardAppService {
                     Dashboardversionreport updatedPublished = dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                         dvr,
                         newOwnerId,
-                        "published"
+                            PUBLISHED
                     );
                     _reportDashboardRepository.save(updatedPublished);
                 }
@@ -1319,14 +1318,14 @@ public class DashboardAppService implements IDashboardAppService {
                 Dashboardversionreport updatedPublished = dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                     dvr,
                     newOwnerId,
-                    "published"
+                        PUBLISHED
                 );
                 _reportDashboardRepository.save(updatedPublished);
             }
         }
 
-        _dashboardversionAppservice.delete(new DashboardversionId(ownerId, dashboardId, "running"));
-        _dashboardversionAppservice.delete(new DashboardversionId(ownerId, dashboardId, "published"));
+        _dashboardversionAppservice.delete(new DashboardversionId(ownerId, dashboardId, RUNNING));
+        _dashboardversionAppservice.delete(new DashboardversionId(ownerId, dashboardId, PUBLISHED));
 
         foundDashboard.setUsers(foundUsers);
         _dashboardRepository.save(foundDashboard);
@@ -1342,15 +1341,14 @@ public class DashboardAppService implements IDashboardAppService {
         Dashboard foundDashboard = _dashboardRepository.findById(dashboardId).orElse(null);
 
         Dashboardversion publishedversion = _dashboardversionRepository
-            .findById(new DashboardversionId(userId, dashboardId, "published"))
+            .findById(new DashboardversionId(userId, dashboardId, PUBLISHED))
             .orElse(null);
         if (publishedversion != null) {
             Dashboardversion runningversion = dashboardversionMapper.dashboardversionToDashboardversion(
                 publishedversion,
                 userId,
-                "running"
+                    RUNNING
             );
-            //	runningversion.setVersion("running");
             runningversion = _dashboardversionRepository.save(runningversion);
 
             foundDashboarduser.setIsResetted(true);
@@ -1358,14 +1356,14 @@ public class DashboardAppService implements IDashboardAppService {
 
             List<Dashboardversionreport> dvrList = _reportDashboardRepository.findByDashboardIdAndVersionAndUsersId(
                 dashboardId,
-                "published",
+                    PUBLISHED,
                 userId
             );
             for (Dashboardversionreport dvr : dvrList) {
                 Dashboardversionreport updateDashboardreport = dashboardversionMapper.dashboardversionreportToDashboardversionreport(
                     dvr,
                     userId,
-                    "running"
+                        RUNNING
                 );
                 _reportDashboardRepository.save(updateDashboardreport);
                 _reportAppService.resetReport(userId, dvr.getReportId());
@@ -1373,7 +1371,7 @@ public class DashboardAppService implements IDashboardAppService {
 
             List<Dashboardversionreport> dvrRunningList = _reportDashboardRepository.findByDashboardIdAndVersionAndUsersId(
                 dashboardId,
-                "running",
+                    RUNNING,
                 userId
             );
             for (Dashboardversionreport dvr : dvrRunningList) {
@@ -1408,7 +1406,7 @@ public class DashboardAppService implements IDashboardAppService {
         while (dashboardIterator.hasNext()) {
             Dashboard dashboard = dashboardIterator.next();
             Dashboardversion dashboardVersion = _dashboardversionRepository
-                .findById(new DashboardversionId(dashboard.getUsers().getId(), dashboard.getId(), "running"))
+                .findById(new DashboardversionId(dashboard.getUsers().getId(), dashboard.getId(), RUNNING))
                 .orElse(null);
             Dashboarduser dashboarduser = _dashboarduserRepository
                 .findById(new DashboarduserId(dashboard.getId(), dashboardVersion.getUserId()))
@@ -1419,7 +1417,7 @@ public class DashboardAppService implements IDashboardAppService {
                 dashboarduser
             );
             Dashboardversion publishedversion = _dashboardversionRepository
-                .findById(new DashboardversionId(dashboard.getUsers().getId(), dashboard.getId(), "published"))
+                .findById(new DashboardversionId(dashboard.getUsers().getId(), dashboard.getId(), PUBLISHED))
                 .orElse(null);
             if (publishedversion == null) {
                 dashboardOutput.setIsResetable(false);
@@ -1445,7 +1443,7 @@ public class DashboardAppService implements IDashboardAppService {
             CreateReportOutput createdReport = _reportAppService.create(report);
             if (report.getReportWidth() != null) {
                 createdReport.setReportWidth(report.getReportWidth());
-            } else createdReport.setReportWidth("mediumchart");
+            } else createdReport.setReportWidth(MEDIUMCHART);
             reportList.add(createdReport);
             FindReportByIdOutput output = reportMapper.createReportOutputToFindReportByIdOutput(createdReport, null);
             output.setReportWidth(report.getReportWidth());
@@ -1464,7 +1462,7 @@ public class DashboardAppService implements IDashboardAppService {
     @Transactional(propagation = Propagation.REQUIRED)
     public FindDashboardByIdOutput addNewReportsToExistingDashboard(AddNewReportToExistingDashboardInput input) {
         Dashboardversion dashboardversion = _dashboardversionRepository
-            .findById(new DashboardversionId(input.getOwnerId(), input.getId(), "running"))
+            .findById(new DashboardversionId(input.getOwnerId(), input.getId(), RUNNING))
             .orElse(null);
         Dashboard dashboard = _dashboardRepository.findById(input.getId()).orElse(null);
 
@@ -1483,7 +1481,7 @@ public class DashboardAppService implements IDashboardAppService {
             CreateReportOutput createdReport = _reportAppService.create(report);
             if (report.getReportWidth() != null) {
                 createdReport.setReportWidth(report.getReportWidth());
-            } else createdReport.setReportWidth("mediumchart");
+            } else createdReport.setReportWidth(MEDIUMCHART);
 
             reportList.add(createdReport);
             FindReportByIdOutput output = reportMapper.createReportOutputToFindReportByIdOutput(createdReport, null);
@@ -1492,7 +1490,6 @@ public class DashboardAppService implements IDashboardAppService {
         }
 
         _reportDashboardAppService.addReportsToDashboardRunningversion(createdDashboard, reportList);
-        //	_reportDashboardAppService.addReportsToDashboardPublishedversion(createdDashboard, reportList);
 
         FindDashboardByIdOutput dashboardOuputDto = mapper.dashboardOutputToFindDashboardByIdOutput(createdDashboard);
         dashboardOuputDto.setReportDetails(reportsOutput);
@@ -1504,11 +1501,10 @@ public class DashboardAppService implements IDashboardAppService {
 
         if (dashboarduser != null) {
             dashboarduser.setIsResetted(false);
-            //		dashboard.setIsShareable(false);
             _dashboarduserRepository.save(dashboarduser);
         }
 
-        if ((dashboard.getUsers() != null && dashboard.getUsers().getId() == input.getOwnerId())) {
+        if ((dashboard.getUsers() != null && dashboard.getUsers().getId().equals(input.getOwnerId()))) {
             dashboard.setIsPublished(false);
             dashboard.setIsShareable(true);
             _dashboardRepository.save(dashboard);
@@ -1526,12 +1522,12 @@ public class DashboardAppService implements IDashboardAppService {
         for (ExistingReportInput report : input.getReportDetails()) {
             Report reportEntity = _reportRepository.findById(report.getId()).orElse(null);
             Reportversion reportversion = _reportversionRepository
-                .findById(new ReportversionId(input.getOwnerId(), report.getId(), "published"))
+                .findById(new ReportversionId(input.getOwnerId(), report.getId(), PUBLISHED))
                 .orElse(null);
             if (reportversion == null) {
                 reportversion =
                     _reportversionRepository
-                        .findById(new ReportversionId(input.getOwnerId(), report.getId(), "running"))
+                        .findById(new ReportversionId(input.getOwnerId(), report.getId(), RUNNING))
                         .orElse(null);
             }
 
@@ -1549,7 +1545,7 @@ public class DashboardAppService implements IDashboardAppService {
             );
             if (report.getReportWidth() != null) {
                 reportOutput.setReportWidth(report.getReportWidth());
-            } else reportOutput.setReportWidth("mediumchart");
+            } else reportOutput.setReportWidth(MEDIUMCHART);
             reportList.add(reportOutput);
 
             FindReportByIdOutput output = reportMapper.createReportOutputToFindReportByIdOutput(
@@ -1580,7 +1576,7 @@ public class DashboardAppService implements IDashboardAppService {
     ) {
         Dashboard dashboard = _dashboardRepository.findById(input.getId()).orElse(null);
         Dashboardversion dashboardversion = _dashboardversionRepository
-            .findById(new DashboardversionId(input.getOwnerId(), dashboard.getId(), "running"))
+            .findById(new DashboardversionId(input.getOwnerId(), dashboard.getId(), RUNNING))
             .orElse(null);
 
         CreateDashboardOutput createdDashboard = mapper.dashboardAndDashboardversionToCreateDashboardOutput(
@@ -1597,12 +1593,12 @@ public class DashboardAppService implements IDashboardAppService {
         for (ExistingReportInput report : input.getReportDetails()) {
             Report reportEntity = _reportRepository.findById(report.getId()).orElse(null);
             Reportversion reportversion = _reportversionRepository
-                .findById(new ReportversionId(input.getOwnerId(), report.getId(), "published"))
+                .findById(new ReportversionId(input.getOwnerId(), report.getId(), PUBLISHED))
                 .orElse(null);
             if (reportversion == null) {
                 reportversion =
                     _reportversionRepository
-                        .findById(new ReportversionId(input.getOwnerId(), report.getId(), "running"))
+                        .findById(new ReportversionId(input.getOwnerId(), report.getId(), RUNNING))
                         .orElse(null);
             }
 
@@ -1620,7 +1616,7 @@ public class DashboardAppService implements IDashboardAppService {
             );
             if (report.getReportWidth() != null) {
                 reportOutput.setReportWidth(report.getReportWidth());
-            } else reportOutput.setReportWidth("mediumchart");
+            } else reportOutput.setReportWidth(MEDIUMCHART);
             reportList.add(reportOutput);
 
             FindReportByIdOutput output = reportMapper.createReportOutputToFindReportByIdOutput(
@@ -1642,7 +1638,7 @@ public class DashboardAppService implements IDashboardAppService {
             _dashboarduserRepository.save(dashboarduser);
         }
 
-        if ((dashboard.getUsers() != null && dashboard.getUsers().getId() == input.getOwnerId())) {
+        if ((dashboard.getUsers() != null && dashboard.getUsers().getId().equals(input.getOwnerId()))) {
             dashboard.setIsPublished(false);
             dashboard.setIsShareable(sharable);
             _dashboardRepository.save(dashboard);
@@ -1671,7 +1667,7 @@ public class DashboardAppService implements IDashboardAppService {
         return null;
     }
 
-    protected void checkProperties(List<String> list) throws Exception {
+    protected void checkProperties(List<String> list) throws MalformedURLException {
         for (int i = 0; i < list.size(); i++) {
             if (
                 !(
@@ -1683,7 +1679,7 @@ public class DashboardAppService implements IDashboardAppService {
                     list.get(i).replace("%20", "").trim().equals("user")
                 )
             ) {
-                throw new Exception("Wrong URL Format: Property " + list.get(i) + " not found!");
+                throw new MalformedURLException("Wrong URL Format: Property " + list.get(i) + " not found!");
             }
         }
     }

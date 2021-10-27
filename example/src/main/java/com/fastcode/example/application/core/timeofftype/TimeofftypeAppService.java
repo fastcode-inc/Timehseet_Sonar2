@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("timeofftypeAppService")
 @RequiredArgsConstructor
 public class TimeofftypeAppService implements ITimeofftypeAppService {
@@ -44,7 +46,12 @@ public class TimeofftypeAppService implements ITimeofftypeAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateTimeofftypeOutput update(Long timeofftypeId, UpdateTimeofftypeInput input) {
-        Timeofftype existing = _timeofftypeRepository.findById(timeofftypeId).get();
+        Timeofftype existing = null;
+        Optional<Timeofftype> t = _timeofftypeRepository.findById(timeofftypeId);
+        if(t.isPresent())
+            existing = t.get();
+        else
+            throw new EntityNotFoundException("Entity not found");
 
         Timeofftype timeofftype = mapper.updateTimeofftypeInputToTimeofftype(input);
         timeofftype.setTimesheetdetailsSet(existing.getTimesheetdetailsSet());

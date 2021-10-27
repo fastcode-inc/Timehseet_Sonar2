@@ -19,11 +19,6 @@ public class MjmlOwnService {
     @Autowired
     private EmailMjmlTemplateGenrator mjmlTemplateGenrator;
 
-    //
-    // private static final String DUMMY_TEMPLATE =
-    // "<mjml><mj-body><mj-container><mj-section><mj-column><mj-text
-    // \"message\"></mj-text></mj-column></mj-section></mj-container></mj-body></mjml>";
-
     @Value("${mjmlFile.path}")
     private String mjmlFilePath;
 

@@ -23,6 +23,5 @@ public class UpdateEmailVariableInput {
     @Length(max = 100, message = "Default_Value must be less than 100 characters")
     private String defaultValue;
 
-    //   private Long versiono;
     private String mergeType;
 }

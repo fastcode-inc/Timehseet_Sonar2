@@ -1,6 +1,8 @@
 package com.fastcode.example.commons.search;
 
 import java.io.Serializable;
+
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -104,6 +106,11 @@ public class OffsetBasedPageRequest implements Pageable, Serializable {
     @Override
     public boolean hasPrevious() {
         return offset > limit;
+    }
+
+    @Override
+    public Pageable withPage(int pageNumber) {
+        return null;
     }
 
     @Override

@@ -26,10 +26,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class DashboarduserAppService implements IDashboarduserAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
-
     @Autowired
     @Qualifier("dashboarduserRepository")
     private IDashboarduserRepository _dashboarduserRepository;

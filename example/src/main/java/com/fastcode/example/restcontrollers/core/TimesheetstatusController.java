@@ -160,7 +160,7 @@ public class TimesheetstatusController {
         Map<String, String> joinColDetails = _timesheetstatusAppService.parseTimesheetsJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 

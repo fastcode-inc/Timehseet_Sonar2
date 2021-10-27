@@ -79,7 +79,7 @@ public class TimesheetAppServiceTest {
     public void findTimesheetById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Timesheet> nullOptional = Optional.ofNullable(null);
         Mockito.when(_timesheetRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(ID)).isNull();
     }
 
     @Test
@@ -125,7 +125,7 @@ public class TimesheetAppServiceTest {
         CreateTimesheetInput timesheet = mock(CreateTimesheetInput.class);
 
         Mockito.when(_mapper.createTimesheetInputToTimesheet(any(CreateTimesheetInput.class))).thenReturn(null);
-        Assertions.assertThat(_appService.create(timesheet)).isEqualTo(null);
+        Assertions.assertThat(_appService.create(timesheet)).isNull();
     }
 
     @Test
@@ -138,7 +138,7 @@ public class TimesheetAppServiceTest {
         Mockito.when(_timesheetstatusRepository.findById(any(Long.class))).thenReturn(nullOptional);
 
         //		Mockito.when(_timesheetstatusRepository.findById(any(Long.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.create(timesheet)).isEqualTo(null);
+        Assertions.assertThat(_appService.create(timesheet)).isNull();
     }
 
     @Test
@@ -150,7 +150,7 @@ public class TimesheetAppServiceTest {
         Mockito.when(_timesheetRepository.findById(anyLong())).thenReturn(timesheetOptional);
 
         Mockito.when(_mapper.updateTimesheetInputToTimesheet(any(UpdateTimesheetInput.class))).thenReturn(timesheet);
-        Assertions.assertThat(_appService.update(ID, timesheetInput)).isEqualTo(null);
+        Assertions.assertThat(_appService.update(ID, timesheetInput)).isNull();
     }
 
     @Test
@@ -168,7 +168,7 @@ public class TimesheetAppServiceTest {
         Mockito.when(_timesheetstatusRepository.findById(any(Long.class))).thenReturn(nullOptional);
 
         //	Mockito.when(_timesheetstatusRepository.findById(any(Long.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.update(ID, timesheetInput)).isEqualTo(null);
+        Assertions.assertThat(_appService.update(ID, timesheetInput)).isNull();
     }
 
     @Test
@@ -285,7 +285,7 @@ public class TimesheetAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     //Timesheetstatus
@@ -307,7 +307,7 @@ public class TimesheetAppServiceTest {
     public void GetTimesheetstatus_IfTimesheetIdAndTimesheetstatusIdIsNotNullAndTimesheetDoesNotExist_ReturnNull() {
         Optional<Timesheet> nullOptional = Optional.ofNullable(null);
         Mockito.when(_timesheetRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getTimesheetstatus(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.getTimesheetstatus(ID)).isNull();
     }
 
     //Users
@@ -329,7 +329,7 @@ public class TimesheetAppServiceTest {
     public void GetUsers_IfTimesheetIdAndUsersIdIsNotNullAndTimesheetDoesNotExist_ReturnNull() {
         Optional<Timesheet> nullOptional = Optional.ofNullable(null);
         Mockito.when(_timesheetRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getUsers(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.getUsers(ID)).isNull();
     }
 
     @Test

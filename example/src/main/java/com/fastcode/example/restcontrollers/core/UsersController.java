@@ -77,7 +77,6 @@ public class UsersController {
         FindUsersByUsernameOutput foundUsers = _usersAppService.findByUsername(users.getUsername());
 
         if (foundUsers != null) {
-            logHelper.getLogger().error("There already exists a users with a Username=%s", users.getUsername());
             throw new EntityExistsException(
                 String.format("There already exists a users with Username =%s", users.getUsername())
             );
@@ -87,7 +86,6 @@ public class UsersController {
         foundUsers = _usersAppService.findByEmailaddress(users.getEmailaddress());
 
         if (foundUsers != null) {
-            logHelper.getLogger().error("There already exists a users with a email =%s", users.getEmailaddress());
             throw new EntityExistsException(
                 String.format("There already exists a users with email =%s", users.getEmailaddress())
             );
@@ -123,15 +121,13 @@ public class UsersController {
 
         FindUsersByUsernameOutput usersOutput;
         usersOutput = _usersAppService.findByUsername(users.getUsername());
-        if (usersOutput != null && usersOutput.getId() != users.getId()) {
-            logHelper.getLogger().error("There already exists a users with user name=%s", users.getUsername());
+        if (usersOutput != null && !(usersOutput.getId().equals(users.getId()))) {
             throw new EntityExistsException(
                 String.format("There already exists a users with user name=%s", users.getUsername())
             );
         }
         usersOutput = _usersAppService.findByEmailaddress(users.getEmailaddress());
-        if (usersOutput != null && usersOutput.getId() != users.getId()) {
-            logHelper.getLogger().error("There already exists a users with a email=%s", users.getEmailaddress());
+        if (usersOutput != null && !(usersOutput.getId().equals(users.getId()))) {
             throw new EntityExistsException(
                 String.format("There already exists a users with a email=%s", users.getEmailaddress())
             );
@@ -279,7 +275,7 @@ public class UsersController {
         Map<String, String> joinColDetails = _usersAppService.parseTimesheetsJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 
@@ -317,7 +313,7 @@ public class UsersController {
         Map<String, String> joinColDetails = _usersAppService.parseUserspermissionsJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 
@@ -355,7 +351,7 @@ public class UsersController {
         Map<String, String> joinColDetails = _usersAppService.parseUsersrolesJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 
@@ -393,12 +389,12 @@ public class UsersController {
         Map<String, String> joinColDetails = _usersAppService.parseUsertasksJoinColumn(id);
         Optional
             .ofNullable(joinColDetails)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid join column")));
+            .orElseThrow(() -> new EntityNotFoundException("Invalid join column"));
 
         searchCriteria.setJoinColumns(joinColDetails);
 
         List<FindUsertaskByIdOutput> output = _usertaskAppService.find(searchCriteria, pageable);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
         return new ResponseEntity(output, HttpStatus.OK);
     }

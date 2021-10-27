@@ -19,7 +19,7 @@ public class EmailVariableTypeController {
 
     @PreAuthorize("hasAnyAuthority('EMAILVARIABLETYPES_READ')")
     @GetMapping("/variable-types")
-    ResponseEntity<EmailVariableTypeEntity> getAll() throws Exception {
+    public ResponseEntity<EmailVariableTypeEntity> getAll() throws Exception {
         return new ResponseEntity(emailVariableTypeAppService.getAllTypes(), HttpStatus.OK);
     }
 }

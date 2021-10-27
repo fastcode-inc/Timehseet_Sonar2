@@ -57,7 +57,7 @@ public class TimesheetdetailsController {
         @RequestBody @Valid CreateTimesheetdetailsInput timesheetdetails
     ) {
         CreateTimesheetdetailsOutput output = _timesheetdetailsAppService.create(timesheetdetails);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
 
         return new ResponseEntity(output, HttpStatus.OK);
     }
@@ -104,7 +104,7 @@ public class TimesheetdetailsController {
 
         timesheetdetails.setVersiono(currentTimesheetdetails.getVersiono());
         UpdateTimesheetdetailsOutput output = _timesheetdetailsAppService.update(Long.valueOf(id), timesheetdetails);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
         return new ResponseEntity(output, HttpStatus.OK);
     }
 

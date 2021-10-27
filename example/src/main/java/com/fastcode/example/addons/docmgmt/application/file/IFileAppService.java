@@ -2,6 +2,8 @@ package com.fastcode.example.addons.docmgmt.application.file;
 
 import com.fastcode.example.addons.docmgmt.application.file.dto.*;
 import com.fastcode.example.commons.search.SearchCriteria;
+
+import java.net.MalformedURLException;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
 
@@ -16,5 +18,5 @@ public interface IFileAppService {
 
     FindFileByIdOutput findById(Long id);
 
-    List<FindFileByIdOutput> find(SearchCriteria search, Pageable pageable) throws Exception;
+    List<FindFileByIdOutput> find(SearchCriteria search, Pageable pageable) throws MalformedURLException;
 }

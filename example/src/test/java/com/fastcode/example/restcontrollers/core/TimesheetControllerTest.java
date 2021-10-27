@@ -1,5 +1,6 @@
 package com.fastcode.example.restcontrollers.core;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -309,8 +310,7 @@ public class TimesheetControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindById_IdIsNotValid_ReturnStatusNotFound() {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(get("/timesheet/999").contentType(MediaType.APPLICATION_JSON))
@@ -355,7 +355,7 @@ public class TimesheetControllerTest extends DatabaseContainerConfig {
 
         String json = ow.writeValueAsString(timesheet);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(
+        assertThatThrownBy(
             () ->
                 mvc
                     .perform(post("/timesheet").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -374,7 +374,7 @@ public class TimesheetControllerTest extends DatabaseContainerConfig {
 
         String json = ow.writeValueAsString(timesheet);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(
+        assertThatThrownBy(
             () ->
                 mvc
                     .perform(post("/timesheet").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -385,8 +385,7 @@ public class TimesheetControllerTest extends DatabaseContainerConfig {
     @Test
     public void DeleteTimesheet_IdIsNotValid_ThrowEntityNotFoundException() {
         doReturn(null).when(timesheetAppService).findById(999L);
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(delete("/timesheet/999").contentType(MediaType.APPLICATION_JSON))
@@ -436,8 +435,7 @@ public class TimesheetControllerTest extends DatabaseContainerConfig {
             .withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(timesheet);
 
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(put("/timesheet/999").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -498,8 +496,7 @@ public class TimesheetControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindAll_SearchIsNotNullAndPropertyIsNotValid_ThrowException() throws Exception {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(
@@ -517,8 +514,7 @@ public class TimesheetControllerTest extends DatabaseContainerConfig {
         joinCol.put("id", "1");
 
         Mockito.when(timesheetAppService.parseTimesheetdetailsJoinColumn("timesheetid")).thenReturn(joinCol);
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(
@@ -548,8 +544,7 @@ public class TimesheetControllerTest extends DatabaseContainerConfig {
     public void GetTimesheetdetails_searchIsNotEmpty() {
         Mockito.when(timesheetAppService.parseTimesheetdetailsJoinColumn(anyString())).thenReturn(null);
 
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(
@@ -563,8 +558,7 @@ public class TimesheetControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetTimesheetstatus_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(get("/timesheet/999/timesheetstatus").contentType(MediaType.APPLICATION_JSON))
@@ -584,8 +578,7 @@ public class TimesheetControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetUsers_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(get("/timesheet/999/users").contentType(MediaType.APPLICATION_JSON))

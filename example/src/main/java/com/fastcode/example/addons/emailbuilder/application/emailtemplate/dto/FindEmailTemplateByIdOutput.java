@@ -20,7 +20,6 @@ public class FindEmailTemplateByIdOutput {
     private String cc;
     private String bcc;
     private String subject;
-    //	private Long versiono;
     private String description;
     List<FileEntity> inlineImages;
     List<FileEntity> attachments;

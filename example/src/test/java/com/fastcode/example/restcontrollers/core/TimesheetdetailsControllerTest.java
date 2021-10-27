@@ -46,6 +46,8 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
+
+import org.assertj.core.api.Assertions;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -450,7 +452,7 @@ public class TimesheetdetailsControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindById_IdIsNotValid_ReturnStatusNotFound() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -500,7 +502,7 @@ public class TimesheetdetailsControllerTest extends DatabaseContainerConfig {
 
         String json = ow.writeValueAsString(timesheetdetails);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(
+        Assertions.assertThatThrownBy(
             () ->
                 mvc
                     .perform(post("/timesheetdetails").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -511,7 +513,7 @@ public class TimesheetdetailsControllerTest extends DatabaseContainerConfig {
     @Test
     public void DeleteTimesheetdetails_IdIsNotValid_ThrowEntityNotFoundException() {
         doReturn(null).when(timesheetdetailsAppService).findById(999L);
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -563,7 +565,7 @@ public class TimesheetdetailsControllerTest extends DatabaseContainerConfig {
             .withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(timesheetdetails);
 
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -631,7 +633,7 @@ public class TimesheetdetailsControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindAll_SearchIsNotNullAndPropertyIsNotValid_ThrowException() throws Exception {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -646,7 +648,7 @@ public class TimesheetdetailsControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetTask_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -667,7 +669,7 @@ public class TimesheetdetailsControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetTimeofftype_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -689,7 +691,7 @@ public class TimesheetdetailsControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetTimesheet_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc

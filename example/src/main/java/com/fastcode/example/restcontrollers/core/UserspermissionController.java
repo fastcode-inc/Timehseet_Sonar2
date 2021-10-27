@@ -58,9 +58,9 @@ public class UserspermissionController {
         @RequestBody @Valid CreateUserspermissionInput userspermission
     ) {
         CreateUserspermissionOutput output = _userspermissionAppService.create(userspermission);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
 
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
 
         FindUsersByIdOutput foundUsers = _usersAppService.findById(output.getUsersId());
         _jwtAppService.deleteAllUserTokens(foundUsers.getUsername());
@@ -126,8 +126,8 @@ public class UserspermissionController {
         _jwtAppService.deleteAllUserTokens(foundUsers.getUsername());
 
         UpdateUserspermissionOutput output = _userspermissionAppService.update(userspermissionid, userspermission);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
         return new ResponseEntity(output, HttpStatus.OK);
     }
 

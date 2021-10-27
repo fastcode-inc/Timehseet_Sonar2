@@ -98,7 +98,7 @@ public class UsersAppServiceTest {
     public void findUsersById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Users> nullOptional = Optional.ofNullable(null);
         Mockito.when(_usersRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(ID)).isNull();
     }
 
     @Test
@@ -264,13 +264,13 @@ public class UsersAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     @Test
     public void findUsersByName_NameIsNotNullAndUsersDoesNotExist_ReturnNull() {
         Mockito.when(_usersRepository.findByUsernameIgnoreCase(anyString())).thenReturn(null);
-        Assertions.assertThat(_appService.findByUsername("User1")).isEqualTo(null);
+        Assertions.assertThat(_appService.findByUsername("User1")).isNull();
     }
 
     @Test

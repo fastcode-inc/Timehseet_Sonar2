@@ -27,10 +27,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("usersAppService")
 @RequiredArgsConstructor
 public class UsersAppService implements IUsersAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
+    public static final String TRUE = "true";
+    public static final String FALSE = "false";
     @NonNull
     protected final IDashboarduserRepository _dashboarduserRepository;
 
@@ -77,7 +84,12 @@ public class UsersAppService implements IUsersAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateUsersOutput update(Long usersId, UpdateUsersInput input) {
-        Users existing = _usersRepository.findById(usersId).get();
+        Users existing = null;
+        Optional<Users> u = _usersRepository.findById(usersId);
+        if(u.isPresent())
+            existing = u.get();
+        else
+            throw new EntityNotFoundException("Entity not found");
 
         Users users = mapper.updateUsersInputToUsers(input);
         users.setDashboardsSet(existing.getDashboardsSet());
@@ -173,11 +185,12 @@ public class UsersAppService implements IUsersAppService {
 
         return mapper.usersToFindUsersWithAllFieldsByIdOutput(foundUsers);
     }
-
+    @Transactional(propagation = Propagation.REQUIRED)
     public UsersProfile getProfile(FindUsersByIdOutput user) {
         return mapper.findUsersByIdOutputToUsersProfile(user);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public UsersProfile updateUsersProfile(FindUsersWithAllFieldsByIdOutput users, UsersProfile usersProfile) {
         UpdateUsersInput usersInput = mapper.findUsersWithAllFieldsByIdOutputAndUsersProfileToUpdateUsersInput(
             users,
@@ -277,33 +290,33 @@ public class UsersAppService implements IUsersAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("emailaddress")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(users.emailaddress.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(users.emailaddress.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(users.emailaddress.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("firstname")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(users.firstname.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(users.firstname.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(users.firstname.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("id")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(users.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(users.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(users.id.ne(Long.valueOf(details.getValue().getSearchValue())));
@@ -327,18 +340,18 @@ public class UsersAppService implements IUsersAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("isactive")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     (
-                        details.getValue().getSearchValue().equalsIgnoreCase("true") ||
-                        details.getValue().getSearchValue().equalsIgnoreCase("false")
+                        details.getValue().getSearchValue().equalsIgnoreCase(TRUE) ||
+                        details.getValue().getSearchValue().equalsIgnoreCase(FALSE)
                     )
                 ) {
                     builder.and(users.isactive.eq(Boolean.parseBoolean(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     (
-                        details.getValue().getSearchValue().equalsIgnoreCase("true") ||
-                        details.getValue().getSearchValue().equalsIgnoreCase("false")
+                        details.getValue().getSearchValue().equalsIgnoreCase(TRUE) ||
+                        details.getValue().getSearchValue().equalsIgnoreCase(FALSE)
                     )
                 ) {
                     builder.and(users.isactive.ne(Boolean.parseBoolean(details.getValue().getSearchValue())));
@@ -346,18 +359,18 @@ public class UsersAppService implements IUsersAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("isemailconfirmed")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     (
-                        details.getValue().getSearchValue().equalsIgnoreCase("true") ||
-                        details.getValue().getSearchValue().equalsIgnoreCase("false")
+                        details.getValue().getSearchValue().equalsIgnoreCase(TRUE) ||
+                        details.getValue().getSearchValue().equalsIgnoreCase(FALSE)
                     )
                 ) {
                     builder.and(users.isemailconfirmed.eq(Boolean.parseBoolean(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     (
-                        details.getValue().getSearchValue().equalsIgnoreCase("true") ||
-                        details.getValue().getSearchValue().equalsIgnoreCase("false")
+                        details.getValue().getSearchValue().equalsIgnoreCase(TRUE) ||
+                        details.getValue().getSearchValue().equalsIgnoreCase(FALSE)
                     )
                 ) {
                     builder.and(users.isemailconfirmed.ne(Boolean.parseBoolean(details.getValue().getSearchValue())));
@@ -365,12 +378,12 @@ public class UsersAppService implements IUsersAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("joinDate")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(users.joinDate.eq(SearchUtils.stringToLocalDate(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(users.joinDate.ne(SearchUtils.stringToLocalDate(details.getValue().getSearchValue())));
@@ -387,29 +400,29 @@ public class UsersAppService implements IUsersAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("lastname")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(users.lastname.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(users.lastname.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(users.lastname.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("password")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(users.password.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(users.password.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(users.password.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("username")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(users.username.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(users.username.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(users.username.ne(details.getValue().getSearchValue()));
                 }
             }

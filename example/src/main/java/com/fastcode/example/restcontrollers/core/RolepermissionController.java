@@ -9,7 +9,6 @@ import com.fastcode.example.commons.search.OffsetBasedPageRequest;
 import com.fastcode.example.commons.search.SearchCriteria;
 import com.fastcode.example.commons.search.SearchUtils;
 import com.fastcode.example.domain.core.authorization.rolepermission.RolepermissionId;
-import java.time.*;
 import java.util.*;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
@@ -53,9 +52,9 @@ public class RolepermissionController {
         @RequestBody @Valid CreateRolepermissionInput rolepermission
     ) {
         CreateRolepermissionOutput output = _rolepermissionAppService.create(rolepermission);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
 
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
 
         _rolepermissionAppService.deleteUserTokens(output.getRoleId());
 
@@ -116,8 +115,8 @@ public class RolepermissionController {
         rolepermission.setVersiono(currentRolepermission.getVersiono());
         _rolepermissionAppService.deleteUserTokens(rolepermissionid.getRoleId());
         UpdateRolepermissionOutput output = _rolepermissionAppService.update(rolepermissionid, rolepermission);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
         return new ResponseEntity(output, HttpStatus.OK);
     }
 

@@ -8,6 +8,8 @@ import java.util.function.BiFunction;
 
 public class CommonUtil {
 
+    private CommonUtil(){}
+
     public static final BiFunction<String, String, String> checkValue = (parem, defaultValue) ->
         parem.isEmpty() ? defaultValue : parem;
 
@@ -19,11 +21,11 @@ public class CommonUtil {
         }
     };
 
-    public static final void deleteFile(String path) {
+    public static final void deleteFile(String path) throws IOException {
         try {
             Files.deleteIfExists(Paths.get(path));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw e;
         }
     }
 }

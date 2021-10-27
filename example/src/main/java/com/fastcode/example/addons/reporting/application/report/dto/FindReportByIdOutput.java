@@ -23,7 +23,6 @@ public class FindReportByIdOutput {
     private Long userId;
     private Boolean editable;
     private Boolean isResetted;
-    //	private Boolean isRefreshed;
     private Boolean ownerSharingStatus;
     private Boolean recipientSharingStatus;
     private Boolean isAssignedByRole;

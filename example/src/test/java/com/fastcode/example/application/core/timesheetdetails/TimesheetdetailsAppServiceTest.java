@@ -84,7 +84,7 @@ public class TimesheetdetailsAppServiceTest {
     public void findTimesheetdetailsById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Timesheetdetails> nullOptional = Optional.ofNullable(null);
         Mockito.when(_timesheetdetailsRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(ID)).isNull();
     }
 
     @Test
@@ -280,7 +280,7 @@ public class TimesheetdetailsAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     //Task
@@ -302,7 +302,7 @@ public class TimesheetdetailsAppServiceTest {
     public void GetTask_IfTimesheetdetailsIdAndTaskIdIsNotNullAndTimesheetdetailsDoesNotExist_ReturnNull() {
         Optional<Timesheetdetails> nullOptional = Optional.ofNullable(null);
         Mockito.when(_timesheetdetailsRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getTask(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.getTask(ID)).isNull();
     }
 
     //Timeofftype
@@ -324,7 +324,7 @@ public class TimesheetdetailsAppServiceTest {
     public void GetTimeofftype_IfTimesheetdetailsIdAndTimeofftypeIdIsNotNullAndTimesheetdetailsDoesNotExist_ReturnNull() {
         Optional<Timesheetdetails> nullOptional = Optional.ofNullable(null);
         Mockito.when(_timesheetdetailsRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getTimeofftype(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.getTimeofftype(ID)).isNull();
     }
 
     //Timesheet
@@ -346,6 +346,6 @@ public class TimesheetdetailsAppServiceTest {
     public void GetTimesheet_IfTimesheetdetailsIdAndTimesheetIdIsNotNullAndTimesheetdetailsDoesNotExist_ReturnNull() {
         Optional<Timesheetdetails> nullOptional = Optional.ofNullable(null);
         Mockito.when(_timesheetdetailsRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getTimesheet(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.getTimesheet(ID)).isNull();
     }
 }

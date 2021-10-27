@@ -9,6 +9,8 @@ import com.fastcode.example.commons.search.SearchCriteria;
 import com.fastcode.example.commons.search.SearchFields;
 import com.fastcode.example.commons.search.SearchUtils;
 import com.querydsl.core.BooleanBuilder;
+
+import java.net.MalformedURLException;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +21,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("fileAppService")
 public class FileAppService implements IFileAppService {
 
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
+    public static final String RANGE = "range";
+    public static final String CONTAINS = "contains";
     @Autowired
     @Qualifier("fileRepository")
     protected IFileRepository _fileRepository;
@@ -47,7 +55,13 @@ public class FileAppService implements IFileAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateFileOutput update(Long fileId, UpdateFileInput input) {
-        FileEntity existing = _fileRepository.findById(fileId).get();
+        FileEntity existing = null;
+        Optional<FileEntity> f = _fileRepository.findById(fileId);
+        if(f.isPresent())
+            existing = f.get();
+        else
+            throw new EntityNotFoundException("Enity not found");
+
         FileEntity file = mapper.updateFileInputToFileEntity(input);
 
         file.setVersiono(existing.getVersiono());
@@ -72,7 +86,7 @@ public class FileAppService implements IFileAppService {
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public List<FindFileByIdOutput> find(SearchCriteria search, Pageable pageable) throws Exception {
+    public List<FindFileByIdOutput> find(SearchCriteria search, Pageable pageable) throws MalformedURLException{
         Page<FileEntity> foundFile = _fileRepository.findAll(search(search), pageable);
         List<FileEntity> fileList = foundFile.getContent();
         Iterator<FileEntity> fileIterator = fileList.iterator();
@@ -85,7 +99,7 @@ public class FileAppService implements IFileAppService {
         return output;
     }
 
-    protected BooleanBuilder search(SearchCriteria search) throws Exception {
+    protected BooleanBuilder search(SearchCriteria search) throws MalformedURLException{
         QFileEntity file = QFileEntity.fileEntity;
         if (search != null) {
             Map<String, SearchFields> map = new HashMap<>();
@@ -99,7 +113,7 @@ public class FileAppService implements IFileAppService {
         return null;
     }
 
-    protected void checkProperties(List<String> list) throws Exception {
+    protected void checkProperties(List<String> list) throws MalformedURLException {
         for (int i = 0; i < list.size(); i++) {
             if (
                 !(
@@ -119,7 +133,7 @@ public class FileAppService implements IFileAppService {
                     list.get(i).replace("%20", "").trim().equals("versionp")
                 )
             ) {
-                throw new Exception("Wrong URL Format: Property " + list.get(i) + " not found!");
+                throw new MalformedURLException("Wrong URL Format: Property " + list.get(i) + " not found!");
             }
         }
     }
@@ -134,13 +148,13 @@ public class FileAppService implements IFileAppService {
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("ancestorId")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(file.ancestorId.eq(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(file.ancestorId.ne(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("range")
+                    details.getValue().getOperator().equals(RANGE)
                 ) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
@@ -159,13 +173,13 @@ public class FileAppService implements IFileAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("ancestralRootId")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(file.ancestralRootId.eq(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(file.ancestralRootId.ne(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("range")
+                    details.getValue().getOperator().equals(RANGE)
                 ) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
@@ -183,23 +197,23 @@ public class FileAppService implements IFileAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("contentId")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     file.contentId.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     file.contentId.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     file.contentId.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("contentLength")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(file.contentLength.eq(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(file.contentLength.ne(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("range")
+                    details.getValue().getOperator().equals(RANGE)
                 ) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
@@ -218,13 +232,13 @@ public class FileAppService implements IFileAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("created")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     SearchUtils.stringToDate(details.getValue().getSearchValue()) != null
                 ) builder.and(file.created.eq(SearchUtils.stringToDate(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     SearchUtils.stringToDate(details.getValue().getSearchValue()) != null
                 ) builder.and(file.created.ne(SearchUtils.stringToDate(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("range")
+                    details.getValue().getOperator().equals(RANGE)
                 ) {
                     Date startDate = SearchUtils.stringToDate(details.getValue().getStartingValue());
                     Date endDate = SearchUtils.stringToDate(details.getValue().getEndingValue());
@@ -236,50 +250,50 @@ public class FileAppService implements IFileAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("label")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     file.label.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     file.label.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     file.label.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("lockOwner")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     file.lockOwner.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     file.lockOwner.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     file.lockOwner.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("mimeType")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     file.mimeType.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     file.mimeType.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     file.mimeType.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("name")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     file.name.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     file.name.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     file.name.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("successorId")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(file.successorId.eq(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(file.successorId.ne(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("range")
+                    details.getValue().getOperator().equals(RANGE)
                 ) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
@@ -297,23 +311,23 @@ public class FileAppService implements IFileAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("summary")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     file.summary.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     file.summary.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     file.summary.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("versiono")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(file.versiono.eq(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) builder.and(file.versiono.ne(Long.valueOf(details.getValue().getSearchValue()))); else if (
-                    details.getValue().getOperator().equals("range")
+                    details.getValue().getOperator().equals(RANGE)
                 ) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
@@ -331,11 +345,11 @@ public class FileAppService implements IFileAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("versionp")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     file.versionp.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     file.versionp.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     file.versionp.ne(details.getValue().getSearchValue())
                 );
             }

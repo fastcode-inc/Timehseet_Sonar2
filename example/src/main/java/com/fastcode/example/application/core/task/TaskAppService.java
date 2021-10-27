@@ -21,10 +21,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("taskAppService")
 @RequiredArgsConstructor
 public class TaskAppService implements ITaskAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
     @Qualifier("taskRepository")
     @NonNull
     protected final ITaskRepository _taskRepository;
@@ -49,7 +54,6 @@ public class TaskAppService implements ITaskAppService {
 
             if (foundProject != null) {
                 foundProject.addTasks(task);
-                //task.setProject(foundProject);
             }
         }
 
@@ -59,7 +63,12 @@ public class TaskAppService implements ITaskAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateTaskOutput update(Long taskId, UpdateTaskInput input) {
-        Task existing = _taskRepository.findById(taskId).get();
+        Task existing = null;
+        Optional<Task> t = _taskRepository.findById(taskId);
+        if(t.isPresent())
+            existing = t.get();
+        else
+            throw new EntityNotFoundException("Entity not found");
 
         Task task = mapper.updateTaskInputToTask(input);
         task.setTimesheetdetailsSet(existing.getTimesheetdetailsSet());
@@ -71,7 +80,6 @@ public class TaskAppService implements ITaskAppService {
 
             if (foundProject != null) {
                 foundProject.addTasks(task);
-                //	task.setProject(foundProject);
             }
         }
 
@@ -164,24 +172,24 @@ public class TaskAppService implements ITaskAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("description")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(task.description.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(task.description.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(task.description.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("id")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(task.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(task.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(task.id.ne(Long.valueOf(details.getValue().getSearchValue())));
@@ -205,7 +213,7 @@ public class TaskAppService implements ITaskAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("isactive")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     (
                         details.getValue().getSearchValue().equalsIgnoreCase("true") ||
                         details.getValue().getSearchValue().equalsIgnoreCase("false")
@@ -213,7 +221,7 @@ public class TaskAppService implements ITaskAppService {
                 ) {
                     builder.and(task.isactive.eq(Boolean.parseBoolean(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     (
                         details.getValue().getSearchValue().equalsIgnoreCase("true") ||
                         details.getValue().getSearchValue().equalsIgnoreCase("false")
@@ -223,28 +231,28 @@ public class TaskAppService implements ITaskAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("name")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(task.name.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(task.name.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(task.name.ne(details.getValue().getSearchValue()));
                 }
             }
 
             if (details.getKey().replace("%20", "").trim().equals("project")) {
                 if (
-                    details.getValue().getOperator().equals("contains") &&
+                    details.getValue().getOperator().equals(CONTAINS) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(task.project.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(task.project.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(task.project.id.ne(Long.valueOf(details.getValue().getSearchValue())));

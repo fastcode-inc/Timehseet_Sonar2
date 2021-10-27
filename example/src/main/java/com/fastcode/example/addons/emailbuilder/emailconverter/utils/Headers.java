@@ -2,5 +2,7 @@ package com.fastcode.example.addons.emailbuilder.emailconverter.utils;
 
 public class Headers {
 
-    public static final String apiKey = "x-api-key";
+    private Headers(){}
+
+    public static final String API_KEY = "x-api-key";
 }

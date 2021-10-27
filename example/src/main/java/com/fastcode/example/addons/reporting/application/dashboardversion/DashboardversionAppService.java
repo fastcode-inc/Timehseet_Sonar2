@@ -22,12 +22,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("dashboardversionAppService")
 public class DashboardversionAppService implements IDashboardversionAppService {
-
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
 
     @Autowired
     @Qualifier("dashboardversionRepository")
@@ -70,7 +68,7 @@ public class DashboardversionAppService implements IDashboardversionAppService {
         Dashboardversion createdRunningDashboardversion = _dashboardversionRepository.save(dashboardversion);
         dashboardversion = mapper.createDashboardversionInputToDashboardversion(input);
         dashboardversion.setDashboardVersion("published");
-        Dashboardversion createdPublishedDashboardversion = _dashboardversionRepository.save(dashboardversion);
+        _dashboardversionRepository.save(dashboardversion);
 
         return mapper.dashboardversionToCreateDashboardversionOutput(createdRunningDashboardversion);
     }
@@ -105,10 +103,22 @@ public class DashboardversionAppService implements IDashboardversionAppService {
     public void delete(DashboardversionId dashboardversionId) {
         Dashboardversion existing = _dashboardversionRepository.findById(dashboardversionId).orElse(null);
 
-        Dashboard dashboard = _dashboardRepository.findById(dashboardversionId.getDashboardId()).get();
+        Dashboard dashboard = null;
+        Optional<Dashboard> d = _dashboardRepository.findById(dashboardversionId.getDashboardId());
+        if(d.isPresent())
+            dashboard = d.get();
+        else
+            throw new EntityNotFoundException("Entity not found");
+
         dashboard.removeDashboardversion(existing);
 
-        Users users = _usersRepository.findById(dashboardversionId.getUserId()).get();
+        Users users = null;
+        Optional<Users> u = _usersRepository.findById(dashboardversionId.getUserId());
+        if(u.isPresent())
+            users = u.get();
+        else
+            throw new EntityNotFoundException("Entity not found");
+
         users.removeDashboardversions(existing);
 
         _dashboardversionRepository.delete(existing);

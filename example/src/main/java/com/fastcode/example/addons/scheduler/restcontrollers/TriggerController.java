@@ -42,11 +42,11 @@ public class TriggerController {
             obj.getTriggerName() == null ||
             obj.getTriggerGroup() == null
         ) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
         boolean status = triggerAppService.createTrigger(obj);
         if (!status) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
 
         return new ResponseEntity(obj, HttpStatus.OK);
@@ -66,19 +66,19 @@ public class TriggerController {
     )
         throws SchedulerException, IOException {
         if (triggerName == null || triggerGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
 
         obj.setTriggerName(triggerName);
         obj.setTriggerGroup(triggerGroup);
         boolean status = triggerAppService.updateTrigger(obj);
         if (!status) {
-            throw new EntityNotFoundException(String.format("There does not exist a trigger "));
+            throw new EntityNotFoundException("There does not exist a trigger");
         }
 
         Optional
             .ofNullable(status)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("There does not exist a trigger ")));
+            .orElseThrow(() -> new EntityNotFoundException("There does not exist a trigger"));
         return new ResponseEntity("Trigger Updation Status " + status, HttpStatus.OK);
     }
 
@@ -95,7 +95,7 @@ public class TriggerController {
     )
         throws SchedulerException, IOException {
         if (triggerName == null || triggerGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
 
         GetTriggerOutput output = triggerAppService.returnTrigger(triggerName, triggerGroup);
@@ -130,7 +130,6 @@ public class TriggerController {
         if (limit == null) {
             limit = env.getProperty("fastCode.limit.default");
         }
-        //if (sort.isUnsorted()) { sort = new Sort(Sort.Direction.fromString(env.getProperty("fastCode.sort.direction.default")), new String[]{env.getProperty("fastCode.sort.property.default")}); }
 
         Pageable offsetPageable = new OffsetBasedPageRequest(Integer.parseInt(offset), Integer.parseInt(limit), sort);
         SearchCriteria searchCriteria = SearchUtils.generateSearchCriteriaObject(search);
@@ -162,7 +161,7 @@ public class TriggerController {
     public ResponseEntity<Boolean> pauseTrigger(@PathVariable String triggerName, @PathVariable String triggerGroup)
         throws SchedulerException, IOException {
         if (triggerName == null || triggerGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
         boolean status = triggerAppService.pauseTrigger(triggerName, triggerGroup);
         Optional
@@ -191,7 +190,7 @@ public class TriggerController {
     public ResponseEntity<Boolean> resumeTrigger(@PathVariable String triggerName, @PathVariable String triggerGroup)
         throws SchedulerException, IOException {
         if (triggerName == null || triggerGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
         boolean status = triggerAppService.resumeTrigger(triggerName, triggerGroup);
         Optional
@@ -219,7 +218,7 @@ public class TriggerController {
     public ResponseEntity<Boolean> cancelTrigger(@PathVariable String triggerName, @PathVariable String triggerGroup)
         throws SchedulerException, IOException {
         if (triggerName == null || triggerGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
         boolean status = triggerAppService.cancelTrigger(triggerName, triggerGroup);
         Optional
@@ -251,7 +250,7 @@ public class TriggerController {
     )
         throws IOException {
         if (triggerName == null || triggerGroup == null) {
-            throw new IOException(String.format("Invalid input"));
+            throw new IOException("Invalid input");
         }
         return new ResponseEntity(
             triggerAppService.executionHistoryByTrigger(triggerName, triggerGroup),

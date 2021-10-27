@@ -82,7 +82,7 @@ public class UsertaskAppServiceTest {
     public void findUsertaskById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Usertask> nullOptional = Optional.ofNullable(null);
         Mockito.when(_usertaskRepository.findById(any(UsertaskId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(usertaskId)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(usertaskId)).isNull();
     }
 
     @Test
@@ -255,7 +255,7 @@ public class UsertaskAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     //Task
@@ -277,7 +277,7 @@ public class UsertaskAppServiceTest {
     public void GetTask_IfUsertaskIdAndTaskIdIsNotNullAndUsertaskDoesNotExist_ReturnNull() {
         Optional<Usertask> nullOptional = Optional.ofNullable(null);
         Mockito.when(_usertaskRepository.findById(any(UsertaskId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getTask(usertaskId)).isEqualTo(null);
+        Assertions.assertThat(_appService.getTask(usertaskId)).isNull();
     }
 
     //Users
@@ -299,7 +299,7 @@ public class UsertaskAppServiceTest {
     public void GetUsers_IfUsertaskIdAndUsersIdIsNotNullAndUsertaskDoesNotExist_ReturnNull() {
         Optional<Usertask> nullOptional = Optional.ofNullable(null);
         Mockito.when(_usertaskRepository.findById(any(UsertaskId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getUsers(usertaskId)).isEqualTo(null);
+        Assertions.assertThat(_appService.getUsers(usertaskId)).isNull();
     }
 
     @Test
@@ -316,13 +316,13 @@ public class UsertaskAppServiceTest {
     @Test
     public void ParseUsertaskKey_KeysStringIsEmpty_ReturnNull() {
         String keyString = "";
-        Assertions.assertThat(_appService.parseUsertaskKey(keyString)).isEqualTo(null);
+        Assertions.assertThat(_appService.parseUsertaskKey(keyString)).isNull();
     }
 
     @Test
     public void ParseUsertaskKey_KeysStringIsNotEmptyAndKeyValuePairDoesNotExist_ReturnNull() {
         String keyString = "taskid";
 
-        Assertions.assertThat(_appService.parseUsertaskKey(keyString)).isEqualTo(null);
+        Assertions.assertThat(_appService.parseUsertaskKey(keyString)).isNull();
     }
 }

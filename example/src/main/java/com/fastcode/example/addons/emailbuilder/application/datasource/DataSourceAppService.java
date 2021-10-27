@@ -38,9 +38,12 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class DataSourceAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
+    static final int CASE1 = 1;
+    static final int CASE2 = 2;
+    static final int CASE3 = 3;
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
 
     @Autowired
     private IDataSourceManager _dataSourceManager;
@@ -66,7 +69,6 @@ public class DataSourceAppService {
     @Transactional(propagation = Propagation.REQUIRED)
     public CreateDataSourceOutput create(CreateDataSourceInput dataSource) {
         if (_dataSourceManager.existsByEmailTemplateId(dataSource.getEmailTemplate().getId())) {
-            System.out.println("Already Exist");
             return null;
         }
 
@@ -130,7 +132,6 @@ public class DataSourceAppService {
     public FindDataSourceByNameOutput findByName(String name) {
         DataSourceEntity foundEmail = _dataSourceManager.findByName(name);
         if (foundEmail == null) {
-            logHelper.getLogger().error("There does not exist a email wth a name=%s", name);
             return null;
         }
         return dataSourceMapper.dataSourceEntityToFindDataSourceByNameOutput(foundEmail);
@@ -154,16 +155,16 @@ public class DataSourceAppService {
     public BooleanBuilder search(SearchCriteria search) throws Exception {
         QDataSourceEntity email = QDataSourceEntity.dataSourceEntity;
         if (search != null) {
-            if (search.getType() == case1) {
+            if (search.getType() == CASE1) {
                 return searchAllProperties(email, search.getValue(), search.getOperator());
-            } else if (search.getType() == case2) {
+            } else if (search.getType() == CASE2) {
                 List<String> keysList = new ArrayList<String>();
                 for (SearchFields f : search.getFields()) {
                     keysList.add(f.getFieldName());
                 }
                 checkProperties(keysList);
                 return searchSpecificProperty(email, keysList, search.getValue(), search.getOperator());
-            } else if (search.getType() == case3) {
+            } else if (search.getType() == CASE3) {
                 Map<String, SearchFields> map = new HashMap<>();
                 for (SearchFields fieldDetails : search.getFields()) {
                     map.put(fieldDetails.getFieldName(), fieldDetails);
@@ -179,11 +180,11 @@ public class DataSourceAppService {
     public BooleanBuilder searchAllProperties(QDataSourceEntity email, String value, String operator) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (operator.equals("contains")) {
+        if (operator.equals(CONTAINS)) {
             builder.or(email.name.likeIgnoreCase("%" + value + "%"));
             builder.or(email.sqlQuery.likeIgnoreCase("%" + value + "%"));
             builder.or(email.emailTemplate.templateName.likeIgnoreCase("%" + value + "%"));
-        } else if (operator.equals("equals")) {
+        } else if (operator.equals(EQUALS_TO)) {
             builder.or(email.name.eq(value));
             builder.or(email.sqlQuery.eq(value));
             builder.or(email.emailTemplate.templateName.eq(value));
@@ -217,23 +218,23 @@ public class DataSourceAppService {
 
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).replace("%20", "").trim().equals("name")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(email.name.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(email.name.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("sqlQuery")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(email.sqlQuery.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(email.sqlQuery.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("emailTemplate")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(email.emailTemplate.templateName.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(email.emailTemplate.templateName.eq(value));
                 }
             }
@@ -246,31 +247,31 @@ public class DataSourceAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("name")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(email.name.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(email.name.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(email.name.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("sqlQuery")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(email.sqlQuery.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(email.sqlQuery.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(email.sqlQuery.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("emailTemplate")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(
                         email.emailTemplate.templateName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
                     );
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(email.emailTemplate.templateName.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(email.emailTemplate.templateName.ne(details.getValue().getSearchValue()));
                 }
             }

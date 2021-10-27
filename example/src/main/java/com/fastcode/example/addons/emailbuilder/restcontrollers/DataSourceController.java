@@ -45,7 +45,6 @@ public class DataSourceController {
     public ResponseEntity<CreateDataSourceOutput> create(@RequestBody @Valid CreateDataSourceInput dataSource) {
         FindDataSourceByNameOutput foundDataSource = dataSourceAppService.findByName(dataSource.getName());
         if (foundDataSource != null) {
-            logHelper.getLogger().error("There already exists a datasource with a name=%s", foundDataSource.getName());
             throw new EntityExistsException(
                 String.format("There already exists a datasource with name=%s", foundDataSource.getName())
             );
@@ -61,7 +60,6 @@ public class DataSourceController {
         FindDataSourceByIdOutput dob = dataSourceAppService.findById(Long.valueOf(id));
 
         if (dob == null) {
-            logHelper.getLogger().error("There does not exist a data source wth a id=%s", id);
             throw new EntityNotFoundException(String.format("There does not exist a data source wth a id=%s", id));
         }
         return new ResponseEntity(dataSourceAppService.delete(Long.valueOf(id)), HttpStatus.OK);

@@ -69,7 +69,7 @@ public class TimesheetstatusAppServiceTest {
     public void findTimesheetstatusById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Timesheetstatus> nullOptional = Optional.ofNullable(null);
         Mockito.when(_timesheetstatusRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(ID)).isNull();
     }
 
     @Test
@@ -216,7 +216,7 @@ public class TimesheetstatusAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     @Test

@@ -1,5 +1,6 @@
 package com.fastcode.example.restcontrollers.core;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
@@ -42,6 +43,8 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
+
+import org.assertj.core.api.Assertions;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -341,8 +344,7 @@ public class UsersroleControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindById_IdIsNotValid_ReturnStatusNotFound() {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(get("/usersrole/roleId=999,usersId=999").contentType(MediaType.APPLICATION_JSON))
@@ -388,7 +390,7 @@ public class UsersroleControllerTest extends DatabaseContainerConfig {
 
         String json = ow.writeValueAsString(usersrole);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(
+        assertThatThrownBy(
             () ->
                 mvc
                     .perform(post("/usersrole").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -407,7 +409,7 @@ public class UsersroleControllerTest extends DatabaseContainerConfig {
 
         String json = ow.writeValueAsString(usersrole);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(
+        assertThatThrownBy(
             () ->
                 mvc
                     .perform(post("/usersrole").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -418,8 +420,7 @@ public class UsersroleControllerTest extends DatabaseContainerConfig {
     @Test
     public void DeleteUsersrole_IdIsNotValid_ThrowEntityNotFoundException() {
         doReturn(null).when(usersroleAppService).findById(new UsersroleId(999L, 999L));
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(delete("/usersrole/roleId=999,usersId=999").contentType(MediaType.APPLICATION_JSON))
@@ -474,8 +475,7 @@ public class UsersroleControllerTest extends DatabaseContainerConfig {
             .withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(usersrole);
 
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(
@@ -549,8 +549,7 @@ public class UsersroleControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindAll_SearchIsNotNullAndPropertyIsNotValid_ThrowException() throws Exception {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(
@@ -564,8 +563,7 @@ public class UsersroleControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetRole_IdIsNotEmptyAndIdIsNotValid_ThrowException() {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(get("/usersrole/roleId999/role").contentType(MediaType.APPLICATION_JSON))
@@ -576,8 +574,7 @@ public class UsersroleControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetRole_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(get("/usersrole/roleId=999,usersId=999/role").contentType(MediaType.APPLICATION_JSON))
@@ -598,8 +595,7 @@ public class UsersroleControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetUsers_IdIsNotEmptyAndIdIsNotValid_ThrowException() {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(get("/usersrole/roleId999/users").contentType(MediaType.APPLICATION_JSON))
@@ -610,8 +606,7 @@ public class UsersroleControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetUsers_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(get("/usersrole/roleId=999,usersId=999/users").contentType(MediaType.APPLICATION_JSON))

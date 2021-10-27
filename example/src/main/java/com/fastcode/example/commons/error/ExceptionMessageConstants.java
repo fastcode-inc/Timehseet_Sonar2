@@ -2,6 +2,8 @@ package com.fastcode.example.commons.error;
 
 public class ExceptionMessageConstants {
 
+    private ExceptionMessageConstants(){}
+
     public static final String TOKEN_UNAUTHORIZED = "TOKEN_UNAUTHORIZED";
     public static final String TOKEN_EXPIRED = "TOKEN_EXPIRED";
     public static final String TOKEN_UNSUPPORTED = "TOKEN_UNSUPPORTED";

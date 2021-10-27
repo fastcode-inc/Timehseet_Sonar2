@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/audit")
 public class AuditController {
 
+    public static final String AUTHOR = "author";
     @Autowired
     private Environment env;
 
@@ -318,10 +319,10 @@ public class AuditController {
 
         query = query.limit(Integer.parseInt(limit)).skip(Integer.parseInt(offset));
         Map<String, Object> map = parseSearchString(search);
-        if (map.containsKey("author") && map.get("author") != null) {
+        if (map.containsKey(AUTHOR) && map.get(AUTHOR) != null) {
             query =
                 query
-                    .byAuthor(map.get("author").toString())
+                    .byAuthor(map.get(AUTHOR).toString())
                     .from((LocalDateTime) map.get("from"))
                     .to((LocalDateTime) map.get("to"));
         } else query = query.from((LocalDateTime) map.get("from")).to((LocalDateTime) map.get("to"));
@@ -372,7 +373,7 @@ public class AuditController {
         @RequestParam(value = "limit", required = false) String limit,
         Sort sort
     )
-        throws Exception {
+         {
         if (offset == null) {
             offset = env.getProperty("fastCode.offset.default");
         }

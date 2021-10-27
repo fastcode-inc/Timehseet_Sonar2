@@ -108,7 +108,6 @@ public class IReportRepositoryCustomImpl implements IReportRepositoryCustom {
                 json = (JSONObject) parser.parse(obj[4].toString());
                 reportDetails.setQuery(json);
             } catch (ParseException e) {
-                e.printStackTrace();
                 throw new Exception("Error occured while parsing query");
             }
 
@@ -200,7 +199,6 @@ public class IReportRepositoryCustomImpl implements IReportRepositoryCustom {
                 json = (JSONObject) parser.parse(obj[5].toString());
                 reportDetails.setQuery(json);
             } catch (ParseException e) {
-                e.printStackTrace();
                 throw new Exception("Error occured while parsing query");
             }
 

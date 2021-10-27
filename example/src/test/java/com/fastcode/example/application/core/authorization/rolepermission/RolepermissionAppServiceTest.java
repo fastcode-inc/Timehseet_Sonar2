@@ -90,7 +90,7 @@ public class RolepermissionAppServiceTest {
     public void findRolepermissionById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Rolepermission> nullOptional = Optional.ofNullable(null);
         Mockito.when(_rolepermissionRepository.findById(any(RolepermissionId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(rolepermissionId)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(rolepermissionId)).isNull();
     }
 
     @Test
@@ -140,7 +140,7 @@ public class RolepermissionAppServiceTest {
         Mockito
             .when(_mapper.createRolepermissionInputToRolepermission(any(CreateRolepermissionInput.class)))
             .thenReturn(null);
-        Assertions.assertThat(_appService.create(rolepermission)).isEqualTo(null);
+        Assertions.assertThat(_appService.create(rolepermission)).isNull();
     }
 
     @Test
@@ -153,7 +153,7 @@ public class RolepermissionAppServiceTest {
         Mockito.when(_permissionRepository.findById(any(Long.class))).thenReturn(nullOptional);
 
         //		Mockito.when(_permissionRepository.findById(any(Long.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.create(rolepermission)).isEqualTo(null);
+        Assertions.assertThat(_appService.create(rolepermission)).isNull();
     }
 
     @Test
@@ -169,7 +169,7 @@ public class RolepermissionAppServiceTest {
         Mockito
             .when(_mapper.updateRolepermissionInputToRolepermission(any(UpdateRolepermissionInput.class)))
             .thenReturn(rolepermission);
-        Assertions.assertThat(_appService.update(rolepermissionId, rolepermissionInput)).isEqualTo(null);
+        Assertions.assertThat(_appService.update(rolepermissionId, rolepermissionInput)).isNull();
     }
 
     @Test
@@ -191,7 +191,7 @@ public class RolepermissionAppServiceTest {
         Mockito.when(_permissionRepository.findById(any(Long.class))).thenReturn(nullOptional);
 
         //	Mockito.when(_permissionRepository.findById(any(Long.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.update(rolepermissionId, rolepermissionInput)).isEqualTo(null);
+        Assertions.assertThat(_appService.update(rolepermissionId, rolepermissionInput)).isNull();
     }
 
     @Test
@@ -311,7 +311,7 @@ public class RolepermissionAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     //Permission
@@ -335,7 +335,7 @@ public class RolepermissionAppServiceTest {
     public void GetPermission_IfRolepermissionIdAndPermissionIdIsNotNullAndRolepermissionDoesNotExist_ReturnNull() {
         Optional<Rolepermission> nullOptional = Optional.ofNullable(null);
         Mockito.when(_rolepermissionRepository.findById(any(RolepermissionId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getPermission(rolepermissionId)).isEqualTo(null);
+        Assertions.assertThat(_appService.getPermission(rolepermissionId)).isNull();
     }
 
     //Role
@@ -359,7 +359,7 @@ public class RolepermissionAppServiceTest {
     public void GetRole_IfRolepermissionIdAndRoleIdIsNotNullAndRolepermissionDoesNotExist_ReturnNull() {
         Optional<Rolepermission> nullOptional = Optional.ofNullable(null);
         Mockito.when(_rolepermissionRepository.findById(any(RolepermissionId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getRole(rolepermissionId)).isEqualTo(null);
+        Assertions.assertThat(_appService.getRole(rolepermissionId)).isNull();
     }
 
     @Test
@@ -378,13 +378,13 @@ public class RolepermissionAppServiceTest {
     @Test
     public void ParseRolepermissionKey_KeysStringIsEmpty_ReturnNull() {
         String keyString = "";
-        Assertions.assertThat(_appService.parseRolepermissionKey(keyString)).isEqualTo(null);
+        Assertions.assertThat(_appService.parseRolepermissionKey(keyString)).isNull();
     }
 
     @Test
     public void ParseRolepermissionKey_KeysStringIsNotEmptyAndKeyValuePairDoesNotExist_ReturnNull() {
         String keyString = "permissionId";
 
-        Assertions.assertThat(_appService.parseRolepermissionKey(keyString)).isEqualTo(null);
+        Assertions.assertThat(_appService.parseRolepermissionKey(keyString)).isNull();
     }
 }

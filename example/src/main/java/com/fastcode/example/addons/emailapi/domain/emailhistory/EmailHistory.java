@@ -48,17 +48,5 @@ public class EmailHistory extends AbstractEntity {
     @Basic
     @Column(name = "is_html", nullable = true, length = 256)
     private Boolean isHtml;
-    //   @OneToMany(mappedBy = "emailHistory", cascade = CascadeType.ALL)
-    // 	private Set<EmailAttachments> emailAttachmentsSet = new HashSet<EmailAttachments>();
-
-    //   public void addEmailAttachments(EmailAttachments emailAttachments) {
-    //   	emailAttachmentsSet.add(emailAttachments);
-    //   	emailAttachments.setEmailHistory(this);
-    //	}
-
-    //	public void removeEmailAttachments(EmailAttachments emailAttachments) {
-    //		emailAttachmentsSet.remove(emailAttachments);
-    //		emailAttachments.setEmailHistory(null);
-    //	}
 
 }

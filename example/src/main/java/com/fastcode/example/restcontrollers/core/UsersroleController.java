@@ -56,9 +56,9 @@ public class UsersroleController {
     @RequestMapping(method = RequestMethod.POST, consumes = { "application/json" }, produces = { "application/json" })
     public ResponseEntity<CreateUsersroleOutput> create(@RequestBody @Valid CreateUsersroleInput usersrole) {
         CreateUsersroleOutput output = _usersroleAppService.create(usersrole);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
 
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
 
         FindUsersByIdOutput foundUsers = _usersAppService.findById(output.getUsersId());
         _jwtAppService.deleteAllUserTokens(foundUsers.getUsername());
@@ -119,8 +119,8 @@ public class UsersroleController {
         _jwtAppService.deleteAllUserTokens(foundUsers.getUsername());
 
         UpdateUsersroleOutput output = _usersroleAppService.update(usersroleid, usersrole);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("No record found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("No record found"));
         return new ResponseEntity(output, HttpStatus.OK);
     }
 

@@ -178,7 +178,6 @@ public class MailController {
         String cc = replaceVariable(email.getCc(), mergeFieldData, imageDataSourceMap);
         String subject = replaceVariable(email.getSubject(), mergeFieldData, imageDataSourceMap);
         String bcc = replaceVariable(email.getBcc(), mergeFieldData, imageDataSourceMap);
-        // String body = replaceVariable(email.getEmailBody());
         String contentjson = replaceVariable(email.getContentJson(), mergeFieldData, imageDataSourceMap);
 
         List<FileEntity> lAttachments = new ArrayList<FileEntity>();

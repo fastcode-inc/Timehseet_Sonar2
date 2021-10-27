@@ -18,7 +18,7 @@ public class EmailCategoryController {
 
     @PreAuthorize("hasAnyAuthority('EMAILCATEGORIES_READ')")
     @GetMapping("/email/categories")
-    ResponseEntity<String> getAll() throws Exception {
+    public ResponseEntity<String> getAll() throws Exception {
         return new ResponseEntity(emailCategoryService.getAllCategories(), HttpStatus.OK);
     }
 }

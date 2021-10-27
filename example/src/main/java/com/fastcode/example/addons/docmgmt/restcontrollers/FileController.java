@@ -11,6 +11,7 @@ import com.fastcode.example.commons.search.OffsetBasedPageRequest;
 import com.fastcode.example.commons.search.SearchCriteria;
 import com.fastcode.example.commons.search.SearchUtils;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityNotFoundException;
@@ -125,8 +126,8 @@ public class FileController {
         @RequestParam(value = "offset", required = false) String offset,
         @RequestParam(value = "limit", required = false) String limit,
         Sort sort
-    )
-        throws Exception {
+    ) throws MalformedURLException
+         {
         if (offset == null) {
             offset = env.getProperty("fastCode.offset.default");
         }
@@ -176,14 +177,14 @@ public class FileController {
         consumes = { "application/json" },
         produces = { "application/hal+json" }
     )
-    public ResponseEntity<?> getContent(@PathVariable("fileId") Long id) {
+    public ResponseEntity<InputStreamResource> getContent(@PathVariable("fileId") Long id) {
         Optional<FileEntity> f = filesRepo.findById(id);
         if (f.isPresent()) {
             InputStreamResource inputStreamResource = new InputStreamResource(contentStore.getContent(f.get()));
             HttpHeaders headers = new HttpHeaders();
             headers.setContentLength(f.get().getContentLength());
             headers.set("Content-Type", f.get().getMimeType());
-            return new ResponseEntity<Object>(inputStreamResource, headers, HttpStatus.OK);
+            return new ResponseEntity<InputStreamResource>(inputStreamResource, headers, HttpStatus.OK);
         } else {
             throw new EntityNotFoundException("The entity with the provided Id has not been found.");
         }
@@ -196,11 +197,11 @@ public class FileController {
         consumes = { "application/json" },
         produces = { "application/hal+json" }
     )
-    public ResponseEntity<?> lock(@PathVariable("fileId") Long id) {
+    public ResponseEntity<FileEntity> lock(@PathVariable("fileId") Long id) {
         Optional<FileEntity> f = filesRepo.findById(id);
         if (f.isPresent()) {
             FileEntity lockedFile = filesRepo.lock(f.get());
-            return new ResponseEntity<Object>(lockedFile, HttpStatus.OK);
+            return new ResponseEntity<FileEntity>(lockedFile, HttpStatus.OK);
         } else {
             throw new EntityNotFoundException("The entity with the provided Id has not been found.");
         }
@@ -213,11 +214,11 @@ public class FileController {
         consumes = { "application/json" },
         produces = { "application/hal+json" }
     )
-    public ResponseEntity<?> unlock(@PathVariable("fileId") Long id) {
+    public ResponseEntity<FileEntity> unlock(@PathVariable("fileId") Long id) {
         Optional<FileEntity> f = filesRepo.findById(id);
         if (f.isPresent()) {
             FileEntity unlockedFile = filesRepo.unlock(f.get());
-            return new ResponseEntity<Object>(unlockedFile, HttpStatus.OK);
+            return new ResponseEntity<FileEntity>(unlockedFile, HttpStatus.OK);
         } else {
             throw new EntityNotFoundException("The entity with the provided Id has not been found.");
         }
@@ -230,11 +231,11 @@ public class FileController {
         consumes = { "application/json" },
         produces = { "application/hal+json" }
     )
-    public ResponseEntity<?> version(@PathVariable("fileId") Long id, @RequestBody @Valid VersionInfo versionInfo) {
+    public ResponseEntity<FileEntity> version(@PathVariable("fileId") Long id, @RequestBody @Valid VersionInfo versionInfo) {
         Optional<FileEntity> f = filesRepo.findById(id);
         if (f.isPresent()) {
             FileEntity versionedFile = filesRepo.version(f.get(), versionInfo);
-            return new ResponseEntity<Object>(versionedFile, HttpStatus.OK);
+            return new ResponseEntity<FileEntity>(versionedFile, HttpStatus.OK);
         } else {
             throw new EntityNotFoundException("The entity with the provided Id has not been found.");
         }

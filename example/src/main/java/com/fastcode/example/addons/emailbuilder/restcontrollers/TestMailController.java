@@ -57,7 +57,6 @@ public class TestMailController {
         String cc = replaceVariable(email.getCc());
         String subject = replaceVariable(email.getSubject());
         String bcc = replaceVariable(email.getBcc());
-        // String body = replaceVariable(email.getEmailBody());
         String contentjson = replaceVariable(email.getContentJson());
 
         List<FileEntity> lAttachments = new ArrayList<FileEntity>();

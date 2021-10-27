@@ -42,6 +42,8 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityNotFoundException;
+
+import org.assertj.core.api.Assertions;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -351,7 +353,7 @@ public class UserspermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindById_IdIsNotValid_ReturnStatusNotFound() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -400,7 +402,7 @@ public class UserspermissionControllerTest extends DatabaseContainerConfig {
 
         String json = ow.writeValueAsString(userspermission);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(
+        Assertions.assertThatThrownBy(
             () ->
                 mvc
                     .perform(post("/userspermission").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -419,7 +421,7 @@ public class UserspermissionControllerTest extends DatabaseContainerConfig {
 
         String json = ow.writeValueAsString(userspermission);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(
+        Assertions.assertThatThrownBy(
             () ->
                 mvc
                     .perform(post("/userspermission").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -430,7 +432,7 @@ public class UserspermissionControllerTest extends DatabaseContainerConfig {
     @Test
     public void DeleteUserspermission_IdIsNotValid_ThrowEntityNotFoundException() {
         doReturn(null).when(userspermissionAppService).findById(new UserspermissionId(999L, 999L));
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -500,7 +502,7 @@ public class UserspermissionControllerTest extends DatabaseContainerConfig {
             .withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(userspermission);
 
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -587,7 +589,7 @@ public class UserspermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindAll_SearchIsNotNullAndPropertyIsNotValid_ThrowException() throws Exception {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -602,7 +604,7 @@ public class UserspermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetPermission_IdIsNotEmptyAndIdIsNotValid_ThrowException() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -616,7 +618,7 @@ public class UserspermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetPermission_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -647,7 +649,7 @@ public class UserspermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetUsers_IdIsNotEmptyAndIdIsNotValid_ThrowException() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc
@@ -659,7 +661,7 @@ public class UserspermissionControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetUsers_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
+        Assertions
             .assertThatThrownBy(
                 () ->
                     mvc

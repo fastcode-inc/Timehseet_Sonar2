@@ -17,12 +17,6 @@ import lombok.Setter;
 @Table(name = "permalink")
 public class Permalink extends AbstractEntity {
 
-    //    @Id
-    //    @GeneratedValue(generator = "uuid2")
-    //    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.PostgresUUIDType")
-    //    @Column(name = "id", columnDefinition = "VARCHAR(255)")
-    //    private UUID id;
-
     private static final long serialVersionUID = 1L;
 
     @Id

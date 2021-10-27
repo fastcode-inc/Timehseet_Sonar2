@@ -47,14 +47,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 @Service("reportAppService")
 public class ReportAppService implements IReportAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
-
+    public static final String RUNNING = "running";
+    public static final String PUBLISHED = "published";
     @Autowired
     @Qualifier("reportRepository")
     protected IReportRepository _reportRepository;
@@ -131,7 +130,7 @@ public class ReportAppService implements IReportAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateReportOutput update(Long reportId, UpdateReportInput input) {
-        ReportversionId reportversionId = new ReportversionId(input.getUserId(), reportId, "running");
+        ReportversionId reportversionId = new ReportversionId(input.getUserId(), reportId, RUNNING);
 
         Reportversion rv = _reportversionRepository.findById(reportversionId).orElse(null);
         UpdateReportversionInput reportversion = mapper.updateReportInputToUpdateReportversionInput(input);
@@ -151,7 +150,7 @@ public class ReportAppService implements IReportAppService {
         }
 
         Report foundReport = _reportRepository.findById(reportId).orElse(null);
-        if (foundReport.getUsers() != null && foundReport.getUsers().getId() == input.getUserId()) {
+        if (foundReport.getUsers() != null && (foundReport.getUsers().getId().equals(input.getUserId()))) {
             foundReport.setIsPublished(false);
             foundReport = _reportRepository.save(foundReport);
         }
@@ -162,8 +161,8 @@ public class ReportAppService implements IReportAppService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void delete(Long reportId, Long userId) {
         Report existing = _reportRepository.findById(reportId).orElse(null);
-        _reportversionAppservice.delete(new ReportversionId(userId, reportId, "running"));
-        _reportversionAppservice.delete(new ReportversionId(userId, reportId, "published"));
+        _reportversionAppservice.delete(new ReportversionId(userId, reportId, RUNNING));
+        _reportversionAppservice.delete(new ReportversionId(userId, reportId, PUBLISHED));
 
         List<Reportuser> reportUserList = _reportuserRepository.findByReportId(existing.getId());
         for (Reportuser reportuser : reportUserList) {
@@ -182,7 +181,7 @@ public class ReportAppService implements IReportAppService {
         if (foundReport == null) return null;
 
         Reportversion reportversion = _reportversionRepository
-            .findById(new ReportversionId(foundReport.getUsers().getId(), foundReport.getId(), "running"))
+            .findById(new ReportversionId(foundReport.getUsers().getId(), foundReport.getId(), RUNNING))
             .orElse(null);
 
         FindReportByIdOutput output = mapper.reportToFindReportByIdOutput(foundReport, reportversion);
@@ -302,13 +301,13 @@ public class ReportAppService implements IReportAppService {
 
         Reportversion reportVersion, publishedversion;
         publishedversion =
-            _reportversionRepository.findById(new ReportversionId(userId, reportId, "published")).orElse(null);
+            _reportversionRepository.findById(new ReportversionId(userId, reportId, PUBLISHED)).orElse(null);
 
-        if (StringUtils.isNotBlank(version) && version.equalsIgnoreCase("published")) {
+        if (StringUtils.isNotBlank(version) && version.equalsIgnoreCase(PUBLISHED)) {
             reportVersion = publishedversion;
         } else {
             reportVersion =
-                _reportversionRepository.findById(new ReportversionId(userId, reportId, "running")).orElse(null);
+                _reportversionRepository.findById(new ReportversionId(userId, reportId, RUNNING)).orElse(null);
         }
         FindReportByIdOutput output = mapper.reportEntitiesToFindReportByIdOutput(
             foundReport,
@@ -340,7 +339,7 @@ public class ReportAppService implements IReportAppService {
         foundReportuser = _reportuserRepository.save(foundReportuser);
 
         Reportversion foundReportversion = _reportversionRepository
-            .findById(new ReportversionId(userId, reportId, "running"))
+            .findById(new ReportversionId(userId, reportId, RUNNING))
             .orElse(null);
         Report foundReport = _reportRepository.findById(reportId).orElse(null);
 
@@ -359,15 +358,15 @@ public class ReportAppService implements IReportAppService {
         foundReport.setIsPublished(true);
         foundReport = _reportRepository.save(foundReport);
         Reportversion foundReportversion = _reportversionRepository
-            .findById(new ReportversionId(userId, reportId, "running"))
+            .findById(new ReportversionId(userId, reportId, RUNNING))
             .orElse(null);
         Reportversion foundPublishedversion = _reportversionRepository
-            .findById(new ReportversionId(userId, reportId, "published"))
+            .findById(new ReportversionId(userId, reportId, PUBLISHED))
             .orElse(null);
         Reportversion publishedVersion = reportversionMapper.reportversionToReportversion(
             foundReportversion,
             userId,
-            "published"
+                PUBLISHED
         );
 
         if (foundPublishedversion != null) {
@@ -386,19 +385,19 @@ public class ReportAppService implements IReportAppService {
 
         if (foundReportuser != null && foundReportuser.getOwnerSharingStatus()) {
             Reportversion ownerPublishedversion = _reportversionRepository
-                .findById(new ReportversionId(foundReport.getUsers().getId(), reportId, "published"))
+                .findById(new ReportversionId(foundReport.getUsers().getId(), reportId, PUBLISHED))
                 .orElse(null);
             Users foundUsers = _usersRepository.findById(userId).orElse(null);
 
             Reportversion publishedversion = _reportversionRepository
-                .findById(new ReportversionId(userId, reportId, "published"))
+                .findById(new ReportversionId(userId, reportId, PUBLISHED))
                 .orElse(null);
             Reportversion updatedVersion;
             if (publishedversion == null) {
                 updatedVersion =
-                    reportversionMapper.reportversionToReportversion(ownerPublishedversion, userId, "published");
+                    reportversionMapper.reportversionToReportversion(ownerPublishedversion, userId, PUBLISHED);
             } else {
-                updatedVersion = reportversionMapper.reportversionToReportversion(publishedversion, userId, "running");
+                updatedVersion = reportversionMapper.reportversionToReportversion(publishedversion, userId, RUNNING);
             }
 
             updatedVersion.setUsers(foundUsers);
@@ -408,7 +407,7 @@ public class ReportAppService implements IReportAppService {
             foundReportuser = _reportuserRepository.save(foundReportuser);
 
             Reportversion runningversion = _reportversionRepository
-                .findById(new ReportversionId(userId, reportId, "running"))
+                .findById(new ReportversionId(userId, reportId, RUNNING))
                 .orElse(null);
             ReportDetailsOutput output = mapper.reportEntitiesToReportDetailsOutput(
                 foundReport,
@@ -418,19 +417,19 @@ public class ReportAppService implements IReportAppService {
             output.setSharedWithMe(true);
 
             return output;
-        } else if (foundReport != null && foundReport.getUsers() != null && foundReport.getUsers().getId() == userId) {
+        } else if (foundReport != null && foundReport.getUsers() != null && foundReport.getUsers().getId().equals(userId)) {
             Reportversion ownerPublishedversion = _reportversionRepository
-                .findById(new ReportversionId(userId, reportId, "published"))
+                .findById(new ReportversionId(userId, reportId, PUBLISHED))
                 .orElse(null);
             Reportversion ownerRunningversion = _reportversionRepository
-                .findById(new ReportversionId(userId, reportId, "running"))
+                .findById(new ReportversionId(userId, reportId, RUNNING))
                 .orElse(null);
 
             Users foundUsers = _usersRepository.findById(userId).orElse(null);
             Reportversion updatedVersion = reportversionMapper.reportversionToReportversion(
                 ownerPublishedversion,
                 userId,
-                "running"
+                    RUNNING
             );
             updatedVersion.setUsers(foundUsers);
             updatedVersion.setVersiono(ownerRunningversion.getVersiono());
@@ -438,7 +437,7 @@ public class ReportAppService implements IReportAppService {
             _reportversionRepository.save(updatedVersion);
 
             Reportversion runningversion = _reportversionRepository
-                .findById(new ReportversionId(userId, reportId, "running"))
+                .findById(new ReportversionId(userId, reportId, RUNNING))
                 .orElse(null);
             ReportDetailsOutput output = mapper.reportEntitiesToReportDetailsOutput(
                 foundReport,
@@ -461,13 +460,13 @@ public class ReportAppService implements IReportAppService {
         Reportuser ru = _reportuserRepository.findById(new ReportuserId(reportId, newOwnerId)).orElse(null);
         if (ru != null) {
             reportRunningversion =
-                _reportversionRepository.findById(new ReportversionId(newOwnerId, reportId, "running")).orElse(null);
+                _reportversionRepository.findById(new ReportversionId(newOwnerId, reportId, RUNNING)).orElse(null);
             Reportversion reportPublishedversion = _reportversionRepository
-                .findById(new ReportversionId(newOwnerId, reportId, "published"))
+                .findById(new ReportversionId(newOwnerId, reportId, PUBLISHED))
                 .orElse(null);
             if (reportPublishedversion == null) {
                 reportPublishedversion =
-                    reportversionMapper.reportversionToReportversion(reportRunningversion, newOwnerId, "published");
+                    reportversionMapper.reportversionToReportversion(reportRunningversion, newOwnerId, PUBLISHED);
                 reportPublishedversion.setUsers(foundUsers);
                 _reportversionRepository.save(reportPublishedversion);
             }
@@ -475,16 +474,16 @@ public class ReportAppService implements IReportAppService {
             _reportuserRepository.delete(ru);
         } else {
             Reportversion foundOwnerReportRunningversion = _reportversionRepository
-                .findById(new ReportversionId(ownerId, reportId, "running"))
+                .findById(new ReportversionId(ownerId, reportId, RUNNING))
                 .orElse(null);
             Reportversion foundOwnerReportPublishedversion = _reportversionRepository
-                .findById(new ReportversionId(ownerId, reportId, "published"))
+                .findById(new ReportversionId(ownerId, reportId, PUBLISHED))
                 .orElse(null);
             reportRunningversion =
                 reportversionMapper.reportversionToReportversion(
                     foundOwnerReportRunningversion,
                     foundUsers.getId(),
-                    "running"
+                        RUNNING
                 );
             reportRunningversion.setUsers(foundUsers);
             _reportversionRepository.save(reportRunningversion);
@@ -492,20 +491,20 @@ public class ReportAppService implements IReportAppService {
             Reportversion reportPublishedversion = reportversionMapper.reportversionToReportversion(
                 foundOwnerReportPublishedversion,
                 foundUsers.getId(),
-                "published"
+                    PUBLISHED
             );
 
             reportPublishedversion.setUsers(foundUsers);
             _reportversionRepository.save(reportPublishedversion);
         }
 
-        _reportversionAppservice.delete(new ReportversionId(ownerId, reportId, "running"));
-        _reportversionAppservice.delete(new ReportversionId(ownerId, reportId, "published"));
+        _reportversionAppservice.delete(new ReportversionId(ownerId, reportId, RUNNING));
+        _reportversionAppservice.delete(new ReportversionId(ownerId, reportId, PUBLISHED));
 
         List<Dashboardversionreport> dvrRunningversionsList = _reportDashboardRepository.findByReportIdAndUsersIdAndVersion(
             reportId,
             ownerId,
-            "running"
+                RUNNING
         );
 
         for (Dashboardversionreport dvr : dvrRunningversionsList) {
@@ -513,7 +512,7 @@ public class ReportAppService implements IReportAppService {
                 dvr.getDashboardId(),
                 reportId,
                 ownerId,
-                "running"
+                    RUNNING
             );
             for (Dashboardversionreport shared : sharedDashboardReportList) {
                 Dashboarduser du = _dashboarduserRepository
@@ -525,7 +524,7 @@ public class ReportAppService implements IReportAppService {
                 }
             }
             Dashboardversionreport ownerPublishedDashboardReport = _reportDashboardRepository
-                .findById(new DashboardversionreportId(dvr.getDashboardId(), ownerId, "published", reportId))
+                .findById(new DashboardversionreportId(dvr.getDashboardId(), ownerId, PUBLISHED, reportId))
                 .orElse(null);
 
             _reportDashboardRepository.delete(dvr);
@@ -541,20 +540,21 @@ public class ReportAppService implements IReportAppService {
     @Transactional(propagation = Propagation.REQUIRED)
     public ReportDetailsOutput resetReport(Long userId, Long reportId) {
         Reportuser foundReportuser = _reportuserRepository.findById(new ReportuserId(reportId, userId)).orElse(null);
+        Assert.notNull(foundReportuser,"Reportuser cannot be null");
         Report foundReport = _reportRepository.findById(reportId).orElse(null);
 
         Reportversion publishedversion = _reportversionRepository
-            .findById(new ReportversionId(userId, reportId, "published"))
+            .findById(new ReportversionId(userId, reportId, PUBLISHED))
             .orElse(null);
         if (publishedversion != null) {
             Reportversion runningversion = reportversionMapper.reportversionToReportversion(
                 publishedversion,
                 userId,
-                "running"
+                    RUNNING
             );
 
             runningversion = _reportversionRepository.save(runningversion);
-            if (foundReportuser != null && !foundReportuser.getEditable()) {
+            if (!foundReportuser.getEditable()) {
                 _reportversionRepository.delete(publishedversion);
             }
 
@@ -582,7 +582,7 @@ public class ReportAppService implements IReportAppService {
     ) {
         Report report = _reportRepository.findById(reportId).orElse(null);
         Reportversion ownerPublishedVersion = _reportversionRepository
-            .findById(new ReportversionId(report.getUsers().getId(), report.getId(), "published"))
+            .findById(new ReportversionId(report.getUsers().getId(), report.getId(), PUBLISHED))
             .orElse(null);
         if (ownerPublishedVersion == null) {
             return null;
@@ -664,7 +664,7 @@ public class ReportAppService implements IReportAppService {
     ) {
         Report report = _reportRepository.findById(reportId).orElse(null);
         Reportversion ownerPublishedVersion = _reportversionRepository
-            .findById(new ReportversionId(report.getUsers().getId(), report.getId(), "published"))
+            .findById(new ReportversionId(report.getUsers().getId(), report.getId(), PUBLISHED))
             .orElse(null);
 
         if (ownerPublishedVersion == null) {
@@ -702,7 +702,7 @@ public class ReportAppService implements IReportAppService {
                         shareReportWithUser(reportuser, ownerPublishedVersion, roleInput.getEditable());
                         reportuser.setEditable(roleInput.getEditable());
                         reportuser.setIsAssignedByRole(true);
-                        reportuser = _reportuserRepository.save(reportuser);
+                        _reportuserRepository.save(reportuser);
                     }
                 } else {
                     createReportuserAndReportVersion(
@@ -727,7 +727,7 @@ public class ReportAppService implements IReportAppService {
                         shareReportWithUser(reportuser, ownerPublishedVersion, userInput.getEditable());
                         reportuser.setEditable(userInput.getEditable());
                         reportuser.setIsAssignedByRole(false);
-                        reportuser = _reportuserRepository.save(reportuser);
+                        _reportuserRepository.save(reportuser);
                     }
                 } else {
                     createReportuserAndReportVersion(
@@ -775,7 +775,7 @@ public class ReportAppService implements IReportAppService {
             Reportversion publishedreportversion = reportversionMapper.reportversionToReportversion(
                 ownerReportversion,
                 users.getId(),
-                "published"
+                    PUBLISHED
             );
             publishedreportversion.setUsers(users);
             publishedreportversion.setIsAssignedByDashboard(isAssignedByDashboard);
@@ -783,7 +783,7 @@ public class ReportAppService implements IReportAppService {
             Reportversion runningreportversion = reportversionMapper.reportversionToReportversion(
                 ownerReportversion,
                 users.getId(),
-                "running"
+                    RUNNING
             );
             runningreportversion.setUsers(users);
             runningreportversion.setIsAssignedByDashboard(isAssignedByDashboard);
@@ -792,7 +792,7 @@ public class ReportAppService implements IReportAppService {
             Reportversion runningreportversion = reportversionMapper.reportversionToReportversion(
                 ownerReportversion,
                 users.getId(),
-                "running"
+                    RUNNING
             );
             runningreportversion.setUsers(users);
             runningreportversion.setIsAssignedByDashboard(isAssignedByDashboard);
@@ -804,10 +804,10 @@ public class ReportAppService implements IReportAppService {
     public void shareReportWithUser(Reportuser reportuser, Reportversion ownerPublishedVersion, Boolean editable) {
         Users users = _usersRepository.findById(reportuser.getUserId()).orElse(null);
         Reportversion reportPublishedVersion = _reportversionRepository
-            .findById(new ReportversionId(users.getId(), reportuser.getReportId(), "published"))
+            .findById(new ReportversionId(users.getId(), reportuser.getReportId(), PUBLISHED))
             .orElse(null);
         Reportversion reportRunningVersion = _reportversionRepository
-            .findById(new ReportversionId(users.getId(), reportuser.getReportId(), "running"))
+            .findById(new ReportversionId(users.getId(), reportuser.getReportId(), RUNNING))
             .orElse(null);
 
         if (reportuser.getEditable() && !editable) {
@@ -820,7 +820,7 @@ public class ReportAppService implements IReportAppService {
                     Reportversion publishedVersion = reportversionMapper.reportversionToReportversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "running"
+                            RUNNING
                     );
                     publishedVersion.setUsers(users);
                     _reportversionRepository.save(publishedVersion);
@@ -828,16 +828,14 @@ public class ReportAppService implements IReportAppService {
                     Reportversion publishedVersion = reportversionMapper.reportversionToReportversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "published"
+                            PUBLISHED
                     );
                     publishedVersion.setUsers(users);
                     _reportversionRepository.save(publishedVersion);
                 }
             } else {
-                if (reportuser.getIsResetted()) {
-                    if (reportPublishedVersion != null) {
-                        _reportversionRepository.delete(reportPublishedVersion);
-                    }
+                if (reportuser.getIsResetted() && reportPublishedVersion != null) {
+                    _reportversionRepository.delete(reportPublishedVersion);
                 }
             }
         } else if (!reportuser.getEditable() && !editable) {
@@ -846,7 +844,7 @@ public class ReportAppService implements IReportAppService {
                     Reportversion publishedVersion = reportversionMapper.reportversionToReportversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "published"
+                            PUBLISHED
                     );
                     publishedVersion.setUsers(users);
                     _reportversionRepository.save(publishedVersion);
@@ -857,7 +855,7 @@ public class ReportAppService implements IReportAppService {
                     Reportversion publishedVersion = reportversionMapper.reportversionToReportversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "running"
+                            RUNNING
                     );
 
                     publishedVersion.setUsers(users);
@@ -869,7 +867,7 @@ public class ReportAppService implements IReportAppService {
                 Reportversion publishedVersion = reportversionMapper.reportversionToReportversion(
                     ownerPublishedVersion,
                     users.getId(),
-                    "published"
+                        PUBLISHED
                 );
 
                 publishedVersion.setUsers(users);
@@ -881,7 +879,7 @@ public class ReportAppService implements IReportAppService {
                     Reportversion publishedVersion = reportversionMapper.reportversionToReportversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "published"
+                            PUBLISHED
                     );
 
                     publishedVersion.setUsers(users);
@@ -894,7 +892,7 @@ public class ReportAppService implements IReportAppService {
                     Reportversion publishedVersion = reportversionMapper.reportversionToReportversion(
                         ownerPublishedVersion,
                         users.getId(),
-                        "published"
+                            PUBLISHED
                     );
                     publishedVersion.setUsers(users);
                     _reportversionRepository.save(publishedVersion);
@@ -903,7 +901,7 @@ public class ReportAppService implements IReportAppService {
                 Reportversion publishedVersion = reportversionMapper.reportversionToReportversion(
                     reportRunningVersion,
                     users.getId(),
-                    "published"
+                        PUBLISHED
                 );
                 publishedVersion.setUsers(users);
                 _reportversionRepository.save(publishedVersion);
@@ -943,7 +941,7 @@ public class ReportAppService implements IReportAppService {
         while (reportIterator.hasNext()) {
             Report report = reportIterator.next();
             Reportversion reportVersion = _reportversionRepository
-                .findById(new ReportversionId(report.getUsers().getId(), report.getId(), "running"))
+                .findById(new ReportversionId(report.getUsers().getId(), report.getId(), RUNNING))
                 .orElse(null);
             Reportuser reportuser = _reportuserRepository
                 .findById(new ReportuserId(report.getId(), reportVersion.getUserId()))
@@ -954,7 +952,7 @@ public class ReportAppService implements IReportAppService {
                 reportuser
             );
             Reportversion publishedversion = _reportversionRepository
-                .findById(new ReportversionId(report.getUsers().getId(), report.getId(), "published"))
+                .findById(new ReportversionId(report.getUsers().getId(), report.getId(), PUBLISHED))
                 .orElse(null);
             if (publishedversion == null) {
                 reportOutput.setIsResetable(false);

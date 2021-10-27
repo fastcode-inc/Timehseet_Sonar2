@@ -69,7 +69,7 @@ public class TimeofftypeAppServiceTest {
     public void findTimeofftypeById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Timeofftype> nullOptional = Optional.ofNullable(null);
         Mockito.when(_timeofftypeRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(ID)).isNull();
     }
 
     @Test
@@ -212,7 +212,7 @@ public class TimeofftypeAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     @Test

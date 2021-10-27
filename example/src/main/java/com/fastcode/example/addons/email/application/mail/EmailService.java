@@ -21,7 +21,7 @@ public class EmailService implements IEmailService {
         try {
             emailSender.send(email);
         } catch (Exception e) {
-            logHelper.getLogger().error(e.getMessage());
+            throw e;
         }
     }
 

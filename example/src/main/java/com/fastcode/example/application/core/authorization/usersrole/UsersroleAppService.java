@@ -24,10 +24,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("usersroleAppService")
 @RequiredArgsConstructor
 public class UsersroleAppService implements IUsersroleAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
+    public static final String RANGE = "range";
     @Qualifier("usersroleRepository")
     @NonNull
     protected final IUsersroleRepository _usersroleRepository;
@@ -62,12 +68,10 @@ public class UsersroleAppService implements IUsersroleAppService {
         } else {
             return null;
         }
-        if (foundUsers != null || foundRole != null) {
+        if (foundUsers != null && foundRole != null) {
             if (!checkIfRoleAlreadyAssigned(foundUsers, foundRole)) {
                 foundRole.addUsersroles(usersrole);
                 foundUsers.addUsersroles(usersrole);
-                //	usersrole.setRole(foundRole);
-                //	usersrole.setUsers(foundUsers);
             }
         } else {
             return null;
@@ -96,12 +100,15 @@ public class UsersroleAppService implements IUsersroleAppService {
         } else {
             return null;
         }
+
+        if(foundUsers==null){
+            throw new EntityNotFoundException("Entity not found");
+        }
+
         if (foundUsers != null || foundRole != null) {
             if (checkIfRoleAlreadyAssigned(foundUsers, foundRole)) {
                 foundRole.addUsersroles(usersrole);
                 foundUsers.addUsersroles(usersrole);
-                //usersrole.setRole(foundRole);
-                //usersrole.setUsers(foundUsers);
             }
         } else {
             return null;
@@ -226,19 +233,19 @@ public class UsersroleAppService implements IUsersroleAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("roleId")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(usersrole.roleId.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usersrole.roleId.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usersrole.roleId.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())
@@ -257,19 +264,19 @@ public class UsersroleAppService implements IUsersroleAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("usersId")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(usersrole.usersId.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usersrole.usersId.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(usersrole.usersId.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())
@@ -289,24 +296,24 @@ public class UsersroleAppService implements IUsersroleAppService {
             }
 
             if (details.getKey().replace("%20", "").trim().equals("role")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(
                         usersrole.role.displayName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
                     );
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(usersrole.role.displayName.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(usersrole.role.displayName.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("users")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(
                         usersrole.users.username.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
                     );
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(usersrole.users.username.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(usersrole.users.username.ne(details.getValue().getSearchValue()));
                 }
             }

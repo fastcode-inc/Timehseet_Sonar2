@@ -43,7 +43,6 @@ public class EmailVariableController {
     public ResponseEntity<CreateEmailVariableOutput> create(@RequestBody @Valid CreateEmailVariableInput email) {
         FindEmailVariableByNameOutput foundEmail = emailVariableAppService.findByName(email.getPropertyName());
         if (foundEmail != null) {
-            logHelper.getLogger().error("There already exists a email with a name=%s", email.getPropertyName());
             throw new EntityExistsException(
                 String.format("There already exists a user with email address=%s", email.getPropertyName())
             );
@@ -81,7 +80,6 @@ public class EmailVariableController {
             .orElseThrow(
                 () -> new EntityNotFoundException(String.format("Unable to update. Email with id=%s not found.", id))
             );
-        //    email.setVersiono(currentEmail.getVersiono());
 
         return new ResponseEntity(emailVariableAppService.update(Long.valueOf(id), email), HttpStatus.OK);
     }
@@ -110,7 +108,6 @@ public class EmailVariableController {
         if (limit == null) {
             limit = env.getProperty("fastCode.limit.default");
         }
-        //if (sort.isUnsorted()) { sort = new Sort(Sort.Direction.fromString(env.getProperty("fastCode.sort.direction.default")), new String[]{env.getProperty("fastCode.sort.property.default")}); }
 
         Pageable Pageable = new OffsetBasedPageRequest(Integer.parseInt(offset), Integer.parseInt(limit), sort);
         SearchCriteria searchCriteria = SearchUtils.generateSearchCriteriaObject(search);

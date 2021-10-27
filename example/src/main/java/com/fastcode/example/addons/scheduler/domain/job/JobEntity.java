@@ -17,10 +17,6 @@ public class JobEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    //@Column(name = "id", nullable = true)
-    //@GeneratedValue(strategy = GenerationType.IDENTITY)
-    //private Long id;
-
     @Id
     @Column(name = "job_name", nullable = false, length = 256)
     private String jobName;

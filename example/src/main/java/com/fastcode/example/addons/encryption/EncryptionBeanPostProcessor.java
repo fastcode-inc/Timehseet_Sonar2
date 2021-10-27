@@ -21,8 +21,6 @@ import org.springframework.stereotype.Component;
 @Component
 public class EncryptionBeanPostProcessor implements BeanPostProcessor {
 
-    //    private static final Logger logger = LoggerFactory.getLogger(EncryptionBeanPostProcessor.class);
-
     @Autowired
     private EncryptionListener encryptionListener;
 
@@ -42,7 +40,6 @@ public class EncryptionBeanPostProcessor implements BeanPostProcessor {
             registry.appendListeners(EventType.POST_LOAD, encryptionListener);
             registry.appendListeners(EventType.PRE_INSERT, encryptionListener);
             registry.appendListeners(EventType.PRE_UPDATE, encryptionListener);
-            //            logger.info("Encryption has been successfully set up");
         }
         return bean;
     }

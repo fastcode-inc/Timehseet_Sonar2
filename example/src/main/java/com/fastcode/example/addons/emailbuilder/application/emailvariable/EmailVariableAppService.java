@@ -27,9 +27,12 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class EmailVariableAppService implements IEmailVariableAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
+    static final int CASE1 = 1;
+    static final int CASE2 = 2;
+    static final int CASE3 = 3;
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
 
     @Autowired
     private IEmailVariableManager _emailVariableManager;
@@ -115,16 +118,16 @@ public class EmailVariableAppService implements IEmailVariableAppService {
     public BooleanBuilder search(SearchCriteria search) throws Exception {
         QEmailVariableEntity email = QEmailVariableEntity.emailVariableEntity;
         if (search != null) {
-            if (search.getType() == case1) {
+            if (search.getType() == CASE1) {
                 return searchAllProperties(email, search.getValue(), search.getOperator());
-            } else if (search.getType() == case2) {
+            } else if (search.getType() == CASE2) {
                 List<String> keysList = new ArrayList<String>();
                 for (SearchFields f : search.getFields()) {
                     keysList.add(f.getFieldName());
                 }
                 checkProperties(keysList);
                 return searchSpecificProperty(email, keysList, search.getValue(), search.getOperator());
-            } else if (search.getType() == case3) {
+            } else if (search.getType() == CASE3) {
                 Map<String, SearchFields> map = new HashMap<>();
                 for (SearchFields fieldDetails : search.getFields()) {
                     map.put(fieldDetails.getFieldName(), fieldDetails);
@@ -140,11 +143,11 @@ public class EmailVariableAppService implements IEmailVariableAppService {
     public BooleanBuilder searchAllProperties(QEmailVariableEntity email, String value, String operator) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (operator.equals("contains")) {
+        if (operator.equals(CONTAINS)) {
             builder.or(email.propertyName.likeIgnoreCase("%" + value + "%"));
             builder.or(email.propertyType.likeIgnoreCase("%" + value + "%"));
             builder.or(email.defaultValue.likeIgnoreCase("%" + value + "%"));
-        } else if (operator.equals("equals")) {
+        } else if (operator.equals(EQUALS_TO)) {
             builder.or(email.propertyName.eq(value));
             builder.or(email.propertyType.eq(value));
             builder.or(email.defaultValue.eq(value));
@@ -178,23 +181,23 @@ public class EmailVariableAppService implements IEmailVariableAppService {
 
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).replace("%20", "").trim().equals("propertyName")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(email.propertyName.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(email.propertyName.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("propertyType")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(email.propertyType.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(email.propertyType.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("defaultValue")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(email.defaultValue.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(email.defaultValue.eq(value));
                 }
             }
@@ -207,29 +210,29 @@ public class EmailVariableAppService implements IEmailVariableAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("propertyName")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(email.propertyName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(email.propertyName.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(email.propertyName.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("propertyType")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(email.propertyType.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(email.propertyType.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(email.propertyType.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("defaultValue")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(email.defaultValue.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(email.defaultValue.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(email.defaultValue.ne(details.getValue().getSearchValue()));
                 }
             }

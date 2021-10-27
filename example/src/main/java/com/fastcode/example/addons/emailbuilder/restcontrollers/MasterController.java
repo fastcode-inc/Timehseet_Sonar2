@@ -19,7 +19,7 @@ public class MasterController {
 
     @PreAuthorize("hasAnyAuthority('MASTERENTITY_READ')")
     @GetMapping("/getMastersByMasterName")
-    ResponseEntity<String> getMastersByMasterName(@RequestParam(value = "name") String name) throws Exception {
+    public ResponseEntity<String> getMastersByMasterName(@RequestParam(value = "name") String name) throws Exception {
         return new ResponseEntity(masterEntityService.getMastersByMasterName(name), HttpStatus.OK);
     }
 }

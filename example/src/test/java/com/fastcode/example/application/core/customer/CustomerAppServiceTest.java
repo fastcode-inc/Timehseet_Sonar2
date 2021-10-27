@@ -69,7 +69,7 @@ public class CustomerAppServiceTest {
     public void findCustomerById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Customer> nullOptional = Optional.ofNullable(null);
         Mockito.when(_customerRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(ID)).isNull();
     }
 
     @Test
@@ -207,7 +207,7 @@ public class CustomerAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     @Test

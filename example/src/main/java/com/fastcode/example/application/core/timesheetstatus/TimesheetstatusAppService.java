@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("timesheetstatusAppService")
 @RequiredArgsConstructor
 public class TimesheetstatusAppService implements ITimesheetstatusAppService {
@@ -44,7 +46,12 @@ public class TimesheetstatusAppService implements ITimesheetstatusAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateTimesheetstatusOutput update(Long timesheetstatusId, UpdateTimesheetstatusInput input) {
-        Timesheetstatus existing = _timesheetstatusRepository.findById(timesheetstatusId).get();
+        Timesheetstatus existing = null;
+        Optional<Timesheetstatus> t = _timesheetstatusRepository.findById(timesheetstatusId);
+        if(t.isPresent())
+            existing = t.get();
+        else
+            throw new EntityNotFoundException("Entity not found");
 
         Timesheetstatus timesheetstatus = mapper.updateTimesheetstatusInputToTimesheetstatus(input);
         timesheetstatus.setTimesheetsSet(existing.getTimesheetsSet());

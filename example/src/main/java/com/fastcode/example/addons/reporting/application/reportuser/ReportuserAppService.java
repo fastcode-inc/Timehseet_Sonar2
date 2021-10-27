@@ -24,10 +24,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ReportuserAppService implements IReportuserAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
-
     @Autowired
     @Qualifier("reportuserRepository")
     private IReportuserRepository _reportuserRepository;

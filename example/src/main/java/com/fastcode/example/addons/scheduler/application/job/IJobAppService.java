@@ -16,7 +16,7 @@ public interface IJobAppService {
 
     List<GetExecutingJob> currentlyExecutingJobs() throws SchedulerException;
 
-    List<String> listAllJobClasses() throws URISyntaxException;
+    List<String> listAllJobClasses() throws URISyntaxException, ClassNotFoundException, IOException;
 
     List<String> listAllJobGroups() throws SchedulerException, IOException;
 

@@ -1,5 +1,6 @@
 package com.fastcode.example.restcontrollers.core;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -303,8 +304,7 @@ public class ProjectControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindById_IdIsNotValid_ReturnStatusNotFound() {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc.perform(get("/project/999").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
             )
@@ -341,7 +341,7 @@ public class ProjectControllerTest extends DatabaseContainerConfig {
 
         String json = ow.writeValueAsString(project);
 
-        org.assertj.core.api.Assertions.assertThatThrownBy(
+        assertThatThrownBy(
             () ->
                 mvc
                     .perform(post("/project").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -352,8 +352,7 @@ public class ProjectControllerTest extends DatabaseContainerConfig {
     @Test
     public void DeleteProject_IdIsNotValid_ThrowEntityNotFoundException() {
         doReturn(null).when(projectAppService).findById(999L);
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(delete("/project/999").contentType(MediaType.APPLICATION_JSON))
@@ -403,8 +402,7 @@ public class ProjectControllerTest extends DatabaseContainerConfig {
             .withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(project);
 
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(put("/project/999").contentType(MediaType.APPLICATION_JSON).content(json))
@@ -464,8 +462,7 @@ public class ProjectControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void FindAll_SearchIsNotNullAndPropertyIsNotValid_ThrowException() throws Exception {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(
@@ -479,8 +476,7 @@ public class ProjectControllerTest extends DatabaseContainerConfig {
 
     @Test
     public void GetCustomer_IdIsNotEmptyAndIdDoesNotExist_ReturnNotFound() {
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(get("/project/999/customer").contentType(MediaType.APPLICATION_JSON))
@@ -502,8 +498,7 @@ public class ProjectControllerTest extends DatabaseContainerConfig {
         joinCol.put("id", "1");
 
         Mockito.when(projectAppService.parseTasksJoinColumn("projectid")).thenReturn(joinCol);
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(
@@ -533,8 +528,7 @@ public class ProjectControllerTest extends DatabaseContainerConfig {
     public void GetTasks_searchIsNotEmpty() {
         Mockito.when(projectAppService.parseTasksJoinColumn(anyString())).thenReturn(null);
 
-        org.assertj.core.api.Assertions
-            .assertThatThrownBy(
+        assertThatThrownBy(
                 () ->
                     mvc
                         .perform(

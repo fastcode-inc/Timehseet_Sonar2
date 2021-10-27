@@ -7,7 +7,6 @@ import com.fastcode.example.domain.core.customer.Customer;
 import com.fastcode.example.domain.core.customer.ICustomerRepository;
 import com.fastcode.example.domain.core.customer.QCustomer;
 import com.querydsl.core.BooleanBuilder;
-import java.time.*;
 import java.util.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class CustomerAppService implements ICustomerAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
     @Qualifier("customerRepository")
     @NonNull
     protected final ICustomerRepository _customerRepository;
@@ -44,7 +46,10 @@ public class CustomerAppService implements ICustomerAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateCustomerOutput update(Long customerId, UpdateCustomerInput input) {
-        Customer existing = _customerRepository.findById(customerId).get();
+        Customer existing = null;
+        Optional<Customer> c = _customerRepository.findById(customerId);
+        if(c.isPresent())
+            existing = c.get();
 
         Customer customer = mapper.updateCustomerInputToCustomer(input);
         customer.setProjectsSet(existing.getProjectsSet());
@@ -120,15 +125,15 @@ public class CustomerAppService implements ICustomerAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("customerid")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(customer.customerid.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(customer.customerid.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(customer.customerid.ne(Long.valueOf(details.getValue().getSearchValue())));
@@ -151,17 +156,17 @@ public class CustomerAppService implements ICustomerAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("description")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(customer.description.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(customer.description.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(customer.description.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("isactive")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     (
                         details.getValue().getSearchValue().equalsIgnoreCase("true") ||
                         details.getValue().getSearchValue().equalsIgnoreCase("false")
@@ -169,7 +174,7 @@ public class CustomerAppService implements ICustomerAppService {
                 ) {
                     builder.and(customer.isactive.eq(Boolean.parseBoolean(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     (
                         details.getValue().getSearchValue().equalsIgnoreCase("true") ||
                         details.getValue().getSearchValue().equalsIgnoreCase("false")
@@ -179,11 +184,11 @@ public class CustomerAppService implements ICustomerAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("name")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(customer.name.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(customer.name.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(customer.name.ne(details.getValue().getSearchValue()));
                 }
             }

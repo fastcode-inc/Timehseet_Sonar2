@@ -42,9 +42,13 @@ import org.springframework.stereotype.Service;
 @Service("triggerAppService")
 public class TriggerAppService implements ITriggerAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
+    static final int CASE1 = 1;
+    static final int CASE2 = 2;
+    static final int CASE3 = 3;
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
+    public static final String RANGE = "range";
 
     @Autowired
     protected LoggingHelper logHelper;
@@ -62,11 +66,10 @@ public class TriggerAppService implements ITriggerAppService {
 
     protected Scheduler scheduler;
 
-    protected QuartzConstants quartzConstant;
+    protected QuartzConstants QuartzConstants;
 
     public Scheduler getScheduler() throws SchedulerException {
         scheduler = schedulerFactoryBean.getScheduler();
-        //scheduler.start();
         return scheduler;
     }
 
@@ -148,9 +151,9 @@ public class TriggerAppService implements ITriggerAppService {
             Trigger trigger = getScheduler().getTrigger(triggerKey);
             JobKey jobKey = trigger.getJobKey();
 
-            String trigType = quartzConstant.SIMPLE_TRIGGER;
-            if (trigger.getClass().toString().equals(quartzConstant.CRON_TRIGGER_CLASS)) trigType =
-                quartzConstant.CRON_TRIGGER;
+            String trigType = QuartzConstants.SIMPLE_TRIGGER;
+            if (trigger.getClass().toString().equals(QuartzConstants.CRON_TRIGGER_CLASS)) trigType =
+                QuartzConstants.CRON_TRIGGER;
 
             String[] jobKeyValues = getScheduler().getJobDetail(jobKey).getJobDataMap().getKeys();
             Map<String, String> map = new HashMap<String, String>();
@@ -181,10 +184,10 @@ public class TriggerAppService implements ITriggerAppService {
             obj.setTriggerMapData(triggerMap);
             obj.setTriggerType(trigType);
 
-            if (trigType.equalsIgnoreCase(quartzConstant.CRON_TRIGGER)) {
+            if (trigType.equalsIgnoreCase(QuartzConstants.CRON_TRIGGER)) {
                 CronTrigger cronTrigger = (CronTrigger) trigger;
                 obj.setCronExpression(cronTrigger.getCronExpression());
-            } else if (trigType.equalsIgnoreCase(quartzConstant.SIMPLE_TRIGGER)) {
+            } else if (trigType.equalsIgnoreCase(QuartzConstants.SIMPLE_TRIGGER)) {
                 SimpleTrigger simpleTrigger = (SimpleTrigger) trigger;
                 obj.setRepeatCount(simpleTrigger.getRepeatCount());
                 int seconds = (int) simpleTrigger.getRepeatInterval() / 1000;
@@ -301,9 +304,7 @@ public class TriggerAppService implements ITriggerAppService {
 
     //List Trigger Groups
     public List<String> listAllTriggerGroups() throws SchedulerException {
-        List<String> list = new ArrayList<String>();
-
-        list = getScheduler().getTriggerGroupNames();
+        List<String> list = getScheduler().getTriggerGroupNames();
         return list;
     }
 
@@ -338,9 +339,9 @@ public class TriggerAppService implements ITriggerAppService {
     protected BooleanBuilder searchTriggerDetails(SearchCriteria search) throws Exception {
         QTriggerEntity triggerDetails = QTriggerEntity.triggerEntity;
         if (search != null) {
-            if (search.getType() == case1) {
+            if (search.getType() == CASE1) {
                 return searchAllPropertiesForTriggerDetails(triggerDetails, search.getValue(), search.getOperator());
-            } else if (search.getType() == case2) {
+            } else if (search.getType() == CASE2) {
                 List<String> keysList = new ArrayList<String>();
                 for (SearchFields f : search.getFields()) {
                     keysList.add(f.getFieldName());
@@ -352,7 +353,7 @@ public class TriggerAppService implements ITriggerAppService {
                     search.getValue(),
                     search.getOperator()
                 );
-            } else if (search.getType() == case3) {
+            } else if (search.getType() == CASE3) {
                 Map<String, SearchFields> map = new HashMap<>();
                 for (SearchFields fieldDetails : search.getFields()) {
                     map.put(fieldDetails.getFieldName(), fieldDetails);
@@ -372,14 +373,14 @@ public class TriggerAppService implements ITriggerAppService {
     ) {
         BooleanBuilder builder = new BooleanBuilder();
 
-        if (operator.equals("contains")) {
+        if (operator.equals(CONTAINS)) {
             builder.or(triggerDetails.jobName.likeIgnoreCase("%" + value + "%"));
             builder.or(triggerDetails.jobGroup.likeIgnoreCase("%" + value + "%"));
             builder.or(triggerDetails.triggerGroup.likeIgnoreCase("%" + value + "%"));
             builder.or(triggerDetails.triggerName.likeIgnoreCase("%" + value + "%"));
             builder.or(triggerDetails.triggerState.likeIgnoreCase("%" + value + "%"));
             builder.or(triggerDetails.triggerType.likeIgnoreCase("%" + value + "%"));
-        } else if (operator.equals("equals")) {
+        } else if (operator.equals(EQUALS_TO)) {
             builder.or(triggerDetails.jobName.eq(value));
             builder.or(triggerDetails.jobGroup.eq(value));
             builder.or(triggerDetails.triggerGroup.eq(value));
@@ -432,68 +433,68 @@ public class TriggerAppService implements ITriggerAppService {
 
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).replace("%20", "").trim().equals("jobName")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(triggerDetails.jobName.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(triggerDetails.jobName.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("jobGroup")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(triggerDetails.jobGroup.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(triggerDetails.jobGroup.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("triggerName")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(triggerDetails.triggerName.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(triggerDetails.triggerName.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("triggerGroup")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(triggerDetails.triggerGroup.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(triggerDetails.triggerGroup.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("triggerState")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(triggerDetails.triggerState.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(triggerDetails.triggerState.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("triggerType")) {
-                if (operator.equals("contains")) {
+                if (operator.equals(CONTAINS)) {
                     builder.or(triggerDetails.triggerType.likeIgnoreCase("%" + value + "%"));
-                } else if (operator.equals("equals")) {
+                } else if (operator.equals(EQUALS_TO)) {
                     builder.or(triggerDetails.triggerType.eq(value));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("nextFireTime")) {
                 Long date = dateStringToMillis(value);
-                if (operator.equals("equals") && date != null) {
+                if (operator.equals(EQUALS_TO) && date != null) {
                     builder.or(triggerDetails.nextFireTime.eq(date));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("prevFireTime")) {
                 Long date = dateStringToMillis(value);
-                if (operator.equals("equals") && date != null) {
+                if (operator.equals(EQUALS_TO) && date != null) {
                     builder.or(triggerDetails.prevFireTime.eq(date));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("startTime")) {
                 Long date = dateStringToMillis(value);
-                if (operator.equals("equals") && date != null) {
+                if (operator.equals(EQUALS_TO) && date != null) {
                     builder.or(triggerDetails.startTime.eq(date));
                 }
             }
             if (list.get(i).replace("%20", "").trim().equals("endTime")) {
                 Long date = dateStringToMillis(value);
-                if (operator.equals("equals") && date != null) {
+                if (operator.equals(EQUALS_TO) && date != null) {
                     builder.or(triggerDetails.endTime.eq(date));
                 }
             }
@@ -509,66 +510,66 @@ public class TriggerAppService implements ITriggerAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("jobName")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     triggerDetails.jobName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     triggerDetails.jobName.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     triggerDetails.jobName.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("jobGroup")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     triggerDetails.jobGroup.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     triggerDetails.jobGroup.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     triggerDetails.jobGroup.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("triggerName")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     triggerDetails.triggerName.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     triggerDetails.triggerName.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     triggerDetails.triggerName.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("triggerGroup")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     triggerDetails.triggerGroup.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     triggerDetails.triggerGroup.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     triggerDetails.triggerGroup.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("triggerState")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     triggerDetails.triggerState.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     triggerDetails.triggerState.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     triggerDetails.triggerState.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("triggerType")) {
-                if (details.getValue().getOperator().equals("contains")) builder.and(
+                if (details.getValue().getOperator().equals(CONTAINS)) builder.and(
                     triggerDetails.triggerType.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%")
-                ); else if (details.getValue().getOperator().equals("equals")) builder.and(
+                ); else if (details.getValue().getOperator().equals(EQUALS_TO)) builder.and(
                     triggerDetails.triggerType.eq(details.getValue().getSearchValue())
-                ); else if (details.getValue().getOperator().equals("notEqual")) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL)) builder.and(
                     triggerDetails.triggerType.ne(details.getValue().getSearchValue())
                 );
             }
             if (details.getKey().replace("%20", "").trim().equals("nextFireTime")) {
                 Long date = dateStringToMillis(details.getValue().getSearchValue());
-                if (details.getValue().getOperator().equals("equals") && date != null) builder.and(
+                if (details.getValue().getOperator().equals(EQUALS_TO) && date != null) builder.and(
                     triggerDetails.nextFireTime.eq(date)
-                ); else if (details.getValue().getOperator().equals("notEqual") && date != null) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL) && date != null) builder.and(
                     triggerDetails.nextFireTime.ne(date)
-                ); else if (details.getValue().getOperator().equals("range")) {
+                ); else if (details.getValue().getOperator().equals(RANGE)) {
                     Long startDate = dateStringToMillis(details.getValue().getStartingValue());
                     Long endDate = dateStringToMillis(details.getValue().getEndingValue());
                     if (startDate != null && endDate != null) builder.and(
@@ -580,11 +581,11 @@ public class TriggerAppService implements ITriggerAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("prevFireTime")) {
                 Long date = dateStringToMillis(details.getValue().getSearchValue());
-                if (details.getValue().getOperator().equals("equals") && date != null) builder.and(
+                if (details.getValue().getOperator().equals(EQUALS_TO) && date != null) builder.and(
                     triggerDetails.prevFireTime.eq(date)
-                ); else if (details.getValue().getOperator().equals("notEqual") && date != null) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL) && date != null) builder.and(
                     triggerDetails.prevFireTime.ne(date)
-                ); else if (details.getValue().getOperator().equals("range")) {
+                ); else if (details.getValue().getOperator().equals(RANGE)) {
                     Long startDate = dateStringToMillis(details.getValue().getStartingValue());
                     Long endDate = dateStringToMillis(details.getValue().getEndingValue());
                     if (startDate != null && endDate != null) builder.and(
@@ -596,11 +597,11 @@ public class TriggerAppService implements ITriggerAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("startTime")) {
                 Long date = dateStringToMillis(details.getValue().getSearchValue());
-                if (details.getValue().getOperator().equals("equals") && date != null) builder.and(
+                if (details.getValue().getOperator().equals(EQUALS_TO) && date != null) builder.and(
                     triggerDetails.startTime.eq(date)
-                ); else if (details.getValue().getOperator().equals("notEqual") && date != null) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL) && date != null) builder.and(
                     triggerDetails.startTime.ne(date)
-                ); else if (details.getValue().getOperator().equals("range")) {
+                ); else if (details.getValue().getOperator().equals(RANGE)) {
                     Long startDate = dateStringToMillis(details.getValue().getStartingValue());
                     Long endDate = dateStringToMillis(details.getValue().getEndingValue());
                     if (startDate != null && endDate != null) builder.and(
@@ -612,11 +613,11 @@ public class TriggerAppService implements ITriggerAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("endTime")) {
                 Long date = dateStringToMillis(details.getValue().getSearchValue());
-                if (details.getValue().getOperator().equals("equals") && date != null) builder.and(
+                if (details.getValue().getOperator().equals(EQUALS_TO) && date != null) builder.and(
                     triggerDetails.endTime.eq(date)
-                ); else if (details.getValue().getOperator().equals("notEqual") && date != null) builder.and(
+                ); else if (details.getValue().getOperator().equals(NOT_EQUAL) && date != null) builder.and(
                     triggerDetails.endTime.ne(date)
-                ); else if (details.getValue().getOperator().equals("range")) {
+                ); else if (details.getValue().getOperator().equals(RANGE)) {
                     Long startDate = dateStringToMillis(details.getValue().getStartingValue());
                     Long endDate = dateStringToMillis(details.getValue().getEndingValue());
                     if (startDate != null && endDate != null) builder.and(
@@ -678,9 +679,9 @@ public class TriggerAppService implements ITriggerAppService {
         TriggerKey triggKey = trigger.getKey();
         String trigName = triggKey.getName();
         String trigGroup = triggKey.getGroup();
-        String trigType = quartzConstant.SIMPLE_TRIGGER;
-        if (trigger.getClass().toString().equals(quartzConstant.CRON_TRIGGER_CLASS)) trigType =
-            quartzConstant.CRON_TRIGGER;
+        String trigType = QuartzConstants.SIMPLE_TRIGGER;
+        if (trigger.getClass().toString().equals(QuartzConstants.CRON_TRIGGER_CLASS)) trigType =
+            QuartzConstants.CRON_TRIGGER;
 
         Date nextFireTime = trigger.getNextFireTime();
         Date endTime = trigger.getEndTime();

@@ -82,7 +82,7 @@ public class UserspermissionAppServiceTest {
     public void findUserspermissionById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Userspermission> nullOptional = Optional.ofNullable(null);
         Mockito.when(_userspermissionRepository.findById(any(UserspermissionId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(userspermissionId)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(userspermissionId)).isNull();
     }
 
     @Test
@@ -137,7 +137,7 @@ public class UserspermissionAppServiceTest {
         Mockito
             .when(_mapper.createUserspermissionInputToUserspermission(any(CreateUserspermissionInput.class)))
             .thenReturn(null);
-        Assertions.assertThat(_appService.create(userspermission)).isEqualTo(null);
+        Assertions.assertThat(_appService.create(userspermission)).isNull();
     }
 
     @Test
@@ -150,7 +150,7 @@ public class UserspermissionAppServiceTest {
         Mockito.when(_permissionRepository.findById(any(Long.class))).thenReturn(nullOptional);
 
         //		Mockito.when(_permissionRepository.findById(any(Long.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.create(userspermission)).isEqualTo(null);
+        Assertions.assertThat(_appService.create(userspermission)).isNull();
     }
 
     @Test
@@ -166,7 +166,7 @@ public class UserspermissionAppServiceTest {
         Mockito
             .when(_mapper.updateUserspermissionInputToUserspermission(any(UpdateUserspermissionInput.class)))
             .thenReturn(userspermission);
-        Assertions.assertThat(_appService.update(userspermissionId, userspermissionInput)).isEqualTo(null);
+        Assertions.assertThat(_appService.update(userspermissionId, userspermissionInput)).isNull();
     }
 
     @Test
@@ -188,7 +188,7 @@ public class UserspermissionAppServiceTest {
         Mockito.when(_permissionRepository.findById(any(Long.class))).thenReturn(nullOptional);
 
         //	Mockito.when(_permissionRepository.findById(any(Long.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.update(userspermissionId, userspermissionInput)).isEqualTo(null);
+        Assertions.assertThat(_appService.update(userspermissionId, userspermissionInput)).isNull();
     }
 
     @Test
@@ -308,7 +308,7 @@ public class UserspermissionAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     //Permission
@@ -332,7 +332,7 @@ public class UserspermissionAppServiceTest {
     public void GetPermission_IfUserspermissionIdAndPermissionIdIsNotNullAndUserspermissionDoesNotExist_ReturnNull() {
         Optional<Userspermission> nullOptional = Optional.ofNullable(null);
         Mockito.when(_userspermissionRepository.findById(any(UserspermissionId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getPermission(userspermissionId)).isEqualTo(null);
+        Assertions.assertThat(_appService.getPermission(userspermissionId)).isNull();
     }
 
     //Users
@@ -356,7 +356,7 @@ public class UserspermissionAppServiceTest {
     public void GetUsers_IfUserspermissionIdAndUsersIdIsNotNullAndUserspermissionDoesNotExist_ReturnNull() {
         Optional<Userspermission> nullOptional = Optional.ofNullable(null);
         Mockito.when(_userspermissionRepository.findById(any(UserspermissionId.class))).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getUsers(userspermissionId)).isEqualTo(null);
+        Assertions.assertThat(_appService.getUsers(userspermissionId)).isNull();
     }
 
     @Test
@@ -375,13 +375,13 @@ public class UserspermissionAppServiceTest {
     @Test
     public void ParseUserspermissionKey_KeysStringIsEmpty_ReturnNull() {
         String keyString = "";
-        Assertions.assertThat(_appService.parseUserspermissionKey(keyString)).isEqualTo(null);
+        Assertions.assertThat(_appService.parseUserspermissionKey(keyString)).isNull();
     }
 
     @Test
     public void ParseUserspermissionKey_KeysStringIsNotEmptyAndKeyValuePairDoesNotExist_ReturnNull() {
         String keyString = "permissionId";
 
-        Assertions.assertThat(_appService.parseUserspermissionKey(keyString)).isEqualTo(null);
+        Assertions.assertThat(_appService.parseUserspermissionKey(keyString)).isNull();
     }
 }

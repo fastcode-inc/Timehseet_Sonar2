@@ -74,7 +74,7 @@ public class TaskAppServiceTest {
     public void findTaskById_IdIsNotNullAndIdDoesNotExist_ReturnNull() {
         Optional<Task> nullOptional = Optional.ofNullable(null);
         Mockito.when(_taskRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.findById(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.findById(ID)).isNull();
     }
 
     @Test
@@ -237,7 +237,7 @@ public class TaskAppServiceTest {
 
     @Test
     public void search_StringIsNull_ReturnNull() throws Exception {
-        Assertions.assertThat(_appService.search(null)).isEqualTo(null);
+        Assertions.assertThat(_appService.search(null)).isNull();
     }
 
     //Project
@@ -259,7 +259,7 @@ public class TaskAppServiceTest {
     public void GetProject_IfTaskIdAndProjectIdIsNotNullAndTaskDoesNotExist_ReturnNull() {
         Optional<Task> nullOptional = Optional.ofNullable(null);
         Mockito.when(_taskRepository.findById(anyLong())).thenReturn(nullOptional);
-        Assertions.assertThat(_appService.getProject(ID)).isEqualTo(null);
+        Assertions.assertThat(_appService.getProject(ID)).isNull();
     }
 
     @Test

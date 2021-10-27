@@ -23,10 +23,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityNotFoundException;
+
 @Service("timesheetAppService")
 @RequiredArgsConstructor
 public class TimesheetAppService implements ITimesheetAppService {
 
+    public static final String CONTAINS = "contains";
+    public static final String EQUALS_TO = "equals";
+    public static final String NOT_EQUAL = "notEqual";
+    public static final String RANGE = "range";
     @Qualifier("timesheetRepository")
     @NonNull
     protected final ITimesheetRepository _timesheetRepository;
@@ -56,7 +62,6 @@ public class TimesheetAppService implements ITimesheetAppService {
 
             if (foundTimesheetstatus != null) {
                 foundTimesheetstatus.addTimesheets(timesheet);
-                //timesheet.setTimesheetstatus(foundTimesheetstatus);
             } else {
                 return null;
             }
@@ -68,7 +73,6 @@ public class TimesheetAppService implements ITimesheetAppService {
 
             if (foundUsers != null) {
                 foundUsers.addTimesheets(timesheet);
-                //timesheet.setUsers(foundUsers);
             } else {
                 return null;
             }
@@ -82,7 +86,12 @@ public class TimesheetAppService implements ITimesheetAppService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public UpdateTimesheetOutput update(Long timesheetId, UpdateTimesheetInput input) {
-        Timesheet existing = _timesheetRepository.findById(timesheetId).get();
+        Timesheet existing = null;
+        Optional<Timesheet> t = _timesheetRepository.findById(timesheetId);
+        if(t.isPresent())
+            existing = t.get();
+        else
+            throw new EntityNotFoundException("Entity not found");
 
         Timesheet timesheet = mapper.updateTimesheetInputToTimesheet(input);
         timesheet.setTimesheetdetailsSet(existing.getTimesheetdetailsSet());
@@ -94,7 +103,6 @@ public class TimesheetAppService implements ITimesheetAppService {
 
             if (foundTimesheetstatus != null) {
                 foundTimesheetstatus.addTimesheets(timesheet);
-                //	timesheet.setTimesheetstatus(foundTimesheetstatus);
             } else {
                 return null;
             }
@@ -107,7 +115,6 @@ public class TimesheetAppService implements ITimesheetAppService {
 
             if (foundUsers != null) {
                 foundUsers.addTimesheets(timesheet);
-                //	timesheet.setUsers(foundUsers);
             } else {
                 return null;
             }
@@ -222,19 +229,19 @@ public class TimesheetAppService implements ITimesheetAppService {
 
         for (Map.Entry<String, SearchFields> details : map.entrySet()) {
             if (details.getKey().replace("%20", "").trim().equals("id")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(timesheet.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheet.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheet.id.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())
@@ -253,17 +260,17 @@ public class TimesheetAppService implements ITimesheetAppService {
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("notes")) {
-                if (details.getValue().getOperator().equals("contains")) {
+                if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(timesheet.notes.likeIgnoreCase("%" + details.getValue().getSearchValue() + "%"));
-                } else if (details.getValue().getOperator().equals("equals")) {
+                } else if (details.getValue().getOperator().equals(EQUALS_TO)) {
                     builder.and(timesheet.notes.eq(details.getValue().getSearchValue()));
-                } else if (details.getValue().getOperator().equals("notEqual")) {
+                } else if (details.getValue().getOperator().equals(NOT_EQUAL)) {
                     builder.and(timesheet.notes.ne(details.getValue().getSearchValue()));
                 }
             }
             if (details.getKey().replace("%20", "").trim().equals("periodendingdate")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(
@@ -272,7 +279,7 @@ public class TimesheetAppService implements ITimesheetAppService {
                         )
                     );
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(
@@ -280,7 +287,7 @@ public class TimesheetAppService implements ITimesheetAppService {
                             SearchUtils.stringToLocalDate(details.getValue().getSearchValue())
                         )
                     );
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     LocalDate startLocalDate = SearchUtils.stringToLocalDate(details.getValue().getStartingValue());
                     LocalDate endLocalDate = SearchUtils.stringToLocalDate(details.getValue().getEndingValue());
                     if (startLocalDate != null && endLocalDate != null) {
@@ -294,7 +301,7 @@ public class TimesheetAppService implements ITimesheetAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("periodstartingdate")) {
                 if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(
@@ -303,7 +310,7 @@ public class TimesheetAppService implements ITimesheetAppService {
                         )
                     );
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     SearchUtils.stringToLocalDate(details.getValue().getSearchValue()) != null
                 ) {
                     builder.and(
@@ -311,7 +318,7 @@ public class TimesheetAppService implements ITimesheetAppService {
                             SearchUtils.stringToLocalDate(details.getValue().getSearchValue())
                         )
                     );
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     LocalDate startLocalDate = SearchUtils.stringToLocalDate(details.getValue().getStartingValue());
                     LocalDate endLocalDate = SearchUtils.stringToLocalDate(details.getValue().getEndingValue());
                     if (startLocalDate != null && endLocalDate != null) {
@@ -326,21 +333,21 @@ public class TimesheetAppService implements ITimesheetAppService {
 
             if (details.getKey().replace("%20", "").trim().equals("timesheetstatus")) {
                 if (
-                    details.getValue().getOperator().equals("contains") &&
+                    details.getValue().getOperator().equals(CONTAINS) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheet.timesheetstatus.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheet.timesheetstatus.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheet.timesheetstatus.id.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())
@@ -364,21 +371,21 @@ public class TimesheetAppService implements ITimesheetAppService {
             }
             if (details.getKey().replace("%20", "").trim().equals("users")) {
                 if (
-                    details.getValue().getOperator().equals("contains") &&
+                    details.getValue().getOperator().equals(CONTAINS) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheet.users.id.like(details.getValue().getSearchValue() + "%"));
                 } else if (
-                    details.getValue().getOperator().equals("equals") &&
+                    details.getValue().getOperator().equals(EQUALS_TO) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheet.users.id.eq(Long.valueOf(details.getValue().getSearchValue())));
                 } else if (
-                    details.getValue().getOperator().equals("notEqual") &&
+                    details.getValue().getOperator().equals(NOT_EQUAL) &&
                     StringUtils.isNumeric(details.getValue().getSearchValue())
                 ) {
                     builder.and(timesheet.users.id.ne(Long.valueOf(details.getValue().getSearchValue())));
-                } else if (details.getValue().getOperator().equals("range")) {
+                } else if (details.getValue().getOperator().equals(RANGE)) {
                     if (
                         StringUtils.isNumeric(details.getValue().getStartingValue()) &&
                         StringUtils.isNumeric(details.getValue().getEndingValue())

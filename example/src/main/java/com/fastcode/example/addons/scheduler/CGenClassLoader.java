@@ -30,7 +30,6 @@ public class CGenClassLoader extends ClassLoader {
                         qalifiedName = qalifiedName.replace(".class", "").replace("/", ".");
                         classFiles.put(qalifiedName, filePath);
                     }
-                    System.out.println("Processing file:" + file);
                     return FileVisitResult.CONTINUE;
                 }
 
@@ -47,9 +46,8 @@ public class CGenClassLoader extends ClassLoader {
     String path = ".";
     String packageName = "";
 
-    public CGenClassLoader(String path) {
+    public CGenClassLoader(String path) throws MalformedURLException {
         this.path = path;
-        System.out.println(" path " + path);
         try {
             classLoader =
                 new URLClassLoader(
@@ -57,7 +55,7 @@ public class CGenClassLoader extends ClassLoader {
                     Thread.currentThread().getContextClassLoader()
                 );
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -82,7 +80,6 @@ public class CGenClassLoader extends ClassLoader {
                 Class<?> cs = classLoader.loadClass(entry.getKey());
                 Class[] interfaces = cs.getInterfaces();
                 for (Class str : interfaces) {
-                    System.out.println(" a " + str.getName().replace(" ", ""));
                     if (str.getName().replace(" ", "").equals("org.quartz.Job")) {
                         classes.add(cs);
                     }
@@ -111,7 +108,6 @@ public class CGenClassLoader extends ClassLoader {
             while (e.hasMoreElements()) {
                 JarEntry je = (JarEntry) e.nextElement();
                 String filePath = je.getName();
-                System.out.println("filepath:" + filePath);
                 if (
                     je.isDirectory() ||
                     (!packagePath.isEmpty() && !filePath.contains(packagePath)) ||
@@ -124,7 +120,6 @@ public class CGenClassLoader extends ClassLoader {
                 qalifiedName = qalifiedName.replace(".class", "").replace("/", ".");
                 qalifiedName = qalifiedName.replace(".class", "").replace("/", ".");
                 classFiles.put(qalifiedName, filePath);
-                System.out.println(qalifiedName + ":" + filePath);
             }
             jarFile.close();
             return classFiles;

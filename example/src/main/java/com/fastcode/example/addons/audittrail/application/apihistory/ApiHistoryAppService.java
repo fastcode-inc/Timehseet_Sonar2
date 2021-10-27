@@ -26,10 +26,6 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class ApiHistoryAppService implements IApiHistoryAppService {
 
-    static final int case1 = 1;
-    static final int case2 = 2;
-    static final int case3 = 3;
-
     @Autowired
     private IApiHistoryManager _apiHistoryManager;
 
@@ -53,16 +49,15 @@ public class ApiHistoryAppService implements IApiHistoryAppService {
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public List<ApiHistoryEntity> find(SearchCriteria search, Pageable pageable) throws Exception {
+    public List<ApiHistoryEntity> find(SearchCriteria search, Pageable pageable) {
         Page<ApiHistoryEntity> foundApiHistory = _apiHistoryManager.findAll(search(search), pageable);
         List<ApiHistoryEntity> apiHistoryList = foundApiHistory.getContent();
 
         return apiHistoryList;
     }
 
-    public BooleanBuilder search(SearchCriteria search) throws Exception {
+    public BooleanBuilder search(SearchCriteria search)  {
         QApiHistoryEntity apiHistory = QApiHistoryEntity.apiHistoryEntity;
-        // apiHistory.requestTime.desc();
         if (search != null) {
             Map<String, SearchFields> map = new HashMap<>();
             for (SearchFields fieldDetails : search.getFields()) {
@@ -75,12 +70,8 @@ public class ApiHistoryAppService implements IApiHistoryAppService {
         return null;
     }
 
-    public void checkProperties(List<String> list) throws Exception {
-        //		for (int i = 0; i < list.size(); i++) {
-        //			if (!(list.get(i).replace("%20", "").trim().equals("id") || list.get(i).replace("%20", "").trim().equals("name") || list.get(i).replace("%20", "").trim().equals("pets"))) {
-        //				throw new Exception("Wrong URL Format: Property " + list.get(i) + " not found!");
-        //			}
-        //		}
+    public void checkProperties(List<String> list) {
+
     }
 
     public BooleanBuilder searchKeyValuePair(

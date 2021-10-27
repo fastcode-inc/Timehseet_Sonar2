@@ -61,7 +61,6 @@ public class EmailTemplateController {
         FindEmailTemplateByNameOutput foundEmail = emailTemplateAppService.findByName(email.getTemplateName());
 
         if (foundEmail != null) {
-            logHelper.getLogger().error("There already exists a email with a name=%s", email.getTemplateName());
             throw new EntityExistsException(
                 String.format("There already exists a user with email address=%s", email.getTemplateName())
             );
@@ -69,7 +68,6 @@ public class EmailTemplateController {
         if (email.getContentJson() != null) {
             String html = emailTemplateAppService.convertJsonToHtml(email.getContentJson());
             email.setContentHtml(html);
-            //emailService.sendSimpleMessage(email.getTo(), email.getSubject(),html);
 
         }
         return new ResponseEntity(emailTemplateAppService.create(email), HttpStatus.CREATED);
@@ -105,7 +103,6 @@ public class EmailTemplateController {
             .orElseThrow(
                 () -> new EntityNotFoundException(String.format("Unable to update. Email with id=%s not found.", id))
             );
-        //  email.setVersiono(currentEmail.getVersiono());
 
         return new ResponseEntity(emailTemplateAppService.update(Long.valueOf(id), email), HttpStatus.OK);
     }
@@ -139,7 +136,6 @@ public class EmailTemplateController {
         if (limit == null) {
             limit = env.getProperty("fastCode.limit.default");
         }
-        //if (sort.isUnsorted()) { sort = new Sort(Sort.Direction.fromString(env.getProperty("fastCode.sort.direction.default")), new String[]{env.getProperty("fastCode.sort.property.default")}); }
 
         Pageable Pageable = new OffsetBasedPageRequest(Integer.parseInt(offset), Integer.parseInt(limit), sort);
         SearchCriteria searchCriteria = SearchUtils.generateSearchCriteriaObject(search);
