@@ -29,7 +29,7 @@ public class AuthenticationController {
     protected final HttpServletResponse response;
 
     @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    public ResponseEntity logout() throws Exception {
+    public ResponseEntity logout()  {
         String token = request.getHeader(SecurityConstants.HEADER_STRING);
         _jwtAppService.deleteToken(token);
 
@@ -51,6 +51,6 @@ public class AuthenticationController {
 
     @RequestMapping(method = RequestMethod.OPTIONS)
     public ResponseEntity getCsrfToken(HttpServletRequest request) {
-        return new ResponseEntity(null, HttpStatus.OK);
+        return new ResponseEntity("", HttpStatus.OK);
     }
 }

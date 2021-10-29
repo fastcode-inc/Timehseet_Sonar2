@@ -114,7 +114,9 @@ public class DashboarduserAppService implements IDashboarduserAppService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void delete(DashboarduserId dashboarduserId) {
         Dashboarduser existing = _dashboarduserRepository.findById(dashboarduserId).orElse(null);
-        _dashboarduserRepository.delete(existing);
+        if(existing !=null) {
+            _dashboarduserRepository.delete(existing);
+        }
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)

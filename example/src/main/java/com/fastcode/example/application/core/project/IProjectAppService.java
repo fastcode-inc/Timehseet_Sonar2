@@ -2,6 +2,8 @@ package com.fastcode.example.application.core.project;
 
 import com.fastcode.example.application.core.project.dto.*;
 import com.fastcode.example.commons.search.SearchCriteria;
+
+import java.net.MalformedURLException;
 import java.util.*;
 import org.springframework.data.domain.Pageable;
 
@@ -14,7 +16,7 @@ public interface IProjectAppService {
     UpdateProjectOutput update(Long id, UpdateProjectInput input);
 
     FindProjectByIdOutput findById(Long id);
-    List<FindProjectByIdOutput> find(SearchCriteria search, Pageable pageable) throws Exception;
+    List<FindProjectByIdOutput> find(SearchCriteria search, Pageable pageable) throws MalformedURLException;
     //Relationship Operations
 
     GetCustomerOutput getCustomer(Long projectid);

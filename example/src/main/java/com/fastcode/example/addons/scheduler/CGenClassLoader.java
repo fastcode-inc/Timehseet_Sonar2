@@ -11,6 +11,8 @@ import java.util.jar.*;
 
 public class CGenClassLoader extends ClassLoader {
 
+    public static final String CLASS = ".class";
+
     public static Map<String, String> retrieveClasses(Path rootDir, String packageName) throws IOException {
         Map<String, String> classFiles = new HashMap<String, String>();
         String packagePath = packageName == null ? "" : packageName.replace('.', '/');
@@ -21,13 +23,13 @@ public class CGenClassLoader extends ClassLoader {
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
                     String filePath = file.toString().replace('\\', '/');
                     if (
-                        filePath.endsWith(".class") &&
-                        (packagePath == null || packagePath.isEmpty() || filePath.contains(packagePath))
+                        filePath.endsWith(CLASS) &&
+                        (packagePath.isEmpty() || filePath.contains(packagePath))
                     ) {
                         String qalifiedName = packagePath.isEmpty()
                             ? filePath.replace(rootDir.toString().replace('\\', '/') + "/", "")
                             : filePath.substring(filePath.indexOf(packagePath));
-                        qalifiedName = qalifiedName.replace(".class", "").replace("/", ".");
+                        qalifiedName = qalifiedName.replace(CLASS, "").replace("/", ".");
                         classFiles.put(qalifiedName, filePath);
                     }
                     return FileVisitResult.CONTINUE;
@@ -79,8 +81,9 @@ public class CGenClassLoader extends ClassLoader {
             for (Map.Entry<String, String> entry : classFiles.entrySet()) {
                 Class<?> cs = classLoader.loadClass(entry.getKey());
                 Class[] interfaces = cs.getInterfaces();
-                for (Class str : interfaces) {
-                    if (str.getName().replace(" ", "").equals("org.quartz.Job")) {
+                for (Class<?> str : interfaces) {
+
+                    if(str.getClass().isAssignableFrom(org.quartz.Job.class)){
                         classes.add(cs);
                     }
                 }
@@ -98,10 +101,12 @@ public class CGenClassLoader extends ClassLoader {
     }
 
     private Map<String, String> findClassesFromJar(String packageName) {
-        try {
+
             String packagePath = packageName == null ? "" : packageName.replace('.', '/');
-            JarFile jarFile = new JarFile(this.path);
-            Enumeration e = jarFile.entries();
+        JarFile jarFile = null;
+        try {
+            jarFile = new JarFile(this.path);
+        Enumeration<java.util.jar.JarEntry> e = jarFile.entries();
 
             Map<String, String> classFiles = new HashMap<String, String>();
             String qalifiedName;
@@ -111,21 +116,22 @@ public class CGenClassLoader extends ClassLoader {
                 if (
                     je.isDirectory() ||
                     (!packagePath.isEmpty() && !filePath.contains(packagePath)) ||
-                    !filePath.endsWith(".class")
+                    !filePath.endsWith(CLASS)
                 ) {
                     continue;
                 }
                 qalifiedName =
                     filePath.indexOf("classes/") > 0 ? filePath.substring(filePath.indexOf("classes/") + 8) : filePath;
-                qalifiedName = qalifiedName.replace(".class", "").replace("/", ".");
-                qalifiedName = qalifiedName.replace(".class", "").replace("/", ".");
+                qalifiedName = qalifiedName.replace(CLASS, "").replace("/", ".");
+                qalifiedName = qalifiedName.replace(CLASS, "").replace("/", ".");
                 classFiles.put(qalifiedName, filePath);
             }
             jarFile.close();
+
             return classFiles;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
+        } catch (IOException e) {
+            return new HashMap<>();
         }
+
     }
 }

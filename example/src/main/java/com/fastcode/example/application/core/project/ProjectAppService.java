@@ -9,6 +9,8 @@ import com.fastcode.example.domain.core.project.IProjectRepository;
 import com.fastcode.example.domain.core.project.Project;
 import com.fastcode.example.domain.core.project.QProject;
 import com.querydsl.core.BooleanBuilder;
+
+import java.net.MalformedURLException;
 import java.time.*;
 import java.util.*;
 import lombok.NonNull;
@@ -126,7 +128,7 @@ public class ProjectAppService implements IProjectAppService {
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public List<FindProjectByIdOutput> find(SearchCriteria search, Pageable pageable) throws Exception {
+    public List<FindProjectByIdOutput> find(SearchCriteria search, Pageable pageable) throws MalformedURLException {
         Page<Project> foundProject = _projectRepository.findAll(search(search), pageable);
         List<Project> projectList = foundProject.getContent();
         Iterator<Project> projectIterator = projectList.iterator();
@@ -139,7 +141,7 @@ public class ProjectAppService implements IProjectAppService {
         return output;
     }
 
-    protected BooleanBuilder search(SearchCriteria search) throws Exception {
+    protected BooleanBuilder search(SearchCriteria search) throws MalformedURLException {
         QProject project = QProject.projectEntity;
         if (search != null) {
             Map<String, SearchFields> map = new HashMap<>();
@@ -153,7 +155,7 @@ public class ProjectAppService implements IProjectAppService {
         return null;
     }
 
-    protected void checkProperties(List<String> list) throws Exception {
+    protected void checkProperties(List<String> list) throws MalformedURLException {
         for (int i = 0; i < list.size(); i++) {
             if (
                 !(
@@ -166,7 +168,7 @@ public class ProjectAppService implements IProjectAppService {
                     list.get(i).replace("%20", "").trim().equals("startdate")
                 )
             ) {
-                throw new Exception("Wrong URL Format: Property " + list.get(i) + " not found!");
+                throw new MalformedURLException("Wrong URL Format: Property " + list.get(i) + " not found!");
             }
         }
     }

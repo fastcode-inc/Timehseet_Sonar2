@@ -182,6 +182,7 @@ public class CustomerAppServiceTest {
     @Test
     public void search_SearchIsNotNullAndSearchContainsCaseThree_ReturnBooleanBuilder() throws Exception {
         Map<String, SearchFields> map = new HashMap<>();
+
         QCustomer customer = QCustomer.customerEntity;
         List<SearchFields> fieldsList = new ArrayList<>();
         SearchFields fields = new SearchFields();

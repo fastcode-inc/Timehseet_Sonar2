@@ -8,6 +8,8 @@ import com.fastcode.example.commons.logging.LoggingHelper;
 import com.fastcode.example.commons.search.OffsetBasedPageRequest;
 import com.fastcode.example.commons.search.SearchCriteria;
 import com.fastcode.example.commons.search.SearchUtils;
+
+import java.net.MalformedURLException;
 import java.util.*;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
@@ -45,7 +47,7 @@ public class CustomerController {
     @RequestMapping(method = RequestMethod.POST, consumes = { "application/json" }, produces = { "application/json" })
     public ResponseEntity<CreateCustomerOutput> create(@RequestBody @Valid CreateCustomerInput customer) {
         CreateCustomerOutput output = _customerAppService.create(customer);
-        return new ResponseEntity(output, HttpStatus.OK);
+        return new ResponseEntity<>(output, HttpStatus.OK);
     }
 
     // ------------ Delete customer ------------
@@ -137,7 +139,7 @@ public class CustomerController {
         @RequestParam(value = "limit", required = false) String limit,
         Sort sort
     )
-        throws Exception {
+            throws EntityNotFoundException, MalformedURLException {
         if (offset == null) {
             offset = env.getProperty("fastCode.offset.default");
         }
@@ -158,6 +160,6 @@ public class CustomerController {
         List<FindProjectByIdOutput> output = _projectAppService.find(searchCriteria, pageable);
         Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
 
-        return new ResponseEntity(output, HttpStatus.OK);
+        return new ResponseEntity<>(output, HttpStatus.OK);
     }
 }

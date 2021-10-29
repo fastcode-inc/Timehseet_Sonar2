@@ -12,7 +12,10 @@ import com.fastcode.example.domain.core.usertask.UsertaskId;
 import java.time.*;
 import java.util.*;
 import javax.persistence.EntityNotFoundException;
+import javax.swing.text.html.Option;
 import javax.validation.Valid;
+
+import liquibase.pro.packaged.F;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -51,7 +54,7 @@ public class UsertaskController {
     @RequestMapping(method = RequestMethod.POST, consumes = { "application/json" }, produces = { "application/json" })
     public ResponseEntity<CreateUsertaskOutput> create(@RequestBody @Valid CreateUsertaskInput usertask) {
         CreateUsertaskOutput output = _usertaskAppService.create(usertask);
-        return new ResponseEntity(output, HttpStatus.OK);
+        return new ResponseEntity<>(output, HttpStatus.OK);
     }
 
     // ------------ Delete usertask ------------
@@ -60,16 +63,15 @@ public class UsertaskController {
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, consumes = { "application/json" })
     public void delete(@PathVariable String id) {
         UsertaskId usertaskid = _usertaskAppService.parseUsertaskKey(id);
-        Optional
-            .ofNullable(usertaskid)
-            .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid id=%s", id)));
+        if(usertaskid ==null) {
+            throw new EntityNotFoundException(String.format("Invalid id=%s", id));
+        }
 
         FindUsertaskByIdOutput output = _usertaskAppService.findById(usertaskid);
-        Optional
-            .ofNullable(output)
-            .orElseThrow(
-                () -> new EntityNotFoundException(String.format("There does not exist a usertask with a id=%s", id))
-            );
+
+        if(output == null) {
+            throw new EntityNotFoundException(String.format("There does not exist a usertask with a id=%s", id));
+        }
 
         _usertaskAppService.delete(usertaskid);
     }
@@ -100,8 +102,7 @@ public class UsertaskController {
             );
 
         usertask.setVersiono(currentUsertask.getVersiono());
-        UpdateUsertaskOutput output = _usertaskAppService.update(usertaskid, usertask);
-        return new ResponseEntity(output, HttpStatus.OK);
+        return new ResponseEntity<>(_usertaskAppService.update(usertaskid, usertask), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyAuthority('USERTASKENTITY_READ')")
@@ -118,14 +119,14 @@ public class UsertaskController {
             .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid id=%s", id)));
 
         FindUsertaskByIdOutput output = _usertaskAppService.findById(usertaskid);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
-        return new ResponseEntity(output, HttpStatus.OK);
+        return new ResponseEntity<>(output, HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyAuthority('USERTASKENTITY_READ')")
     @RequestMapping(method = RequestMethod.GET, consumes = { "application/json" }, produces = { "application/json" })
-    public ResponseEntity find(
+    public ResponseEntity<List<FindUsertaskByIdOutput>> find(
         @RequestParam(value = "search", required = false) String search,
         @RequestParam(value = "offset", required = false) String offset,
         @RequestParam(value = "limit", required = false) String limit,
@@ -142,7 +143,7 @@ public class UsertaskController {
         Pageable Pageable = new OffsetBasedPageRequest(Integer.parseInt(offset), Integer.parseInt(limit), sort);
         SearchCriteria searchCriteria = SearchUtils.generateSearchCriteriaObject(search);
 
-        return ResponseEntity.ok(_usertaskAppService.find(searchCriteria, Pageable));
+        return new ResponseEntity<>(_usertaskAppService.find(searchCriteria, Pageable), HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyAuthority('USERTASKENTITY_READ')")
@@ -159,9 +160,9 @@ public class UsertaskController {
             .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid id=%s", id)));
 
         GetTaskOutput output = _usertaskAppService.getTask(usertaskid);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
-        return new ResponseEntity(output, HttpStatus.OK);
+        return new ResponseEntity<>(output, HttpStatus.OK);
     }
 
     @PreAuthorize("hasAnyAuthority('USERTASKENTITY_READ')")
@@ -178,8 +179,8 @@ public class UsertaskController {
             .orElseThrow(() -> new EntityNotFoundException(String.format("Invalid id=%s", id)));
 
         GetUsersOutput output = _usertaskAppService.getUsers(usertaskid);
-        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException(String.format("Not found")));
+        Optional.ofNullable(output).orElseThrow(() -> new EntityNotFoundException("Not found"));
 
-        return new ResponseEntity(output, HttpStatus.OK);
+        return new ResponseEntity<>(output, HttpStatus.OK);
     }
 }

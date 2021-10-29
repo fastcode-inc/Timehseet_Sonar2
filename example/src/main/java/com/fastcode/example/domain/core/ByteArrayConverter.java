@@ -21,8 +21,7 @@ public class ByteArrayConverter implements AttributeConverter<Object, byte[]> {
             }
             return b.toByteArray();
         } catch (IOException e1) {
-            e1.printStackTrace();
-            return null;
+            return new byte[]{};
         }
     }
 
@@ -32,12 +31,10 @@ public class ByteArrayConverter implements AttributeConverter<Object, byte[]> {
             try (ObjectInputStream o = new ObjectInputStream(b)) {
                 return o.readObject();
             } catch (IOException | ClassNotFoundException e) {
-                e.printStackTrace();
-                return null;
+                return new Object[]{};
             }
         } catch (IOException e1) {
-            e1.printStackTrace();
-            return null;
+            return new Object[]{};
         }
     }
 }

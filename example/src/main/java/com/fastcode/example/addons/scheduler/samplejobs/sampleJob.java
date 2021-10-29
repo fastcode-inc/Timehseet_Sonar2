@@ -9,6 +9,7 @@ public class sampleJob implements Job {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
+            return;
         }
     }
 }

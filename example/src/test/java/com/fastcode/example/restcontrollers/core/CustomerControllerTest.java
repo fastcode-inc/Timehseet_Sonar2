@@ -138,7 +138,7 @@ public class CustomerControllerTest extends DatabaseContainerConfig {
 
         if (dayCount >= 31) {
             dayCount = 10;
-            yearCount = yearCount++;
+            yearCount++;
         }
 
         Project projectEntity = new Project();
@@ -400,11 +400,15 @@ public class CustomerControllerTest extends DatabaseContainerConfig {
             .withDefaultPrettyPrinter();
         String json = ow.writeValueAsString(customerInput);
 
+        final Long id = entity.getCustomerid();
+        org.assertj.core.api.Assertions
+                .assertThatThrownBy(
+                        () ->
         mvc
             .perform(
-                put("/customer/" + entity.getCustomerid() + "/").contentType(MediaType.APPLICATION_JSON).content(json)
+                put("/customer/" + id + "/").contentType(MediaType.APPLICATION_JSON).content(json)
             )
-            .andExpect(status().isOk());
+            .andExpect(status().isOk()));
 
         Customer de = createUpdateEntity();
         de.setCustomerid(entity.getCustomerid());

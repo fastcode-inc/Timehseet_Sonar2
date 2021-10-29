@@ -227,7 +227,7 @@ public class DashboardAppService implements IDashboardAppService {
             _dashboardversionRepository.findById(new DashboardversionId(userId, dashboardId, RUNNING)).orElse(null)
         );
         existing.removeDashboardversion(
-            _dashboardversionRepository.findById(new DashboardversionId(userId, dashboardId, PUBLISHED)).get()
+            _dashboardversionRepository.findById(new DashboardversionId(userId, dashboardId, PUBLISHED)).orElse(null)
         );
 
         _dashboardversionAppservice.delete(new DashboardversionId(userId, dashboardId, RUNNING));
@@ -248,12 +248,14 @@ public class DashboardAppService implements IDashboardAppService {
     public void deleteReportFromDashboard(Long dashboardId, Long reportId, Long userId) {
         Dashboardversionreport existing = _reportDashboardRepository
             .findById(new DashboardversionreportId(dashboardId, userId, RUNNING, reportId))
-            .get();
+            .orElse(null);
 
-        _dashboardversionRepository
+        Dashboardversion dv = _dashboardversionRepository
             .findById(new DashboardversionId(userId, dashboardId, RUNNING))
-            .get()
-            .removeDashboardversionreport(existing);
+            .orElse(null);
+        if(dv !=null) {
+            dv.removeDashboardversionreport(existing);
+        }
         _reportRepository.findByReportIdAndUsersId(reportId, userId).removeDashboardversionreport(existing);
 
         _reportDashboardAppService.delete(new DashboardversionreportId(dashboardId, userId, RUNNING, reportId));
@@ -1699,15 +1701,17 @@ public class DashboardAppService implements IDashboardAppService {
                         details.getValue().getSearchValue().equalsIgnoreCase("true") ||
                         details.getValue().getSearchValue().equalsIgnoreCase("false")
                     )
-                ) builder.and(
+                ) {
+                    builder.and(
                     dashboard.isPublished.eq(Boolean.parseBoolean(details.getValue().getSearchValue()))
-                ); else if (
+                ); }
+                else if (
                     details.getValue().getOperator().equals("notEqual") &&
                     (
                         details.getValue().getSearchValue().equalsIgnoreCase("true") ||
                         details.getValue().getSearchValue().equalsIgnoreCase("false")
                     )
-                ) builder.and(dashboard.isPublished.ne(Boolean.parseBoolean(details.getValue().getSearchValue())));
+                ) { builder.and(dashboard.isPublished.ne(Boolean.parseBoolean(details.getValue().getSearchValue())));}
             }
         }
 

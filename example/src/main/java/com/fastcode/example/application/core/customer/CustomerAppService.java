@@ -7,6 +7,8 @@ import com.fastcode.example.domain.core.customer.Customer;
 import com.fastcode.example.domain.core.customer.ICustomerRepository;
 import com.fastcode.example.domain.core.customer.QCustomer;
 import com.querydsl.core.BooleanBuilder;
+
+import java.net.MalformedURLException;
 import java.util.*;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityNotFoundException;
 
 @Service("customerAppService")
 @RequiredArgsConstructor
@@ -50,6 +54,9 @@ public class CustomerAppService implements ICustomerAppService {
         Optional<Customer> c = _customerRepository.findById(customerId);
         if(c.isPresent())
             existing = c.get();
+        else {
+            throw new EntityNotFoundException("Entity not found");
+        }
 
         Customer customer = mapper.updateCustomerInputToCustomer(input);
         customer.setProjectsSet(existing.getProjectsSet());
@@ -61,8 +68,9 @@ public class CustomerAppService implements ICustomerAppService {
     @Transactional(propagation = Propagation.REQUIRED)
     public void delete(Long customerId) {
         Customer existing = _customerRepository.findById(customerId).orElse(null);
-
-        _customerRepository.delete(existing);
+        if(existing !=null) {
+            _customerRepository.delete(existing);
+        }
     }
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -111,7 +119,7 @@ public class CustomerAppService implements ICustomerAppService {
                     list.get(i).replace("%20", "").trim().equals("name")
                 )
             ) {
-                throw new Exception("Wrong URL Format: Property " + list.get(i) + " not found!");
+                throw new MalformedURLException("Wrong URL Format: Property " + list.get(i) + " not found!");
             }
         }
     }
@@ -122,8 +130,9 @@ public class CustomerAppService implements ICustomerAppService {
         Map<String, String> joinColumns
     ) {
         BooleanBuilder builder = new BooleanBuilder();
-
-        for (Map.Entry<String, SearchFields> details : map.entrySet()) {
+        Iterator<Map.Entry<String, SearchFields>> iterator = map.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<String, SearchFields> details = iterator.next();
             if (details.getKey().replace("%20", "").trim().equals("customerid")) {
                 if (details.getValue().getOperator().equals(CONTAINS)) {
                     builder.and(customer.customerid.like(details.getValue().getSearchValue() + "%"));
